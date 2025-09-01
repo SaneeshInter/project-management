@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: pm-postgres
+    environment:
+      POSTGRES_DB: project_management
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pm-backend
+    environment:
+      DATABASE_URL: "postgresql://postgres:password123@postgres:5432/project_management"
+      JWT_SECRET: "your-super-secret-jwt-key-here"
+      JWT_EXPIRES_IN: "7d"
+      PORT: 3001
+      NODE_ENV: "production"
+      FRONTEND_URL: "http://localhost:3000"
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: sh -c "npx prisma migrate deploy && npx prisma db seed && npm run start:prod"
+
+  # Frontend App
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pm-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:3001/api
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: project-management-network

@@ -1,0 +1,57 @@
+{
+  "name": "project-management-system",
+  "version": "1.0.0",
+  "description": "Full-stack project management system for IT companies",
+  "private": true,
+  "scripts": {
+    "start": "./start.sh",
+    "start:docker": "./start.sh docker",
+    "start:docker-dev": "./start.sh docker-dev",
+    "start:manual": "./start.sh manual",
+    "setup": "./scripts/setup.sh",
+    "reset": "./scripts/reset.sh",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "build:all": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "dev:backend": "cd backend && npm run start:dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "db:migrate": "cd backend && npx prisma migrate dev",
+    "db:generate": "cd backend && npx prisma generate",
+    "db:seed": "cd backend && npm run db:seed",
+    "db:studio": "cd backend && npm run db:studio",
+    "db:reset": "cd backend && npx prisma migrate reset",
+    "lint:all": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:frontend": "cd frontend && npm run lint",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up",
+    "docker:down": "docker-compose down && docker-compose -f docker-compose.dev.yml down"
+  },
+  "workspaces": [
+    "backend",
+    "frontend",
+    "shared"
+  ],
+  "keywords": [
+    "project-management",
+    "react",
+    "nestjs",
+    "typescript",
+    "postgresql",
+    "docker"
+  ],
+  "author": "Intersmart Office",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/project-management.git"
+  }
+}

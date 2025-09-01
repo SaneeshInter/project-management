@@ -1,0 +1,120 @@
+import { PrismaService } from '../database/prisma.service';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
+import { User } from '@prisma/client';
+export declare class CommentsService {
+    private prisma;
+    constructor(prisma: PrismaService);
+    create(createCommentDto: CreateCommentDto, user: User): Promise<{
+        project: {
+            name: string;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            office: string;
+            category: import(".prisma/client").$Enums.ProjectCategory;
+            pagesCount: number | null;
+            targetDate: Date;
+            status: import(".prisma/client").$Enums.ProjectStatus;
+            ownerId: string;
+            clientName: string | null;
+            observations: string | null;
+            monthsPassed: number;
+            startDate: Date;
+            deviationReason: string | null;
+            dependency: boolean;
+            currentDepartment: import(".prisma/client").$Enums.Department;
+            nextDepartment: import(".prisma/client").$Enums.Department | null;
+            projectCode: string;
+        };
+        task: {
+            description: string | null;
+            title: string;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import(".prisma/client").$Enums.TaskStatus;
+            projectId: string;
+            priority: import(".prisma/client").$Enums.Priority;
+            dueDate: Date | null;
+            assigneeId: string | null;
+        };
+        author: {
+            name: string;
+            email: string;
+            id: string;
+        };
+    } & {
+        id: string;
+        createdAt: Date;
+        content: string;
+        projectId: string | null;
+        authorId: string;
+        taskId: string | null;
+    }>;
+    findAll(projectId?: string, taskId?: string, user?: User): Promise<({
+        project: {
+            name: string;
+            id: string;
+        };
+        task: {
+            title: string;
+            id: string;
+        };
+        author: {
+            name: string;
+            email: string;
+            id: string;
+        };
+    } & {
+        id: string;
+        createdAt: Date;
+        content: string;
+        projectId: string | null;
+        authorId: string;
+        taskId: string | null;
+    })[]>;
+    findOne(id: string, user: User): Promise<{
+        project: {
+            name: string;
+            id: string;
+            ownerId: string;
+        };
+        task: {
+            project: {
+                ownerId: string;
+            };
+            title: string;
+            id: string;
+        };
+        author: {
+            name: string;
+            email: string;
+            id: string;
+        };
+    } & {
+        id: string;
+        createdAt: Date;
+        content: string;
+        projectId: string | null;
+        authorId: string;
+        taskId: string | null;
+    }>;
+    update(id: string, updateCommentDto: UpdateCommentDto, user: User): Promise<{
+        author: {
+            name: string;
+            email: string;
+            id: string;
+        };
+    } & {
+        id: string;
+        createdAt: Date;
+        content: string;
+        projectId: string | null;
+        authorId: string;
+        taskId: string | null;
+    }>;
+    remove(id: string, user: User): Promise<{
+        message: string;
+    }>;
+}
