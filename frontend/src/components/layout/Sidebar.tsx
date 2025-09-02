@@ -25,9 +25,9 @@ export default function Sidebar() {
   const getFilteredNavigation = () => {
     if (!user) return [];
     
-    // Super users (ADMIN and PROJECT_MANAGER) see all menus
-    if (user.role === Role.ADMIN || user.role === Role.PROJECT_MANAGER || 
-        user.role === 'ADMIN' || user.role === 'PROJECT_MANAGER') {
+    // Super users (ADMIN, SU_ADMIN and PROJECT_MANAGER) see all menus
+    if (user.role === Role.ADMIN || user.role === Role.SU_ADMIN || user.role === Role.PROJECT_MANAGER || 
+        user.role === 'ADMIN' || user.role === 'SU_ADMIN' || user.role === 'PROJECT_MANAGER') {
       return allNavigation;
     }
     

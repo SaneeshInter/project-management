@@ -168,7 +168,7 @@ export class ProjectsService {
     if (roleCode === 'CLIENT') {
       // Clients only see their own projects
       where = { ownerId: userId };
-    } else if (roleCode === 'ADMIN' || roleCode === 'PROJECT_MANAGER') {
+    } else if (roleCode === 'ADMIN' || roleCode === 'SU_ADMIN' || roleCode === 'PROJECT_MANAGER') {
       // Super users see all projects
       where = {};
     } else if (userWithDept?.departmentMaster?.code === 'PMO') {

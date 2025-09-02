@@ -153,7 +153,7 @@ let ProjectsService = class ProjectsService {
         if (roleCode === 'CLIENT') {
             where = { ownerId: userId };
         }
-        else if (roleCode === 'ADMIN' || roleCode === 'PROJECT_MANAGER') {
+        else if (roleCode === 'ADMIN' || roleCode === 'SU_ADMIN' || roleCode === 'PROJECT_MANAGER') {
             where = {};
         }
         else if (userWithDept?.departmentMaster?.code === 'PMO') {
