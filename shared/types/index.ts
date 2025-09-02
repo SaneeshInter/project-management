@@ -8,6 +8,15 @@ export enum Role {
   HTML_DEVELOPER = 'HTML_DEVELOPER',
   QA_TESTER = 'QA_TESTER',
   CLIENT = 'CLIENT',
+  PC = 'PC',
+  TESTER = 'TESTER',
+  PHP_TL1 = 'PHP_TL1',
+  PHP_TL2 = 'PHP_TL2',
+  REACT_TL = 'REACT_TL',
+  HTML_TL = 'HTML_TL',
+  PC_TL1 = 'PC_TL1',
+  PC_TL2 = 'PC_TL2',
+  DESIGN_TL = 'DESIGN_TL',
 }
 
 export enum ProjectCategory {
@@ -119,6 +128,8 @@ export interface User {
   avatar?: string;
   createdAt: string;
   updatedAt: string;
+  roleMaster?: RoleMaster;
+  departmentMaster?: DepartmentMaster;
 }
 
 // Employee types (extends User with additional employee management fields)
@@ -234,11 +245,16 @@ export interface Project {
   updatedAt: string;
   owner: User;
   ownerId: string;
+  projectCoordinatorId?: string;
+  pcTeamLeadId?: string;
+  projectCoordinator?: User;
+  pcTeamLead?: User;
   customFields?: CustomField[];
   tasks?: Task[];
   comments?: Comment[];
   departmentHistory?: ProjectDepartmentHistory[];
   assignments?: ProjectAssignment[];
+  assignmentHistory?: ProjectAssignmentHistory[];
   _count?: {
     tasks: number;
     comments: number;
@@ -260,6 +276,8 @@ export interface CreateProjectDto {
   deviationReason?: string;
   dependency?: boolean;
   startDate?: string;
+  projectCoordinatorId?: string;
+  pcTeamLeadId?: string;
 }
 
 // Task types
@@ -691,4 +709,31 @@ export interface BulkAssignProjectDto {
 export interface UpdateProjectAssignmentDto {
   role?: string;
   status?: ProjectAssignmentStatus;
+}
+
+// Project Assignment History types
+export enum ProjectAssignmentType {
+  PROJECT_COORDINATOR = 'PROJECT_COORDINATOR',
+  PC_TEAM_LEAD = 'PC_TEAM_LEAD',
+}
+
+export interface ProjectAssignmentHistory {
+  id: string;
+  projectId: string;
+  assignmentType: ProjectAssignmentType;
+  previousUserId?: string;
+  newUserId?: string;
+  assignedById: string;
+  assignedAt: string;
+  reason?: string;
+  notes?: string;
+  previousUser?: User;
+  assignedBy: User;
+}
+
+export interface ReassignPCDto {
+  assignmentType: 'PROJECT_COORDINATOR' | 'PC_TEAM_LEAD';
+  newUserId: string;
+  reason?: string;
+  notes?: string;
 }

@@ -16,6 +16,9 @@ import {
 import EmployeeCard from './EmployeeCard';
 import CSVImportModal from './CSVImportModal';
 import AddEmployeeModal from './AddEmployeeModal';
+import EditEmployeeModal from './EditEmployeeModal';
+import ConfirmationDialog from '@/components/ui/confirmation-dialog';
+import AlertDialog from '@/components/ui/alert-dialog';
 import { employeeUtils, departmentUtils } from '@/lib/employeeUtils';
 import { CSVImportService } from '@/lib/csvUtils';
 import { toast } from 'sonner';
@@ -35,6 +38,12 @@ export default function EmployeeManagementPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showForceDelete, setShowForceDelete] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   
   const [filters, setFilters] = useState<EmployeeFilters>({
     search: '',
@@ -52,6 +61,8 @@ export default function EmployeeManagementPage() {
         // Convert User objects to Employee objects with default employee fields
         const employeeData: Employee[] = response.data.map((user: User) => ({
           ...user,
+          // Extract department from departmentMaster or use existing department
+          department: user.departmentMaster?.name as Department || user.department,
           status: EmployeeStatus.ACTIVE,
           weeklyLimit: 40,
           dailyLimit: 8,
@@ -126,19 +137,59 @@ export default function EmployeeManagementPage() {
     setShowAddModal(false);
   };
 
+  const handleEmployeeUpdated = (updatedEmployee: Employee) => {
+    setEmployees(prev => prev.map(emp => 
+      emp.id === updatedEmployee.id ? updatedEmployee : emp
+    ));
+    setShowEditModal(false);
+    setSelectedEmployee(null);
+  };
+
+  const confirmDeleteEmployee = async (force: boolean = false) => {
+    if (!selectedEmployee) return;
+    
+    try {
+      await usersApi.delete(selectedEmployee.id, force);
+      setEmployees(prev => prev.filter(emp => emp.id !== selectedEmployee.id));
+      toast.success(`Employee ${selectedEmployee.name} deleted successfully`);
+      setShowDeleteDialog(false);
+      setShowForceDelete(false);
+      setSelectedEmployee(null);
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      const message = error.response?.data?.message || error.message || 'Failed to delete employee';
+      
+      if (!force && error.response?.status === 400) {
+        // Show force delete option for constraint violations
+        setShowForceDelete(true);
+        setErrorMessage(message + '\n\nWould you like to force delete? This will remove all related records.');
+      } else {
+        setShowForceDelete(false);
+      }
+      
+      setShowErrorDialog(true);
+      setShowDeleteDialog(false);
+    }
+  };
+
+  const handleForceDelete = async () => {
+    setShowErrorDialog(false);
+    await confirmDeleteEmployee(true);
+  };
+
   const handleExportCSV = () => {
     CSVImportService.exportEmployeesToCSV(filteredEmployees);
     toast.success('Employee data exported successfully');
   };
 
   const handleEditEmployee = (employee: Employee) => {
-    // TODO: Implement edit functionality
-    toast.info(`Edit functionality for ${employee.name} - coming soon`);
+    setSelectedEmployee(employee);
+    setShowEditModal(true);
   };
 
   const handleDeleteEmployee = (employee: Employee) => {
-    // TODO: Implement delete functionality
-    toast.info(`Delete functionality for ${employee.name} - coming soon`);
+    setSelectedEmployee(employee);
+    setShowDeleteDialog(true);
   };
 
   const handleAssignProject = (employee: Employee) => {
@@ -436,6 +487,74 @@ export default function EmployeeManagementPage() {
         onClose={() => setShowAddModal(false)}
         onEmployeeAdded={handleEmployeeAdded}
       />
+
+      {/* Edit Employee Modal */}
+      <EditEmployeeModal
+        isOpen={showEditModal}
+        employee={selectedEmployee}
+        onClose={() => {
+          setShowEditModal(false);
+          setSelectedEmployee(null);
+        }}
+        onEmployeeUpdated={handleEmployeeUpdated}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showDeleteDialog}
+        onClose={() => {
+          setShowDeleteDialog(false);
+          setSelectedEmployee(null);
+        }}
+        onConfirm={() => confirmDeleteEmployee(false)}
+        title="Delete Employee"
+        message={`Are you sure you want to delete ${selectedEmployee?.name}? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+      />
+
+      {/* Error Dialog */}
+      <AlertDialog
+        isOpen={showErrorDialog}
+        onClose={() => {
+          setShowErrorDialog(false);
+          setShowForceDelete(false);
+        }}
+        title="Operation Failed"
+        message={errorMessage}
+        type="error"
+      />
+      
+      {/* Force Delete Confirmation */}
+      {showForceDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[60]">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4 text-red-600">Force Delete Warning</h3>
+            <p className="text-gray-600 mb-6">
+              This will permanently delete {selectedEmployee?.name} and ALL related records including projects, tasks, and comments. This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setShowErrorDialog(false);
+                  setShowForceDelete(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="destructive"
+                onClick={handleForceDelete}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Force Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

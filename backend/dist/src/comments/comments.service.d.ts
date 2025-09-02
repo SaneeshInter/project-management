@@ -26,6 +26,8 @@ export declare class CommentsService {
             currentDepartment: import(".prisma/client").$Enums.Department;
             nextDepartment: import(".prisma/client").$Enums.Department | null;
             projectCode: string;
+            projectCoordinatorId: string | null;
+            pcTeamLeadId: string | null;
         };
         task: {
             description: string | null;
@@ -48,8 +50,8 @@ export declare class CommentsService {
         id: string;
         createdAt: Date;
         content: string;
-        projectId: string | null;
         authorId: string;
+        projectId: string | null;
         taskId: string | null;
     }>;
     findAll(projectId?: string, taskId?: string, user?: User): Promise<({
@@ -70,8 +72,8 @@ export declare class CommentsService {
         id: string;
         createdAt: Date;
         content: string;
-        projectId: string | null;
         authorId: string;
+        projectId: string | null;
         taskId: string | null;
     })[]>;
     findOne(id: string, user: User): Promise<{
@@ -96,8 +98,8 @@ export declare class CommentsService {
         id: string;
         createdAt: Date;
         content: string;
-        projectId: string | null;
         authorId: string;
+        projectId: string | null;
         taskId: string | null;
     }>;
     update(id: string, updateCommentDto: UpdateCommentDto, user: User): Promise<{
@@ -110,8 +112,8 @@ export declare class CommentsService {
         id: string;
         createdAt: Date;
         content: string;
-        projectId: string | null;
         authorId: string;
+        projectId: string | null;
         taskId: string | null;
     }>;
     remove(id: string, user: User): Promise<{

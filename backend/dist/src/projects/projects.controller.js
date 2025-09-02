@@ -102,6 +102,12 @@ let ProjectsController = class ProjectsController {
     submitManagerReview(approvalId, reviewDecision, user) {
         return this.projectsService.submitManagerReview(approvalId, reviewDecision.decision, reviewDecision.comments, user);
     }
+    reassignPCOrTL(projectId, reassignDto, user) {
+        return this.projectsService.reassignPCOrTL(projectId, reassignDto, user);
+    }
+    getAssignmentHistory(projectId, user) {
+        return this.projectsService.getAssignmentHistory(projectId, user);
+    }
 };
 exports.ProjectsController = ProjectsController;
 __decorate([
@@ -360,6 +366,27 @@ __decorate([
     __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", void 0)
 ], ProjectsController.prototype, "submitManagerReview", null);
+__decorate([
+    (0, common_1.Patch)(':id/reassign'),
+    (0, swagger_1.ApiOperation)({ summary: 'Reassign PC or PC TL for a project' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Assignment updated successfully' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, user_decorator_1.User)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "reassignPCOrTL", null);
+__decorate([
+    (0, common_1.Get)(':id/assignment-history'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get assignment history for a project' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Assignment history retrieved successfully' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, user_decorator_1.User)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "getAssignmentHistory", null);
 exports.ProjectsController = ProjectsController = __decorate([
     (0, swagger_1.ApiTags)('Projects'),
     (0, swagger_1.ApiBearerAuth)('JWT'),

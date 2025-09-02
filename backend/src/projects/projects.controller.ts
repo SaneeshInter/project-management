@@ -269,4 +269,22 @@ export class ProjectsController {
       user
     );
   }
+
+  @Patch(':id/reassign')
+  @ApiOperation({ summary: 'Reassign PC or PC TL for a project' })
+  @ApiResponse({ status: 200, description: 'Assignment updated successfully' })
+  reassignPCOrTL(
+    @Param('id') projectId: string,
+    @Body() reassignDto: { assignmentType: 'PROJECT_COORDINATOR' | 'PC_TEAM_LEAD'; newUserId: string; reason?: string; notes?: string },
+    @User() user: UserEntity,
+  ) {
+    return this.projectsService.reassignPCOrTL(projectId, reassignDto, user);
+  }
+
+  @Get(':id/assignment-history')
+  @ApiOperation({ summary: 'Get assignment history for a project' })
+  @ApiResponse({ status: 200, description: 'Assignment history retrieved successfully' })
+  getAssignmentHistory(@Param('id') projectId: string, @User() user: UserEntity) {
+    return this.projectsService.getAssignmentHistory(projectId, user);
+  }
 }

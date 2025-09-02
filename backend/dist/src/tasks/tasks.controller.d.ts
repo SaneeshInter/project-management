@@ -71,8 +71,8 @@ export declare class TasksController {
             id: string;
             createdAt: Date;
             content: string;
-            projectId: string | null;
             authorId: string;
+            projectId: string | null;
             taskId: string | null;
         })[];
         assignee: {

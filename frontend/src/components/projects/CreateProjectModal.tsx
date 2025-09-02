@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProjectsStore } from '@/stores/projects';
-import { CreateProjectDto, ProjectCategory, ProjectStatus, Department, Office } from '@/types';
+import { CreateProjectDto, ProjectCategory, ProjectStatus, Department, Office, Role, User, usersApi } from '@/types';
 
 const createProjectSchema = z.object({
   name: z.string().min(1, 'Project name is required'),
@@ -23,6 +23,8 @@ const createProjectSchema = z.object({
   deviationReason: z.string().optional(),
   dependency: z.boolean().optional(),
   startDate: z.string().optional(),
+  projectCoordinatorId: z.string().optional(),
+  pcTeamLeadId: z.string().optional(),
 });
 
 interface CreateProjectModalProps {
@@ -33,6 +35,8 @@ interface CreateProjectModalProps {
 export default function CreateProjectModal({ isOpen, onClose }: CreateProjectModalProps) {
   const { createProject, isLoading } = useProjectsStore();
   const [error, setError] = useState<string>('');
+  const [users, setUsers] = useState<User[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
 
   const {
     register,
@@ -48,6 +52,26 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
       office: 'KOCHI',
     },
   });
+
+  // Fetch users with PC and PC_TL roles
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (!isOpen) return;
+      
+      setLoadingUsers(true);
+      try {
+        // Get PMO users with PC and PC_TL roles
+        const pmoUsers = await usersApi.getPMOCoordinators();
+        setUsers(pmoUsers);
+      } catch (err) {
+        console.error('Failed to fetch users:', err);
+      } finally {
+        setLoadingUsers(false);
+      }
+    };
+
+    fetchUsers();
+  }, [isOpen]);
 
   const onSubmit = async (data: CreateProjectDto) => {
     try {
@@ -206,6 +230,56 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
                 />
                 {errors.targetDate && (
                   <p className="text-sm text-red-500">{errors.targetDate.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label htmlFor="projectCoordinatorId" className="text-sm font-medium">
+                  Project Coordinator (PC)
+                </label>
+                <select
+                  id="projectCoordinatorId"
+                  {...register('projectCoordinatorId')}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  disabled={loadingUsers}
+                >
+                  <option value="">Select Project Coordinator (optional)</option>
+                  {users
+                    .filter(user => user.roleMaster?.code === 'PC')
+                    .map(user => (
+                      <option key={user.id} value={user.id}>
+                        {user.name} ({user.email})
+                      </option>
+                    ))}
+                </select>
+                {errors.projectCoordinatorId && (
+                  <p className="text-sm text-red-500">{errors.projectCoordinatorId.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="pcTeamLeadId" className="text-sm font-medium">
+                  PC Team Lead
+                </label>
+                <select
+                  id="pcTeamLeadId"
+                  {...register('pcTeamLeadId')}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  disabled={loadingUsers}
+                >
+                  <option value="">Select PC Team Lead (optional)</option>
+                  {users
+                    .filter(user => ['PC_TL1', 'PC_TL2'].includes(user.roleMaster?.code || ''))
+                    .map(user => (
+                      <option key={user.id} value={user.id}>
+                        {user.name} ({user.email}) - {user.roleMaster?.code}
+                      </option>
+                    ))}
+                </select>
+                {errors.pcTeamLeadId && (
+                  <p className="text-sm text-red-500">{errors.pcTeamLeadId.message}</p>
                 )}
               </div>
             </div>

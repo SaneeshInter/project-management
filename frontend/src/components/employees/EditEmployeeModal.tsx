@@ -8,36 +8,37 @@ import {
   EmployeeStatus, 
   DepartmentMaster,
   RoleMaster,
+  Role,
   usersApi,
   departmentsApi,
   rolesApi
 } from '@/types';
 import { toast } from 'sonner';
 
-interface AddEmployeeModalProps {
+interface EditEmployeeModalProps {
   isOpen: boolean;
+  employee: Employee | null;
   onClose: () => void;
-  onEmployeeAdded: (employee: Employee) => void;
+  onEmployeeUpdated: (employee: Employee) => void;
 }
 
 interface EmployeeFormData {
   name: string;
   email: string;
-  password: string;
   roleId: string;
   departmentId: string;
   status: EmployeeStatus;
 }
 
-export default function AddEmployeeModal({
+export default function EditEmployeeModal({
   isOpen,
+  employee,
   onClose,
-  onEmployeeAdded
-}: AddEmployeeModalProps) {
+  onEmployeeUpdated
+}: EditEmployeeModalProps) {
   const [formData, setFormData] = useState<EmployeeFormData>({
     name: '',
     email: '',
-    password: 'inter123',
     roleId: '',
     departmentId: '',
     status: EmployeeStatus.ACTIVE
@@ -50,6 +51,19 @@ export default function AddEmployeeModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
+
+  // Initialize form data with employee data
+  useEffect(() => {
+    if (employee && isOpen) {
+      setFormData({
+        name: employee.name,
+        email: employee.email,
+        roleId: employee.roleMaster?.id || '',
+        departmentId: employee.departmentMaster?.id || '',
+        status: employee.status
+      });
+    }
+  }, [employee, isOpen]);
 
   // Fetch departments and roles on component mount
   useEffect(() => {
@@ -101,12 +115,6 @@ export default function AddEmployeeModal({
       newErrors.email = 'Please enter a valid email address';
     }
 
-    if (!formData.password.trim()) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-
     if (!formData.departmentId) {
       newErrors.departmentId = 'Department is required';
     }
@@ -120,7 +128,7 @@ export default function AddEmployeeModal({
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) {
+    if (!employee || !validateForm()) {
       toast.error('Please fix the validation errors');
       return;
     }
@@ -128,37 +136,36 @@ export default function AddEmployeeModal({
     setIsSubmitting(true);
 
     try {
-      // Create user via API
-      const newUser = await usersApi.create({
+      // Update user via API
+      const updatedUser = await usersApi.update(employee.id, {
         name: formData.name.trim(),
         email: formData.email.trim(),
-        password: formData.password,
-        roleId: formData.roleId,
-        departmentId: formData.departmentId
+        role: formData.roleId as Role,
+        department: formData.departmentId as any
       });
 
       // Convert to Employee format for UI
       const selectedRole = roles.find(r => r.id === formData.roleId);
       const selectedDept = departments.find(d => d.id === formData.departmentId);
       
-      const newEmployee: Employee = {
-        ...newUser,
+      const updatedEmployee: Employee = {
+        ...updatedUser,
         role: selectedRole?.code as any,
         department: selectedDept?.code as any,
         status: formData.status,
-        trackingEnabled: true,
-        timesheetsEnabled: false,
-        countsTowardPricing: true,
-        dateAdded: newUser.createdAt,
-        projectAssignments: []
+        trackingEnabled: employee.trackingEnabled,
+        timesheetsEnabled: employee.timesheetsEnabled,
+        countsTowardPricing: employee.countsTowardPricing,
+        dateAdded: employee.dateAdded,
+        projectAssignments: employee.projectAssignments || []
       };
 
-      onEmployeeAdded(newEmployee);
-      toast.success(`Employee ${newEmployee.name} added successfully`);
+      onEmployeeUpdated(updatedEmployee);
+      toast.success(`Employee ${updatedEmployee.name} updated successfully`);
       handleClose();
     } catch (error: any) {
-      console.error('Error creating user:', error);
-      const message = error.response?.data?.message || error.message || 'Failed to add employee';
+      console.error('Error updating user:', error);
+      const message = error.response?.data?.message || error.message || 'Failed to update employee';
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -169,7 +176,6 @@ export default function AddEmployeeModal({
     setFormData({
       name: '',
       email: '',
-      password: 'inter123',
       roleId: '',
       departmentId: '',
       status: EmployeeStatus.ACTIVE
@@ -186,7 +192,7 @@ export default function AddEmployeeModal({
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !employee) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -195,7 +201,7 @@ export default function AddEmployeeModal({
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              Add New Employee
+              Edit Employee
             </CardTitle>
             <Button variant="ghost" size="icon" onClick={handleClose}>
               <X className="w-4 h-4" />
@@ -241,24 +247,6 @@ export default function AddEmployeeModal({
                   <p className="text-sm text-red-600 mt-1">{errors.email}</p>
                 )}
               </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-2">
-                Password *
-              </label>
-              <Input
-                id="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => handleInputChange('password', e.target.value)}
-                placeholder="Enter password"
-                className={errors.password ? 'border-red-300' : ''}
-              />
-              {errors.password && (
-                <p className="text-sm text-red-600 mt-1">{errors.password}</p>
-              )}
-              <p className="text-xs text-muted-foreground mt-1">Default password: inter123</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -334,7 +322,7 @@ export default function AddEmployeeModal({
           </Button>
           <Button onClick={handleSubmit} disabled={isSubmitting}>
             <Save className="h-4 w-4 mr-2" />
-            {isSubmitting ? 'Adding...' : 'Add Employee'}
+            {isSubmitting ? 'Updating...' : 'Update Employee'}
           </Button>
         </div>
       </Card>

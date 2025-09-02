@@ -27,40 +27,49 @@ model User {
   departmentTransitions ProjectDepartmentHistory[] @relation("DepartmentTransitions")
   departmentPermissions ProjectDepartmentHistory[] @relation("DepartmentPermissions")
   ownedProjects         Project[]                  @relation("ProjectOwner")
+  coordinatedProjects   Project[]                  @relation("ProjectCoordinator")
+  pcTeamLeadProjects    Project[]                  @relation("PCTeamLead")
   bugAssignments        QABug[]                    @relation("BugAssignments")
   qaTestingRounds       QATestingRound[]           @relation("QATesters")
   assignedTasks         Task[]
   approvalRequests      WorkflowApproval[]         @relation("ApprovalRequests")
   approvalReviews       WorkflowApproval[]         @relation("ApprovalReviews")
+  assignmentHistory     ProjectAssignmentHistory[] @relation("AssignmentUser")
+  assignmentsMade       ProjectAssignmentHistory[] @relation("AssignmentAssigner")
 
   @@map("users")
 }
 
 model Project {
-  id                String                     @id @default(cuid())
-  name              String
-  office            String
-  category          ProjectCategory
-  pagesCount        Int?
-  targetDate        DateTime
-  status            ProjectStatus              @default(ACTIVE)
-  ownerId           String
-  clientName        String?
-  observations      String?
-  monthsPassed      Int                        @default(0)
-  startDate         DateTime                   @default(now())
-  deviationReason   String?
-  dependency        Boolean                    @default(false)
-  createdAt         DateTime                   @default(now())
-  updatedAt         DateTime                   @updatedAt
-  currentDepartment Department                 @default(PMO)
-  nextDepartment    Department?
-  projectCode       String                     @default("")
-  comments          Comment[]
-  customFields      CustomField[]
-  departmentHistory ProjectDepartmentHistory[]
-  owner             User                       @relation("ProjectOwner", fields: [ownerId], references: [id])
-  tasks             Task[]
+  id                   String                     @id @default(cuid())
+  name                 String
+  office               String
+  category             ProjectCategory
+  pagesCount           Int?
+  targetDate           DateTime
+  status               ProjectStatus              @default(ACTIVE)
+  ownerId              String
+  clientName           String?
+  observations         String?
+  monthsPassed         Int                        @default(0)
+  startDate            DateTime                   @default(now())
+  deviationReason      String?
+  dependency           Boolean                    @default(false)
+  createdAt            DateTime                   @default(now())
+  updatedAt            DateTime                   @updatedAt
+  currentDepartment    Department                 @default(PMO)
+  nextDepartment       Department?
+  projectCode          String                     @default("")
+  projectCoordinatorId String?
+  pcTeamLeadId         String?
+  comments             Comment[]
+  customFields         CustomField[]
+  departmentHistory    ProjectDepartmentHistory[]
+  owner                User                       @relation("ProjectOwner", fields: [ownerId], references: [id])
+  projectCoordinator   User?                      @relation("ProjectCoordinator", fields: [projectCoordinatorId], references: [id])
+  pcTeamLead           User?                      @relation("PCTeamLead", fields: [pcTeamLeadId], references: [id])
+  tasks                Task[]
+  assignmentHistory    ProjectAssignmentHistory[]
 
   @@map("projects")
 }
@@ -242,6 +251,23 @@ model RoleMaster {
   @@map("role_master")
 }
 
+model ProjectAssignmentHistory {
+  id              String                   @id @default(cuid())
+  projectId       String
+  assignmentType  ProjectAssignmentType
+  previousUserId  String?
+  newUserId       String?
+  assignedById    String
+  assignedAt      DateTime                 @default(now())
+  reason          String?
+  notes           String?
+  project         Project                  @relation(fields: [projectId], references: [id])
+  previousUser    User?                    @relation("AssignmentUser", fields: [previousUserId], references: [id])
+  assignedBy      User                     @relation("AssignmentAssigner", fields: [assignedById], references: [id])
+
+  @@map("project_assignment_history")
+}
+
 enum ApprovalType {
   CLIENT_APPROVAL
   QA_APPROVAL
@@ -307,6 +333,7 @@ enum Role {
   REACT_TL
   HTML_TL
   PC_TL1
+  PC_TL2
   DESIGN_TL
 }
 
@@ -369,4 +396,9 @@ enum DepartmentWorkStatus {
   BUGFIX_IN_PROGRESS
   BEFORE_LIVE_QA
   READY_FOR_DELIVERY
+}
+
+enum ProjectAssignmentType {
+  PROJECT_COORDINATOR
+  PC_TEAM_LEAD
 }

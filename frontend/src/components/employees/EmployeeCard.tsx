@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Employee, Role } from '@/types';
-import { employeeUtils, departmentUtils } from '@/lib/employeeUtils';
+import { employeeUtils } from '@/lib/employeeUtils';
 
 interface EmployeeCardProps {
   employee: Employee;
@@ -139,15 +139,13 @@ export default function EmployeeCard({
               
               <div className="flex items-center gap-2">
                 <User className="h-3 w-3" />
-                <span>{formatRole(employee.role)}</span>
+                <span>{employee.roleMaster?.name || formatRole(employee.role)}</span>
               </div>
               
-              {employee.department && (
-                <div className="flex items-center gap-2">
-                  <Building2 className="h-3 w-3" />
-                  <span>{departmentUtils.formatDepartmentName(employee.department)}</span>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                <Building2 className="h-3 w-3" />
+                <span>{employee.departmentMaster?.name || employee.department || 'No Department'}</span>
+              </div>
             </div>
           </div>
         </div>

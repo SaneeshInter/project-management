@@ -38,8 +38,11 @@ let UsersController = class UsersController {
     update(id, updateUserDto) {
         return this.usersService.update(id, updateUserDto);
     }
-    remove(id) {
-        return this.usersService.remove(id);
+    remove(id, force) {
+        return this.usersService.remove(id, force === 'true');
+    }
+    getPMOCoordinators() {
+        return this.usersService.getPMOCoordinators();
     }
 };
 exports.UsersController = UsersController;
@@ -89,11 +92,21 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Delete user' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'User deleted successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'User has related records' }),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Query)('force')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)('pmo/coordinators'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get PMO users with PC and PC_TL roles' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'PMO coordinators retrieved successfully' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "getPMOCoordinators", null);
 exports.UsersController = UsersController = __decorate([
     (0, swagger_1.ApiTags)('Users'),
     (0, swagger_1.ApiBearerAuth)('JWT'),

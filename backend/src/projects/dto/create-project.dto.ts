@@ -64,4 +64,14 @@ export class CreateProjectDto {
   @IsDateString()
   @IsOptional()
   startDate?: string;
+
+  @ApiPropertyOptional({ example: 'user-id-123' })
+  @IsString()
+  @IsOptional()
+  projectCoordinatorId?: string;
+
+  @ApiPropertyOptional({ example: 'user-id-456' })
+  @IsString()
+  @IsOptional()
+  pcTeamLeadId?: string;
 }

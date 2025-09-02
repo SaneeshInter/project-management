@@ -72,8 +72,11 @@ export const usersApi = {
   update: (id: string, data: Partial<User>): Promise<User> =>
     api.patch(`/users/${id}`, data).then((res) => res.data),
   
-  delete: (id: string): Promise<void> =>
-    api.delete(`/users/${id}`).then((res) => res.data),
+  delete: (id: string, force: boolean = false): Promise<void> =>
+    api.delete(`/users/${id}${force ? '?force=true' : ''}`).then((res) => res.data),
+
+  getPMOCoordinators: (): Promise<User[]> =>
+    api.get('/users/pmo/coordinators').then((res) => res.data),
 };
 
 // Departments API
@@ -156,6 +159,13 @@ export const projectsApi = {
 
   getWorkflowValidationStatus: (id: string) =>
     api.get(`/projects/${id}/workflow-validation`).then((res) => res.data),
+
+  // PC Assignment Methods
+  reassignPCOrTL: (projectId: string, data: { assignmentType: 'PROJECT_COORDINATOR' | 'PC_TEAM_LEAD'; newUserId: string; reason?: string; notes?: string }) =>
+    api.patch(`/projects/${projectId}/reassign`, data).then((res) => res.data),
+
+  getAssignmentHistory: (projectId: string) =>
+    api.get(`/projects/${projectId}/assignment-history`).then((res) => res.data),
 };
 
 

@@ -91,4 +91,16 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateProjectDto.prototype, "startDate", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'user-id-123' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateProjectDto.prototype, "projectCoordinatorId", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'user-id-456' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateProjectDto.prototype, "pcTeamLeadId", void 0);
 //# sourceMappingURL=create-project.dto.js.map

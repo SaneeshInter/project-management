@@ -8,7 +8,7 @@ import { CreateDepartmentTransitionDto } from './dto/create-department-transitio
 import { UpdateDepartmentWorkStatusDto } from './dto/update-department-work-status.dto';
 import { CreateCorrectionDto } from './dto/create-correction.dto';
 import { UpdateCorrectionDto } from './dto/update-correction.dto';
-import { User, Role, DepartmentWorkStatus, CorrectionStatus, ApprovalType, ApprovalStatus, QAType, QAStatus, Department, ProjectStatus } from '@prisma/client';
+import { User, Role, DepartmentWorkStatus, CorrectionStatus, ApprovalType, ApprovalStatus, QAType, QAStatus, Department, ProjectStatus, ProjectAssignmentType } from '@prisma/client';
 import { generateProjectCode } from '../utils/project-code.util';
 
 @Injectable()
@@ -31,6 +31,22 @@ export class ProjectsService {
       },
       include: {
         owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+        projectCoordinator: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+        pcTeamLead: {
           select: {
             id: true,
             name: true,
@@ -67,6 +83,35 @@ export class ProjectsService {
     } catch (historyError) {
       console.error('❌ Failed to create department history:', historyError);
       // Don't fail the project creation, just log the error for now
+    }
+
+    // Create assignment history records for PC and PC TL if assigned
+    try {
+      if (createProjectDto.projectCoordinatorId) {
+        await this.prisma.projectAssignmentHistory.create({
+          data: {
+            projectId: project.id,
+            assignmentType: ProjectAssignmentType.PROJECT_COORDINATOR,
+            newUserId: createProjectDto.projectCoordinatorId,
+            assignedById: user.id,
+            reason: 'Initial project creation',
+          },
+        });
+      }
+
+      if (createProjectDto.pcTeamLeadId) {
+        await this.prisma.projectAssignmentHistory.create({
+          data: {
+            projectId: project.id,
+            assignmentType: ProjectAssignmentType.PC_TEAM_LEAD,
+            newUserId: createProjectDto.pcTeamLeadId,
+            assignedById: user.id,
+            reason: 'Initial project creation',
+          },
+        });
+      }
+    } catch (assignmentError) {
+      console.error('❌ Failed to create assignment history:', assignmentError);
     }
 
     return project;
@@ -1173,6 +1218,129 @@ export class ProjectsService {
       });
 
       return updatedProject;
+    });
+  }
+
+  async reassignPCOrTL(projectId: string, reassignDto: { assignmentType: 'PROJECT_COORDINATOR' | 'PC_TEAM_LEAD'; newUserId: string; reason?: string; notes?: string }, user: User) {
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+      include: {
+        projectCoordinator: true,
+        pcTeamLead: true,
+      },
+    });
+
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${projectId} not found`);
+    }
+
+    // Check permissions - only PMO department, Admin, or Project Manager can reassign
+    const userDepartment = await this.prisma.user.findUnique({
+      where: { id: user.id },
+      include: { departmentMaster: true }
+    });
+    
+    const isPMOUser = userDepartment?.departmentMaster?.code === 'PMO';
+    
+    if (user.role !== Role.ADMIN && user.role !== Role.PROJECT_MANAGER && !isPMOUser) {
+      throw new ForbiddenException('You do not have permission to reassign project coordinators');
+    }
+
+    const assignmentType = reassignDto.assignmentType === 'PROJECT_COORDINATOR' 
+      ? ProjectAssignmentType.PROJECT_COORDINATOR 
+      : ProjectAssignmentType.PC_TEAM_LEAD;
+
+    const currentUserId = reassignDto.assignmentType === 'PROJECT_COORDINATOR' 
+      ? project.projectCoordinatorId 
+      : project.pcTeamLeadId;
+
+    // Verify the new user has the correct role
+    const newUser = await this.prisma.user.findUnique({ 
+      where: { id: reassignDto.newUserId },
+      include: { roleMaster: true, departmentMaster: true }
+    });
+    if (!newUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if user is in PMO department
+    if (newUser.departmentMaster?.code !== 'PMO') {
+      throw new BadRequestException('User must be in PMO department');
+    }
+
+    if (reassignDto.assignmentType === 'PROJECT_COORDINATOR') {
+      if (newUser.roleMaster?.code !== 'PC') {
+        throw new BadRequestException('User must have PC role for this assignment');
+      }
+    } else {
+      if (!['PC_TL1', 'PC_TL2'].includes(newUser.roleMaster?.code || '')) {
+        throw new BadRequestException('User must have PC_TL1 or PC_TL2 role for this assignment');
+      }
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      // Create assignment history record
+      await tx.projectAssignmentHistory.create({
+        data: {
+          projectId,
+          assignmentType,
+          previousUserId: currentUserId,
+          newUserId: reassignDto.newUserId,
+          assignedById: user.id,
+          reason: reassignDto.reason || 'Manual reassignment',
+          notes: reassignDto.notes,
+        },
+      });
+
+      // Update project with new assignment
+      const updateData: any = {};
+      if (reassignDto.assignmentType === 'PROJECT_COORDINATOR') {
+        updateData.projectCoordinatorId = reassignDto.newUserId;
+      } else {
+        updateData.pcTeamLeadId = reassignDto.newUserId;
+      }
+
+      return tx.project.update({
+        where: { id: projectId },
+        data: updateData,
+        include: {
+          owner: {
+            select: { id: true, name: true, email: true, role: true },
+          },
+          projectCoordinator: {
+            select: { id: true, name: true, email: true, role: true },
+          },
+          pcTeamLead: {
+            select: { id: true, name: true, email: true, role: true },
+          },
+        },
+      });
+    });
+  }
+
+  async getAssignmentHistory(projectId: string, user: User) {
+    const project = await this.prisma.project.findUnique({ where: { id: projectId } });
+    
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${projectId} not found`);
+    }
+
+    // Check access permissions
+    if (user.role === Role.CLIENT && project.ownerId !== user.id) {
+      throw new ForbiddenException('Access denied to this project');
+    }
+
+    return this.prisma.projectAssignmentHistory.findMany({
+      where: { projectId },
+      include: {
+        previousUser: {
+          select: { id: true, name: true, email: true, role: true },
+        },
+        assignedBy: {
+          select: { id: true, name: true, email: true, role: true },
+        },
+      },
+      orderBy: { assignedAt: 'desc' },
     });
   }
 }

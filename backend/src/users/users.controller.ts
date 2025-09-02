@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -52,7 +52,15 @@ export class UsersController {
   @ApiOperation({ summary: 'Delete user' })
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+  @ApiResponse({ status: 400, description: 'User has related records' })
+  remove(@Param('id') id: string, @Query('force') force?: string) {
+    return this.usersService.remove(id, force === 'true');
+  }
+
+  @Get('pmo/coordinators')
+  @ApiOperation({ summary: 'Get PMO users with PC and PC_TL roles' })
+  @ApiResponse({ status: 200, description: 'PMO coordinators retrieved successfully' })
+  getPMOCoordinators() {
+    return this.usersService.getPMOCoordinators();
   }
 }

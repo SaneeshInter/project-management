@@ -13,4 +13,6 @@ export declare class CreateProjectDto {
     deviationReason?: string;
     dependency?: boolean;
     startDate?: string;
+    projectCoordinatorId?: string;
+    pcTeamLeadId?: string;
 }
