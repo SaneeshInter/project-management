@@ -11,40 +11,56 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
+const bcrypt = require("bcrypt");
 const prisma_service_1 = require("../database/prisma.service");
 let UsersService = class UsersService {
     constructor(prisma) {
         this.prisma = prisma;
     }
     async create(createUserDto) {
+        const password = createUserDto.password || 'inter123';
+        const hashedPassword = await bcrypt.hash(password, 12);
+        const role = await this.prisma.roleMaster.findUnique({
+            where: { id: createUserDto.roleId }
+        });
+        const department = await this.prisma.departmentMaster.findUnique({
+            where: { id: createUserDto.departmentId }
+        });
+        if (!role) {
+            throw new common_1.NotFoundException(`Role with ID ${createUserDto.roleId} not found`);
+        }
+        if (!department) {
+            throw new common_1.NotFoundException(`Department with ID ${createUserDto.departmentId} not found`);
+        }
         return this.prisma.user.create({
-            data: createUserDto,
+            data: {
+                email: createUserDto.email,
+                name: createUserDto.name,
+                password: hashedPassword,
+                roleId: createUserDto.roleId,
+                departmentId: createUserDto.departmentId,
+                avatar: createUserDto.avatar,
+            },
+            include: {
+                roleMaster: true,
+                departmentMaster: true,
+            },
         });
     }
     async findAll() {
         return this.prisma.user.findMany({
-            select: {
-                id: true,
-                email: true,
-                name: true,
-                role: true,
-                avatar: true,
-                createdAt: true,
-                updatedAt: true,
+            include: {
+                roleMaster: true,
+                departmentMaster: true,
             },
         });
     }
     async findById(id) {
         const user = await this.prisma.user.findUnique({
             where: { id },
-            select: {
-                id: true,
-                email: true,
-                name: true,
-                role: true,
-                avatar: true,
-                createdAt: true,
-                updatedAt: true,
+            include: {
+                roleMaster: true,
+                departmentMaster: true,
             },
         });
         if (!user) {
@@ -65,14 +81,9 @@ let UsersService = class UsersService {
         return this.prisma.user.update({
             where: { id },
             data: updateUserDto,
-            select: {
-                id: true,
-                email: true,
-                name: true,
-                role: true,
-                avatar: true,
-                createdAt: true,
-                updatedAt: true,
+            include: {
+                roleMaster: true,
+                departmentMaster: true,
             },
         });
     }

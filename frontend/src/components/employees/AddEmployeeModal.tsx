@@ -1,16 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, User, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Employee, 
   EmployeeStatus, 
-  Department, 
-  Role 
+  DepartmentMaster,
+  RoleMaster,
+  usersApi,
+  departmentsApi,
+  rolesApi
 } from '@/types';
-import { departmentUtils } from '@/lib/employeeUtils';
 import { toast } from 'sonner';
 
 interface AddEmployeeModalProps {
@@ -22,14 +23,10 @@ interface AddEmployeeModalProps {
 interface EmployeeFormData {
   name: string;
   email: string;
-  role: Role;
-  department: Department | '';
+  password: string;
+  roleId: string;
+  departmentId: string;
   status: EmployeeStatus;
-  weeklyLimit: number | '';
-  dailyLimit: number | '';
-  trackingEnabled: boolean;
-  timesheetsEnabled: boolean;
-  countsTowardPricing: boolean;
 }
 
 export default function AddEmployeeModal({
@@ -40,18 +37,56 @@ export default function AddEmployeeModal({
   const [formData, setFormData] = useState<EmployeeFormData>({
     name: '',
     email: '',
-    role: Role.DEVELOPER,
-    department: '',
-    status: EmployeeStatus.ACTIVE,
-    weeklyLimit: 40,
-    dailyLimit: 8,
-    trackingEnabled: true,
-    timesheetsEnabled: false,
-    countsTowardPricing: true
+    password: 'inter123',
+    roleId: '',
+    departmentId: '',
+    status: EmployeeStatus.ACTIVE
   });
+
+  const [departments, setDepartments] = useState<DepartmentMaster[]>([]);
+  const [roles, setRoles] = useState<RoleMaster[]>([]);
+  const [filteredRoles, setFilteredRoles] = useState<RoleMaster[]>([]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+
+  // Fetch departments and roles on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [deptResponse, rolesResponse] = await Promise.all([
+          departmentsApi.getAll(),
+          rolesApi.getAll()
+        ]);
+        setDepartments(deptResponse.filter((dept: DepartmentMaster) => dept.isActive));
+        setRoles(rolesResponse.filter((role: RoleMaster) => role.isActive));
+        setFilteredRoles(rolesResponse.filter((role: RoleMaster) => role.isActive));
+      } catch (error) {
+        toast.error('Failed to load departments and roles');
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+
+    if (isOpen) {
+      fetchData();
+    }
+  }, [isOpen]);
+
+  // Filter roles by selected department
+  useEffect(() => {
+    if (formData.departmentId) {
+      setFilteredRoles(roles.filter(role => role.departmentId === formData.departmentId));
+      // Reset role selection if current role doesn't belong to selected department
+      if (formData.roleId && !roles.find(r => r.id === formData.roleId && r.departmentId === formData.departmentId)) {
+        setFormData(prev => ({ ...prev, roleId: '' }));
+      }
+    } else {
+      setFilteredRoles(roles);
+    }
+  }, [formData.departmentId, roles]);
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -66,12 +101,18 @@ export default function AddEmployeeModal({
       newErrors.email = 'Please enter a valid email address';
     }
 
-    if (formData.weeklyLimit && (formData.weeklyLimit < 1 || formData.weeklyLimit > 168)) {
-      newErrors.weeklyLimit = 'Weekly limit must be between 1 and 168 hours';
+    if (!formData.password.trim()) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
     }
 
-    if (formData.dailyLimit && (formData.dailyLimit < 1 || formData.dailyLimit > 24)) {
-      newErrors.dailyLimit = 'Daily limit must be between 1 and 24 hours';
+    if (!formData.departmentId) {
+      newErrors.departmentId = 'Department is required';
+    }
+
+    if (!formData.roleId) {
+      newErrors.roleId = 'Role is required';
     }
 
     setErrors(newErrors);
@@ -87,30 +128,36 @@ export default function AddEmployeeModal({
     setIsSubmitting(true);
 
     try {
-      // Create employee object
-      const newEmployee: Employee = {
-        id: `emp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      // Create user via API
+      const newUser = await usersApi.create({
         name: formData.name.trim(),
         email: formData.email.trim(),
-        role: formData.role,
-        department: formData.department || undefined,
+        password: formData.password,
+        roleId: formData.roleId,
+        departmentId: formData.departmentId
+      });
+
+      // Convert to Employee format for UI
+      const selectedRole = roles.find(r => r.id === formData.roleId);
+      const selectedDept = departments.find(d => d.id === formData.departmentId);
+      
+      const newEmployee: Employee = {
+        ...newUser,
+        role: selectedRole?.code as any,
+        department: selectedDept?.code as any,
         status: formData.status,
-        weeklyLimit: formData.weeklyLimit || undefined,
-        dailyLimit: formData.dailyLimit || undefined,
-        trackingEnabled: formData.trackingEnabled,
-        timesheetsEnabled: formData.timesheetsEnabled,
-        countsTowardPricing: formData.countsTowardPricing,
-        dateAdded: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        trackingEnabled: true,
+        timesheetsEnabled: false,
+        countsTowardPricing: true,
+        dateAdded: newUser.createdAt,
         projectAssignments: []
       };
 
-      // In real implementation, this would be an API call
       onEmployeeAdded(newEmployee);
       toast.success(`Employee ${newEmployee.name} added successfully`);
       handleClose();
     } catch (error) {
+      console.error('Error creating user:', error);
       toast.error('Failed to add employee');
     } finally {
       setIsSubmitting(false);
@@ -121,14 +168,10 @@ export default function AddEmployeeModal({
     setFormData({
       name: '',
       email: '',
-      role: Role.DEVELOPER,
-      department: '',
-      status: EmployeeStatus.ACTIVE,
-      weeklyLimit: 40,
-      dailyLimit: 8,
-      trackingEnabled: true,
-      timesheetsEnabled: false,
-      countsTowardPricing: true
+      password: 'inter123',
+      roleId: '',
+      departmentId: '',
+      status: EmployeeStatus.ACTIVE
     });
     setErrors({});
     setIsSubmitting(false);
@@ -199,42 +242,69 @@ export default function AddEmployeeModal({
               </div>
             </div>
 
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium mb-2">
+                Password *
+              </label>
+              <Input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) => handleInputChange('password', e.target.value)}
+                placeholder="Enter password"
+                className={errors.password ? 'border-red-300' : ''}
+              />
+              {errors.password && (
+                <p className="text-sm text-red-600 mt-1">{errors.password}</p>
+              )}
+              <p className="text-xs text-muted-foreground mt-1">Default password: inter123</p>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="department" className="block text-sm font-medium mb-2">
+                  Department *
+                </label>
+                <select
+                  id="department"
+                  value={formData.departmentId}
+                  onChange={(e) => handleInputChange('departmentId', e.target.value)}
+                  className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ${errors.departmentId ? 'border-red-300' : ''}`}
+                  disabled={isLoadingData}
+                >
+                  <option value="">Select department</option>
+                  {departments.map(dept => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.departmentId && (
+                  <p className="text-sm text-red-600 mt-1">{errors.departmentId}</p>
+                )}
+              </div>
+
               <div>
                 <label htmlFor="role" className="block text-sm font-medium mb-2">
                   Role *
                 </label>
                 <select
                   id="role"
-                  value={formData.role}
-                  onChange={(e) => handleInputChange('role', e.target.value as Role)}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  value={formData.roleId}
+                  onChange={(e) => handleInputChange('roleId', e.target.value)}
+                  className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ${errors.roleId ? 'border-red-300' : ''}`}
+                  disabled={isLoadingData || !formData.departmentId}
                 >
-                  <option value={Role.ADMIN}>Admin</option>
-                  <option value={Role.PROJECT_MANAGER}>Project Manager</option>
-                  <option value={Role.DEVELOPER}>Developer</option>
-                  <option value={Role.DESIGNER}>Designer</option>
-                  <option value={Role.CLIENT}>Client</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="department" className="block text-sm font-medium mb-2">
-                  Department
-                </label>
-                <select
-                  id="department"
-                  value={formData.department}
-                  onChange={(e) => handleInputChange('department', e.target.value as Department | '')}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                >
-                  <option value="">No department</option>
-                  {Object.values(Department).map(dept => (
-                    <option key={dept} value={dept}>
-                      {departmentUtils.formatDepartmentName(dept)}
+                  <option value="">Select role</option>
+                  {filteredRoles.map(role => (
+                    <option key={role.id} value={role.id}>
+                      {role.name}
                     </option>
                   ))}
                 </select>
+                {errors.roleId && (
+                  <p className="text-sm text-red-600 mt-1">{errors.roleId}</p>
+                )}
               </div>
             </div>
 
@@ -254,90 +324,6 @@ export default function AddEmployeeModal({
             </div>
           </div>
 
-          {/* Work Limits */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg">Work Limits</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="weeklyLimit" className="block text-sm font-medium mb-2">
-                  Weekly Limit (hours)
-                </label>
-                <Input
-                  id="weeklyLimit"
-                  type="number"
-                  min="1"
-                  max="168"
-                  value={formData.weeklyLimit}
-                  onChange={(e) => handleInputChange('weeklyLimit', e.target.value ? Number(e.target.value) : '')}
-                  placeholder="40"
-                  className={errors.weeklyLimit ? 'border-red-300' : ''}
-                />
-                {errors.weeklyLimit && (
-                  <p className="text-sm text-red-600 mt-1">{errors.weeklyLimit}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="dailyLimit" className="block text-sm font-medium mb-2">
-                  Daily Limit (hours)
-                </label>
-                <Input
-                  id="dailyLimit"
-                  type="number"
-                  min="1"
-                  max="24"
-                  value={formData.dailyLimit}
-                  onChange={(e) => handleInputChange('dailyLimit', e.target.value ? Number(e.target.value) : '')}
-                  placeholder="8"
-                  className={errors.dailyLimit ? 'border-red-300' : ''}
-                />
-                {errors.dailyLimit && (
-                  <p className="text-sm text-red-600 mt-1">{errors.dailyLimit}</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Settings */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg">Settings</h3>
-            
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="trackingEnabled"
-                  checked={formData.trackingEnabled}
-                  onCheckedChange={(checked) => handleInputChange('trackingEnabled', checked)}
-                />
-                <label htmlFor="trackingEnabled" className="text-sm font-medium">
-                  Enable time tracking
-                </label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="timesheetsEnabled"
-                  checked={formData.timesheetsEnabled}
-                  onCheckedChange={(checked) => handleInputChange('timesheetsEnabled', checked)}
-                />
-                <label htmlFor="timesheetsEnabled" className="text-sm font-medium">
-                  Enable timesheets
-                </label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="countsTowardPricing"
-                  checked={formData.countsTowardPricing}
-                  onCheckedChange={(checked) => handleInputChange('countsTowardPricing', checked)}
-                />
-                <label htmlFor="countsTowardPricing" className="text-sm font-medium">
-                  Counts toward pricing plan
-                </label>
-              </div>
-            </div>
-          </div>
         </CardContent>
 
         {/* Footer Actions */}

@@ -104,8 +104,8 @@ export const useProjectsStore = create<ProjectsState>((set) => ({
       set({ isLoading: false });
     } catch (error: any) {
       set({ isLoading: false });
-      toast.error(error.response?.data?.message || 'Failed to move project');
-      throw error;
+      const errorMessage = error.response?.data?.message || 'Failed to move project';
+      throw new Error(errorMessage);
     }
   },
 

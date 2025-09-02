@@ -21,8 +21,8 @@ export declare class ProjectsService {
         owner: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
     } & {
         name: string;
@@ -53,8 +53,8 @@ export declare class ProjectsService {
         owner: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
     } & {
         name: string;
@@ -103,14 +103,14 @@ export declare class ProjectsService {
                 requestedBy: {
                     name: string;
                     email: string;
-                    role: import(".prisma/client").$Enums.Role;
                     id: string;
+                    role: import(".prisma/client").$Enums.Role;
                 };
                 assignedTo: {
                     name: string;
                     email: string;
-                    role: import(".prisma/client").$Enums.Role;
                     id: string;
+                    role: import(".prisma/client").$Enums.Role;
                 };
             } & {
                 description: string;
@@ -130,22 +130,22 @@ export declare class ProjectsService {
             movedBy: {
                 name: string;
                 email: string;
-                role: import(".prisma/client").$Enums.Role;
                 id: string;
+                role: import(".prisma/client").$Enums.Role;
             };
             permissionGrantedBy: {
                 name: string;
                 email: string;
-                role: import(".prisma/client").$Enums.Role;
                 id: string;
+                role: import(".prisma/client").$Enums.Role;
             };
             qaRounds: ({
                 bugs: ({
                     assignedTo: {
                         name: string;
                         email: string;
-                        role: import(".prisma/client").$Enums.Role;
                         id: string;
+                        role: import(".prisma/client").$Enums.Role;
                     };
                 } & {
                     description: string;
@@ -163,8 +163,8 @@ export declare class ProjectsService {
                 testedBy: {
                     name: string;
                     email: string;
-                    role: import(".prisma/client").$Enums.Role;
                     id: string;
+                    role: import(".prisma/client").$Enums.Role;
                 };
             } & {
                 id: string;
@@ -184,14 +184,14 @@ export declare class ProjectsService {
                 requestedBy: {
                     name: string;
                     email: string;
-                    role: import(".prisma/client").$Enums.Role;
                     id: string;
+                    role: import(".prisma/client").$Enums.Role;
                 };
                 reviewedBy: {
                     name: string;
                     email: string;
-                    role: import(".prisma/client").$Enums.Role;
                     id: string;
+                    role: import(".prisma/client").$Enums.Role;
                 };
             } & {
                 id: string;
@@ -226,8 +226,8 @@ export declare class ProjectsService {
         owner: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
         tasks: ({
             _count: {
@@ -279,8 +279,8 @@ export declare class ProjectsService {
         owner: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
     } & {
         name: string;
@@ -321,8 +321,8 @@ export declare class ProjectsService {
             movedBy: {
                 name: string;
                 email: string;
-                role: import(".prisma/client").$Enums.Role;
                 id: string;
+                role: import(".prisma/client").$Enums.Role;
             };
         } & {
             id: string;
@@ -344,9 +344,9 @@ export declare class ProjectsService {
         owner: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
-            department: import(".prisma/client").$Enums.Department;
             id: string;
+            department: import(".prisma/client").$Enums.Department;
+            role: import(".prisma/client").$Enums.Role;
         };
     } & {
         name: string;
@@ -373,8 +373,8 @@ export declare class ProjectsService {
         movedBy: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
     } & {
         id: string;
@@ -398,14 +398,14 @@ export declare class ProjectsService {
             requestedBy: {
                 name: string;
                 email: string;
-                role: import(".prisma/client").$Enums.Role;
                 id: string;
+                role: import(".prisma/client").$Enums.Role;
             };
             assignedTo: {
                 name: string;
                 email: string;
-                role: import(".prisma/client").$Enums.Role;
                 id: string;
+                role: import(".prisma/client").$Enums.Role;
             };
         } & {
             description: string;
@@ -425,14 +425,14 @@ export declare class ProjectsService {
         movedBy: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
         permissionGrantedBy: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
     } & {
         id: string;
@@ -455,14 +455,14 @@ export declare class ProjectsService {
         requestedBy: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
         assignedTo: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
     } & {
         description: string;
@@ -488,14 +488,14 @@ export declare class ProjectsService {
         requestedBy: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
         assignedTo: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
     } & {
         description: string;
@@ -516,14 +516,14 @@ export declare class ProjectsService {
         requestedBy: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
         assignedTo: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
     } & {
         description: string;
@@ -562,8 +562,8 @@ export declare class ProjectsService {
         requestedBy: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
     } & {
         id: string;
@@ -582,14 +582,14 @@ export declare class ProjectsService {
         requestedBy: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
         reviewedBy: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
     } & {
         id: string;
@@ -608,8 +608,8 @@ export declare class ProjectsService {
         testedBy: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
     } & {
         id: string;
@@ -642,8 +642,8 @@ export declare class ProjectsService {
         testedBy: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
     } & {
         id: string;
@@ -663,8 +663,8 @@ export declare class ProjectsService {
         assignedTo: {
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
             id: string;
+            role: import(".prisma/client").$Enums.Role;
         };
     } & {
         description: string;
@@ -685,14 +685,14 @@ export declare class ProjectsService {
                 requestedBy: {
                     name: string;
                     email: string;
-                    role: import(".prisma/client").$Enums.Role;
                     id: string;
+                    role: import(".prisma/client").$Enums.Role;
                 };
                 assignedTo: {
                     name: string;
                     email: string;
-                    role: import(".prisma/client").$Enums.Role;
                     id: string;
+                    role: import(".prisma/client").$Enums.Role;
                 };
             } & {
                 description: string;
@@ -714,8 +714,8 @@ export declare class ProjectsService {
                     assignedTo: {
                         name: string;
                         email: string;
-                        role: import(".prisma/client").$Enums.Role;
                         id: string;
+                        role: import(".prisma/client").$Enums.Role;
                     };
                 } & {
                     description: string;
@@ -733,8 +733,8 @@ export declare class ProjectsService {
                 testedBy: {
                     name: string;
                     email: string;
-                    role: import(".prisma/client").$Enums.Role;
                     id: string;
+                    role: import(".prisma/client").$Enums.Role;
                 };
             } & {
                 id: string;
@@ -754,14 +754,14 @@ export declare class ProjectsService {
                 requestedBy: {
                     name: string;
                     email: string;
-                    role: import(".prisma/client").$Enums.Role;
                     id: string;
+                    role: import(".prisma/client").$Enums.Role;
                 };
                 reviewedBy: {
                     name: string;
                     email: string;
-                    role: import(".prisma/client").$Enums.Role;
                     id: string;
+                    role: import(".prisma/client").$Enums.Role;
                 };
             } & {
                 id: string;
@@ -826,5 +826,46 @@ export declare class ProjectsService {
             missingRequirements: string[];
         };
         canProceed: boolean;
+    }>;
+    requestManagerReview(projectId: string, reason: string, user: User): Promise<{
+        requestedBy: {
+            name: string;
+            email: string;
+            id: string;
+            role: import(".prisma/client").$Enums.Role;
+        };
+    } & {
+        id: string;
+        comments: string | null;
+        status: import(".prisma/client").$Enums.ApprovalStatus;
+        historyId: string;
+        approvalType: import(".prisma/client").$Enums.ApprovalType;
+        requestedById: string;
+        reviewedById: string | null;
+        requestedAt: Date;
+        reviewedAt: Date | null;
+        rejectionReason: string | null;
+        attachments: string[];
+    }>;
+    submitManagerReview(approvalId: string, decision: 'PROCEED' | 'REVISE' | 'CANCEL', comments: string, user: User): Promise<{
+        name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        office: string;
+        category: import(".prisma/client").$Enums.ProjectCategory;
+        pagesCount: number | null;
+        targetDate: Date;
+        status: import(".prisma/client").$Enums.ProjectStatus;
+        ownerId: string;
+        clientName: string | null;
+        observations: string | null;
+        monthsPassed: number;
+        startDate: Date;
+        deviationReason: string | null;
+        dependency: boolean;
+        currentDepartment: import(".prisma/client").$Enums.Department;
+        nextDepartment: import(".prisma/client").$Enums.Department | null;
+        projectCode: string;
     }>;
 }

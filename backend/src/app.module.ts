@@ -7,6 +7,8 @@ import { UsersModule } from './users/users.module';
 import { ProjectsModule } from './projects/projects.module';
 import { TasksModule } from './tasks/tasks.module';
 import { CommentsModule } from './comments/comments.module';
+import { DepartmentsModule } from './departments/departments.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { CommentsModule } from './comments/comments.module';
     ProjectsModule,
     TasksModule,
     CommentsModule,
+    DepartmentsModule,
+    RolesModule,
   ],
   controllers: [],
   providers: [],

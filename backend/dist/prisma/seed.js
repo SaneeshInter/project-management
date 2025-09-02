@@ -6,17 +6,131 @@ const project_code_util_1 = require("../src/utils/project-code.util");
 const prisma = new client_1.PrismaClient();
 async function main() {
     console.log('🌱 Starting database seed...');
+    const pmoDept = await prisma.departmentMaster.upsert({
+        where: { code: 'PMO' },
+        update: {},
+        create: {
+            name: 'PMO',
+            code: 'PMO',
+        },
+    });
+    const designDept = await prisma.departmentMaster.upsert({
+        where: { code: 'DESIGN' },
+        update: {},
+        create: {
+            name: 'DESIGN',
+            code: 'DESIGN',
+        },
+    });
+    const htmlDept = await prisma.departmentMaster.upsert({
+        where: { code: 'HTML' },
+        update: {},
+        create: {
+            name: 'HTML',
+            code: 'HTML',
+        },
+    });
+    const devDept = await prisma.departmentMaster.upsert({
+        where: { code: 'DEV' },
+        update: {},
+        create: {
+            name: 'DEV',
+            code: 'DEV',
+        },
+    });
+    const reactDept = await prisma.departmentMaster.upsert({
+        where: { code: 'REACT' },
+        update: {},
+        create: {
+            name: 'React',
+            code: 'REACT',
+            parentId: devDept.id,
+        },
+    });
+    const phpDept = await prisma.departmentMaster.upsert({
+        where: { code: 'PHP' },
+        update: {},
+        create: {
+            name: 'PHP',
+            code: 'PHP',
+            parentId: devDept.id,
+        },
+    });
+    const appDept = await prisma.departmentMaster.upsert({
+        where: { code: 'APP' },
+        update: {},
+        create: {
+            name: 'App',
+            code: 'APP',
+            parentId: devDept.id,
+        },
+    });
+    const wordpressDept = await prisma.departmentMaster.upsert({
+        where: { code: 'WORDPRESS' },
+        update: {},
+        create: {
+            name: 'WordPress',
+            code: 'WORDPRESS',
+            parentId: devDept.id,
+        },
+    });
+    console.log('✅ Department master data created/updated');
+    await prisma.roleMaster.upsert({
+        where: { code: 'PC' },
+        update: {},
+        create: {
+            name: 'Project Coordinator',
+            code: 'PC',
+            description: 'Coordinates project activities and timelines',
+            departmentId: pmoDept.id,
+        },
+    });
+    await prisma.roleMaster.upsert({
+        where: { code: 'DESIGNER' },
+        update: {},
+        create: {
+            name: 'Designer',
+            code: 'DESIGNER',
+            description: 'Creates visual designs and user interfaces',
+            departmentId: designDept.id,
+        },
+    });
+    await prisma.roleMaster.upsert({
+        where: { code: 'DEVELOPER' },
+        update: {},
+        create: {
+            name: 'Developer',
+            code: 'DEVELOPER',
+            description: 'Develops software applications and systems',
+            departmentId: devDept.id,
+        },
+    });
+    await prisma.roleMaster.upsert({
+        where: { code: 'TESTER' },
+        update: {},
+        create: {
+            name: 'Tester',
+            code: 'TESTER',
+            description: 'Tests software quality and functionality',
+            departmentId: devDept.id,
+        },
+    });
+    console.log('✅ Role master data created/updated');
     const hashedPassword = await bcrypt.hash('password123', 12);
-    const admin = await prisma.user.create({
-        data: {
+    const admin = await prisma.user.upsert({
+        where: { email: 'admin@intersmart.com' },
+        update: {},
+        create: {
             email: 'admin@intersmart.com',
             name: 'Admin User',
             password: hashedPassword,
             role: client_1.Role.ADMIN,
         },
     });
-    const projectManager = await prisma.user.create({
-        data: {
+    const projectManager = await prisma.user.upsert({
+        where: { email: 'pm@intersmart.com' },
+        update: {},
+        create: {
             email: 'pm@intersmart.com',
             name: 'Project Manager',
             password: hashedPassword,
@@ -24,8 +138,10 @@ async function main() {
             department: client_1.Department.PMO,
         },
     });
-    const arjun = await prisma.user.create({
-        data: {
+    const arjun = await prisma.user.upsert({
+        where: { email: 'arjun@intersmart.com' },
+        update: {},
+        create: {
             email: 'arjun@intersmart.com',
             name: 'Arjun Developer',
             password: hashedPassword,
@@ -33,8 +149,10 @@ async function main() {
             department: client_1.Department.REACT,
         },
     });
-    const designer = await prisma.user.create({
-        data: {
+    const designer = await prisma.user.upsert({
+        where: { email: 'designer@intersmart.com' },
+        update: {},
+        create: {
             email: 'designer@intersmart.com',
             name: 'UI Designer',
             password: hashedPassword,
@@ -42,16 +160,20 @@ async function main() {
             department: client_1.Department.DESIGN,
         },
     });
-    const client = await prisma.user.create({
-        data: {
+    const client = await prisma.user.upsert({
+        where: { email: 'client@example.com' },
+        update: {},
+        create: {
             email: 'client@example.com',
             name: 'Client User',
             password: hashedPassword,
             role: client_1.Role.CLIENT,
         },
     });
-    const seniorManager = await prisma.user.create({
-        data: {
+    const seniorManager = await prisma.user.upsert({
+        where: { email: 'senior.manager@intersmart.com' },
+        update: {},
+        create: {
             email: 'senior.manager@intersmart.com',
             name: 'Senior Manager',
             password: hashedPassword,
@@ -59,8 +181,10 @@ async function main() {
             department: client_1.Department.MANAGER,
         },
     });
-    const operationsManager = await prisma.user.create({
-        data: {
+    const operationsManager = await prisma.user.upsert({
+        where: { email: 'ops.manager@intersmart.com' },
+        update: {},
+        create: {
             email: 'ops.manager@intersmart.com',
             name: 'Operations Manager',
             password: hashedPassword,
@@ -68,8 +192,10 @@ async function main() {
             department: client_1.Department.MANAGER,
         },
     });
-    const regionalManager = await prisma.user.create({
-        data: {
+    const regionalManager = await prisma.user.upsert({
+        where: { email: 'regional.manager@intersmart.com' },
+        update: {},
+        create: {
             email: 'regional.manager@intersmart.com',
             name: 'Regional Manager',
             password: hashedPassword,
@@ -77,8 +203,10 @@ async function main() {
             department: client_1.Department.MANAGER,
         },
     });
-    const departmentHead = await prisma.user.create({
-        data: {
+    const departmentHead = await prisma.user.upsert({
+        where: { email: 'dept.head@intersmart.com' },
+        update: {},
+        create: {
             email: 'dept.head@intersmart.com',
             name: 'Department Head',
             password: hashedPassword,

@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Project, Department, CreateDepartmentTransitionDto } from '@/types';
 import { projectsApi } from '@/lib/api';
 import toast from 'react-hot-toast';
+import AlertDialog from '@/components/ui/alert-dialog';
+import { standardizeErrorMessage, getErrorSuggestion } from '@/lib/errorMessages';
 
 interface DepartmentWorkflowCardProps {
   project: Project;
@@ -46,6 +48,7 @@ export default function DepartmentWorkflowCard({
   const [showTransitionModal, setShowTransitionModal] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
   const [transitionNotes, setTransitionNotes] = useState('');
+  const [errorAlert, setErrorAlert] = useState<{ title: string; message: string; suggestion?: string } | null>(null);
 
   const currentIndex = departmentOrder.indexOf(project.currentDepartment);
   const suggestedNext = currentIndex < departmentOrder.length - 1 
@@ -68,7 +71,12 @@ export default function DepartmentWorkflowCard({
       setShowTransitionModal(false);
       setTransitionNotes('');
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to move project');
+      const technicalMessage = error.response?.data?.message || 'Failed to move project to the selected department. Please try again.';
+      setErrorAlert({
+        title: 'Cannot Change Project Stage',
+        message: standardizeErrorMessage(technicalMessage),
+        suggestion: getErrorSuggestion(technicalMessage)
+      });
     } finally {
       setIsMoving(false);
     }
@@ -80,6 +88,7 @@ export default function DepartmentWorkflowCard({
   };
 
   return (
+    <>
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
@@ -275,5 +284,17 @@ export default function DepartmentWorkflowCard({
         )}
       </CardContent>
     </Card>
+    
+    {errorAlert && (
+      <AlertDialog
+        isOpen={!!errorAlert}
+        onClose={() => setErrorAlert(null)}
+        title={errorAlert.title}
+        message={errorAlert.message}
+        suggestion={errorAlert.suggestion}
+        type="error"
+      />
+    )}
+    </>
   );
 }

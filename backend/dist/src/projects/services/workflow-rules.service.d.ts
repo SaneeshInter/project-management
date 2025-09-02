@@ -32,6 +32,8 @@ export declare class WorkflowRulesService {
     getAllowedNextDepartments(currentDepartment: Department): Department[];
     getWorkflowSequence(projectCategory: string): Department[];
     canSkipDepartment(department: Department, reason: string, userRole: string): boolean;
+    getBugFixDepartment(bugDescription: string, bugTitle: string): Department[];
+    requiresManagerReview(projectRejectionCount: number, criticalBugsCount: number): boolean;
     validateWorkflowTransition(currentDepartment: Department, targetDepartment: Department, currentStatus: DepartmentWorkStatus, approvals: Array<{
         approvalType: string;
         status: ApprovalStatus;

@@ -2,8 +2,11 @@
 export enum Role {
   ADMIN = 'ADMIN',
   PROJECT_MANAGER = 'PROJECT_MANAGER',
+  PROJECT_COORDINATOR = 'PROJECT_COORDINATOR',
   DEVELOPER = 'DEVELOPER',
   DESIGNER = 'DESIGNER',
+  HTML_DEVELOPER = 'HTML_DEVELOPER',
+  QA_TESTER = 'QA_TESTER',
   CLIENT = 'CLIENT',
 }
 
@@ -79,6 +82,31 @@ export enum CorrectionStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   RESOLVED = 'RESOLVED',
   REJECTED = 'REJECTED',
+}
+
+// Master table types
+export interface DepartmentMaster {
+  id: string;
+  name: string;
+  code: string;
+  parentId?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  parent?: DepartmentMaster;
+  children?: DepartmentMaster[];
+}
+
+export interface RoleMaster {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  departmentId: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  department: DepartmentMaster;
 }
 
 // User types
@@ -361,6 +389,7 @@ export enum ApprovalType {
   CLIENT_APPROVAL = 'CLIENT_APPROVAL',
   QA_APPROVAL = 'QA_APPROVAL',
   BEFORE_LIVE_QA = 'BEFORE_LIVE_QA',
+  MANAGER_REVIEW = 'MANAGER_REVIEW',
 }
 
 export enum ApprovalStatus {

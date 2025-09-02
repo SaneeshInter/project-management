@@ -1,2 +1,2 @@
 export * from '../../../shared/types';
-export { authApi, projectsApi, usersApi, commentsApi } from '../lib/api';
+export { authApi, projectsApi, usersApi, commentsApi, departmentsApi, rolesApi } from '../lib/api';

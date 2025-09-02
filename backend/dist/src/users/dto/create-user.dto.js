@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateUserDto = void 0;
 const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
-const client_1 = require("@prisma/client");
 class CreateUserDto {
 }
 exports.CreateUserDto = CreateUserDto;
@@ -27,23 +26,22 @@ __decorate([
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'password123', minLength: 6 }),
+    (0, swagger_1.ApiPropertyOptional)({ example: 'inter123', minLength: 6, default: 'inter123' }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(6),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "password", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ enum: client_1.Role, example: client_1.Role.DEVELOPER }),
-    (0, class_validator_1.IsEnum)(client_1.Role),
-    (0, class_validator_1.IsOptional)(),
+    (0, swagger_1.ApiProperty)({ example: 'role-id-from-database' }),
+    (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CreateUserDto.prototype, "role", void 0);
+], CreateUserDto.prototype, "roleId", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ enum: client_1.Department, example: client_1.Department.DESIGN }),
-    (0, class_validator_1.IsEnum)(client_1.Department),
-    (0, class_validator_1.IsOptional)(),
+    (0, swagger_1.ApiProperty)({ example: 'department-id-from-database' }),
+    (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CreateUserDto.prototype, "department", void 0);
+], CreateUserDto.prototype, "departmentId", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: 'https://example.com/avatar.jpg' }),
     (0, class_validator_1.IsString)(),

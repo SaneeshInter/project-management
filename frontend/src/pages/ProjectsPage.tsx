@@ -17,6 +17,8 @@ import ProjectQuickActions from '@/components/projects/ProjectQuickActions';
 import GroupedProjectView from '@/components/projects/GroupedProjectView';
 import ProjectViewControls from '@/components/projects/ProjectViewControls';
 import SimpleDepartmentPipeline from '@/components/projects/SimpleDepartmentPipeline';
+import AlertDialog from '@/components/ui/alert-dialog';
+import { standardizeErrorMessage, getErrorSuggestion } from '@/lib/errorMessages';
 
 interface FilterOptions {
   searchTerm: string;
@@ -66,6 +68,7 @@ export default function ProjectsPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [groupBy, setGroupBy] = useState<'department' | 'status' | 'health' | 'dueDate' | 'none'>('department');
   const [showStats, setShowStats] = useState(true);
+  const [errorAlert, setErrorAlert] = useState<{ title: string; message: string; suggestion?: string } | null>(null);
   
   const [filters, setFilters] = useState<FilterOptions>({
     searchTerm: '',
@@ -244,8 +247,13 @@ export default function ProjectsPage() {
     try {
       await moveProject(projectId, data);
       fetchProjects(); // Refresh the projects list
-    } catch (error) {
-      console.error('Failed to move project:', error);
+    } catch (error: any) {
+      const technicalMessage = error.message || 'Failed to move project to the selected department. Please try again.';
+      setErrorAlert({
+        title: 'Cannot Change Project Stage',
+        message: standardizeErrorMessage(technicalMessage),
+        suggestion: getErrorSuggestion(technicalMessage)
+      });
     }
   };
 
@@ -341,7 +349,7 @@ export default function ProjectsPage() {
       {/* Department Pipeline */}
       {groupBy === 'department' && filteredProjects.length > 0 && (
         <SimpleDepartmentPipeline
-          projects={filteredProjects}
+          projects={projects}
           onDepartmentClick={(dept) => {
             setFilters(prev => ({ ...prev, department: dept }));
           }}
@@ -449,6 +457,17 @@ export default function ProjectsPage() {
           onMoveProject={handleMoveProject}
           onUpdateStatus={handleUpdateStatus}
           onQuickEdit={handleQuickEdit}
+        />
+      )}
+      
+      {errorAlert && (
+        <AlertDialog
+          isOpen={!!errorAlert}
+          onClose={() => setErrorAlert(null)}
+          title={errorAlert.title}
+          message={errorAlert.message}
+          suggestion={errorAlert.suggestion}
+          type="error"
         />
       )}
     </div>

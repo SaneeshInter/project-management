@@ -7,6 +7,8 @@ import RegisterPage from '@/pages/RegisterPage';
 import ProjectsPage from '@/pages/ProjectsPage';
 import ProjectDetailPage from '@/pages/ProjectDetailPage';
 import UsersPage from '@/pages/UsersPage';
+import DepartmentsPage from '@/pages/DepartmentsPage';
+import RolesPage from '@/pages/RolesPage';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 function App() {
@@ -38,6 +40,8 @@ function App() {
           <Route path="projects" element={<ProjectsPage />} />
           <Route path="projects/:id" element={<ProjectDetailPage />} />
           <Route path="users" element={<UsersPage />} />
+          <Route path="departments" element={<DepartmentsPage />} />
+          <Route path="roles" element={<RolesPage />} />
         </Route>
 
         {/* Catch all route */}

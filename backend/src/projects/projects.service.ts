@@ -8,7 +8,7 @@ import { CreateDepartmentTransitionDto } from './dto/create-department-transitio
 import { UpdateDepartmentWorkStatusDto } from './dto/update-department-work-status.dto';
 import { CreateCorrectionDto } from './dto/create-correction.dto';
 import { UpdateCorrectionDto } from './dto/update-correction.dto';
-import { User, Role, DepartmentWorkStatus, CorrectionStatus, ApprovalType, ApprovalStatus, QAType, QAStatus, Department } from '@prisma/client';
+import { User, Role, DepartmentWorkStatus, CorrectionStatus, ApprovalType, ApprovalStatus, QAType, QAStatus, Department, ProjectStatus } from '@prisma/client';
 import { generateProjectCode } from '../utils/project-code.util';
 
 @Injectable()
@@ -436,7 +436,7 @@ export class ProjectsService {
     }
 
     // Find the current department history entry
-    const currentDepartmentHistory = await this.prisma.projectDepartmentHistory.findFirst({
+    let currentDepartmentHistory = await this.prisma.projectDepartmentHistory.findFirst({
       where: {
         projectId,
         toDepartment: project.currentDepartment,
@@ -444,8 +444,19 @@ export class ProjectsService {
       orderBy: { createdAt: 'desc' },
     });
 
+    // If no history record exists for current department, create one
     if (!currentDepartmentHistory) {
-      throw new NotFoundException('Current department history not found');
+      currentDepartmentHistory = await this.prisma.projectDepartmentHistory.create({
+        data: {
+          projectId,
+          fromDepartment: null,
+          toDepartment: project.currentDepartment,
+          workStatus: DepartmentWorkStatus.NOT_STARTED,
+          movedById: user.id,
+          permissionGrantedById: user.id,
+          notes: 'Auto-created missing department history record',
+        },
+      });
     }
 
     // Calculate actual days if work is completed
@@ -876,16 +887,45 @@ export class ProjectsService {
   async createQABug(qaRoundId: string, bugData: any, user: User) {
     const qaRound = await this.prisma.qATestingRound.findUnique({
       where: { id: qaRoundId },
+      include: {
+        departmentHistory: {
+          include: { project: true }
+        }
+      }
     });
 
     if (!qaRound) {
       throw new NotFoundException('QA testing round not found');
     }
 
+    // Use workflow rules to determine which department should fix this bug
+    const targetDepartments = this.workflowRules.getBugFixDepartment(
+      bugData.description || '', 
+      bugData.title || ''
+    );
+
+    // For now, assign to the most appropriate department based on project type
+    let assignedDepartment: Department;
+    const project = qaRound.departmentHistory.project;
+    
+    if (targetDepartments.includes(Department.HTML)) {
+      assignedDepartment = Department.HTML;
+    } else if (project.category.includes('PHP') && targetDepartments.includes(Department.PHP)) {
+      assignedDepartment = Department.PHP;
+    } else if (targetDepartments.includes(Department.REACT)) {
+      assignedDepartment = Department.REACT;
+    } else {
+      assignedDepartment = Department.HTML; // Default fallback
+    }
+
     return this.prisma.qABug.create({
       data: {
         qaRoundId,
         ...bugData,
+        // Add metadata about department assignment
+        steps: bugData.steps ? 
+          `${bugData.steps}\n\n[Auto-assigned to ${assignedDepartment} based on bug analysis]` :
+          `[Auto-assigned to ${assignedDepartment} based on bug analysis]`
       },
       include: {
         assignedTo: {
@@ -1006,5 +1046,133 @@ export class ProjectsService {
       },
       canProceed: gateStatus.satisfied && allowedDepartments.length > 0,
     };
+  }
+
+  async requestManagerReview(projectId: string, reason: string, user: User) {
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+      include: {
+        departmentHistory: {
+          include: {
+            qaRounds: {
+              include: { bugs: true }
+            }
+          }
+        }
+      }
+    });
+
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${projectId} not found`);
+    }
+
+    // Check if manager review is required
+    const totalRejections = project.departmentHistory.filter(
+      h => h.workStatus === DepartmentWorkStatus.QA_REJECTED || 
+           h.workStatus === DepartmentWorkStatus.CLIENT_REJECTED
+    ).length;
+
+    const totalCriticalBugs = project.departmentHistory
+      .flatMap(h => h.qaRounds)
+      .reduce((sum, qa) => sum + qa.criticalBugs, 0);
+
+    if (!this.workflowRules.requiresManagerReview(totalRejections, totalCriticalBugs)) {
+      throw new BadRequestException('Manager review not required for this project');
+    }
+
+    // Find current department history
+    const currentHistory = await this.prisma.projectDepartmentHistory.findFirst({
+      where: { 
+        projectId: projectId,
+        toDepartment: project.currentDepartment 
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!currentHistory) {
+      throw new NotFoundException('Current department history not found');
+    }
+
+    // Create manager approval request
+    return this.prisma.workflowApproval.create({
+      data: {
+        historyId: currentHistory.id,
+        approvalType: ApprovalType.MANAGER_REVIEW,
+        requestedById: user.id,
+        comments: `Manager review requested: ${reason}`,
+      },
+      include: {
+        requestedBy: {
+          select: { id: true, name: true, email: true, role: true },
+        },
+      },
+    });
+  }
+
+  async submitManagerReview(approvalId: string, decision: 'PROCEED' | 'REVISE' | 'CANCEL', comments: string, user: User) {
+    // Only managers can submit manager reviews
+    if (user.role !== Role.PROJECT_MANAGER && user.role !== Role.ADMIN) {
+      throw new ForbiddenException('Only managers can submit manager reviews');
+    }
+
+    const approval = await this.prisma.workflowApproval.findUnique({
+      where: { id: approvalId },
+      include: { 
+        departmentHistory: { 
+          include: { project: true } 
+        } 
+      },
+    });
+
+    if (!approval) {
+      throw new NotFoundException('Manager review not found');
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      // Update the approval
+      await tx.workflowApproval.update({
+        where: { id: approvalId },
+        data: {
+          status: decision === 'PROCEED' ? ApprovalStatus.APPROVED : ApprovalStatus.REJECTED,
+          reviewedById: user.id,
+          reviewedAt: new Date(),
+          comments,
+          rejectionReason: decision === 'CANCEL' ? 'Project cancelled by management' : undefined,
+        },
+      });
+
+      // Update project status based on decision
+      let newStatus: ProjectStatus;
+      let newWorkStatus: DepartmentWorkStatus;
+
+      switch (decision) {
+        case 'PROCEED':
+          newStatus = ProjectStatus.ACTIVE;
+          newWorkStatus = DepartmentWorkStatus.READY_FOR_DELIVERY;
+          break;
+        case 'REVISE':
+          newStatus = ProjectStatus.ACTIVE;
+          newWorkStatus = DepartmentWorkStatus.CORRECTIONS_NEEDED;
+          break;
+        case 'CANCEL':
+          newStatus = ProjectStatus.CANCELLED;
+          newWorkStatus = approval.departmentHistory.workStatus;
+          break;
+      }
+
+      // Update project
+      const updatedProject = await tx.project.update({
+        where: { id: approval.departmentHistory.projectId },
+        data: { status: newStatus },
+      });
+
+      // Update department history
+      await tx.projectDepartmentHistory.update({
+        where: { id: approval.historyId },
+        data: { workStatus: newWorkStatus },
+      });
+
+      return updatedProject;
+    });
   }
 }

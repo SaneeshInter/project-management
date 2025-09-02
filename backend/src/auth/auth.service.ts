@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
+import { PrismaService } from '../database/prisma.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
@@ -10,6 +11,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private prisma: PrismaService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -46,10 +48,25 @@ export class AuthService {
       throw new ConflictException('User with this email already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(registerDto.password, 12);
+    // For registration, we need to find default department and role
+    // This is a registration flow, so we'll use default values
+    const defaultDepartment = await this.prisma.departmentMaster.findFirst({
+      where: { isActive: true }
+    });
+    const defaultRole = await this.prisma.roleMaster.findFirst({
+      where: { isActive: true }
+    });
+
+    if (!defaultDepartment || !defaultRole) {
+      throw new Error('No active departments or roles found');
+    }
+
     const user = await this.usersService.create({
-      ...registerDto,
-      password: hashedPassword,
+      email: registerDto.email,
+      name: registerDto.name,
+      roleId: defaultRole.id,
+      departmentId: defaultDepartment.id,
+      avatar: registerDto.avatar,
     });
 
     const { password, ...result } = user;

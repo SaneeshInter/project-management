@@ -25,69 +25,103 @@ let WorkflowRulesService = class WorkflowRulesService {
                 from: client_1.Department.PMO,
                 to: client_1.Department.DESIGN,
                 requiredStatus: client_1.DepartmentWorkStatus.COMPLETED,
+                requiresApproval: true,
+                allowedRoles: ['PROJECT_COORDINATOR', 'ADMIN'],
             },
             {
                 from: client_1.Department.DESIGN,
                 to: client_1.Department.HTML,
                 requiredStatus: client_1.DepartmentWorkStatus.COMPLETED,
                 requiresApproval: true,
+                allowedRoles: ['PROJECT_COORDINATOR', 'ADMIN'],
             },
             {
                 from: client_1.Department.HTML,
                 to: client_1.Department.PHP,
                 requiredStatus: client_1.DepartmentWorkStatus.COMPLETED,
                 requiresQAPassing: true,
+                allowedRoles: ['PROJECT_COORDINATOR', 'QA_TESTER', 'ADMIN'],
             },
             {
                 from: client_1.Department.HTML,
                 to: client_1.Department.REACT,
                 requiredStatus: client_1.DepartmentWorkStatus.COMPLETED,
                 requiresQAPassing: true,
+                allowedRoles: ['PROJECT_COORDINATOR', 'QA_TESTER', 'ADMIN'],
             },
             {
                 from: client_1.Department.PHP,
                 to: client_1.Department.QA,
                 requiredStatus: client_1.DepartmentWorkStatus.COMPLETED,
-                requiresQAPassing: true,
+                allowedRoles: ['DEVELOPER', 'PROJECT_COORDINATOR', 'ADMIN'],
             },
             {
                 from: client_1.Department.REACT,
                 to: client_1.Department.QA,
                 requiredStatus: client_1.DepartmentWorkStatus.COMPLETED,
-                requiresQAPassing: true,
+                allowedRoles: ['DEVELOPER', 'PROJECT_COORDINATOR', 'ADMIN'],
             },
             {
                 from: client_1.Department.QA,
                 to: client_1.Department.DELIVERY,
                 requiredStatus: client_1.DepartmentWorkStatus.READY_FOR_DELIVERY,
                 requiresApproval: true,
+                allowedRoles: ['QA_TESTER', 'PROJECT_COORDINATOR', 'ADMIN'],
+            },
+            {
+                from: client_1.Department.HTML,
+                to: client_1.Department.DESIGN,
+                requiredStatus: client_1.DepartmentWorkStatus.CORRECTIONS_NEEDED,
+                allowedRoles: ['PROJECT_COORDINATOR', 'QA_TESTER', 'ADMIN'],
+            },
+            {
+                from: client_1.Department.QA,
+                to: client_1.Department.HTML,
+                requiredStatus: client_1.DepartmentWorkStatus.BUGFIX_IN_PROGRESS,
+                allowedRoles: ['QA_TESTER', 'PROJECT_COORDINATOR', 'ADMIN'],
+            },
+            {
+                from: client_1.Department.QA,
+                to: client_1.Department.PHP,
+                requiredStatus: client_1.DepartmentWorkStatus.BUGFIX_IN_PROGRESS,
+                allowedRoles: ['QA_TESTER', 'PROJECT_COORDINATOR', 'ADMIN'],
+            },
+            {
+                from: client_1.Department.QA,
+                to: client_1.Department.REACT,
+                requiredStatus: client_1.DepartmentWorkStatus.BUGFIX_IN_PROGRESS,
+                allowedRoles: ['QA_TESTER', 'PROJECT_COORDINATOR', 'ADMIN'],
             },
         ];
         this.approvalGates = [
             {
+                department: client_1.Department.PMO,
+                requiredApprovals: ['CLIENT_APPROVAL'],
+                minimumWorkStatus: client_1.DepartmentWorkStatus.PENDING_CLIENT_APPROVAL,
+            },
+            {
                 department: client_1.Department.DESIGN,
                 requiredApprovals: ['CLIENT_APPROVAL'],
-                minimumWorkStatus: client_1.DepartmentWorkStatus.COMPLETED,
+                minimumWorkStatus: client_1.DepartmentWorkStatus.PENDING_CLIENT_APPROVAL,
             },
             {
                 department: client_1.Department.HTML,
                 requiredQAStatus: client_1.QAStatus.PASSED,
-                minimumWorkStatus: client_1.DepartmentWorkStatus.COMPLETED,
+                minimumWorkStatus: client_1.DepartmentWorkStatus.QA_TESTING,
             },
             {
                 department: client_1.Department.PHP,
                 requiredQAStatus: client_1.QAStatus.PASSED,
-                minimumWorkStatus: client_1.DepartmentWorkStatus.COMPLETED,
+                minimumWorkStatus: client_1.DepartmentWorkStatus.QA_TESTING,
             },
             {
                 department: client_1.Department.REACT,
                 requiredQAStatus: client_1.QAStatus.PASSED,
-                minimumWorkStatus: client_1.DepartmentWorkStatus.COMPLETED,
+                minimumWorkStatus: client_1.DepartmentWorkStatus.QA_TESTING,
             },
             {
                 department: client_1.Department.QA,
-                requiredApprovals: ['BEFORE_LIVE_QA'],
-                minimumWorkStatus: client_1.DepartmentWorkStatus.BEFORE_LIVE_QA,
+                minimumWorkStatus: client_1.DepartmentWorkStatus.READY_FOR_DELIVERY,
             },
         ];
     }
@@ -159,6 +193,27 @@ let WorkflowRulesService = class WorkflowRulesService {
             return false;
         }
         return reason.toLowerCase().includes('emergency');
+    }
+    getBugFixDepartment(bugDescription, bugTitle) {
+        const content = (bugDescription + ' ' + bugTitle).toLowerCase();
+        const possibleDepartments = [];
+        const htmlKeywords = ['layout', 'css', 'styling', 'responsive', 'alignment', 'ui', 'visual', 'design', 'html', 'frontend'];
+        const devKeywords = ['function', 'api', 'database', 'backend', 'logic', 'validation', 'calculation', 'data', 'server'];
+        const hasHtmlKeywords = htmlKeywords.some(keyword => content.includes(keyword));
+        const hasDevKeywords = devKeywords.some(keyword => content.includes(keyword));
+        if (hasHtmlKeywords)
+            possibleDepartments.push(client_1.Department.HTML);
+        if (hasDevKeywords) {
+            possibleDepartments.push(client_1.Department.PHP);
+            possibleDepartments.push(client_1.Department.REACT);
+        }
+        if (possibleDepartments.length === 0) {
+            possibleDepartments.push(client_1.Department.HTML, client_1.Department.PHP, client_1.Department.REACT);
+        }
+        return possibleDepartments;
+    }
+    requiresManagerReview(projectRejectionCount, criticalBugsCount) {
+        return projectRejectionCount > 0 || criticalBugsCount > 2;
     }
     validateWorkflowTransition(currentDepartment, targetDepartment, currentStatus, approvals, qaRounds, userRole) {
         const errors = [];

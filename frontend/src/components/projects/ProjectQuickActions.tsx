@@ -14,12 +14,14 @@ import {
   ProjectStatus,
   CreateDepartmentTransitionDto 
 } from '@/types';
+import AlertDialog from '@/components/ui/alert-dialog';
+import { standardizeErrorMessage, getErrorSuggestion } from '@/lib/errorMessages';
 
 interface ProjectQuickActionsProps {
   project: Project;
   isOpen: boolean;
   onClose: () => void;
-  onMoveProject?: (projectId: string, data: CreateDepartmentTransitionDto) => void;
+  onMoveProject?: (projectId: string, data: CreateDepartmentTransitionDto) => Promise<void>;
   onUpdateStatus?: (projectId: string, status: ProjectStatus) => void;
   onQuickEdit?: (project: Project) => void;
 }
@@ -28,7 +30,7 @@ interface QuickMoveModalProps {
   project: Project;
   isOpen: boolean;
   onClose: () => void;
-  onMove: (data: CreateDepartmentTransitionDto) => void;
+  onMove: (data: CreateDepartmentTransitionDto) => Promise<void>;
 }
 
 interface QuickStatusUpdateProps {
@@ -53,23 +55,37 @@ function QuickMoveModal({ project, isOpen, onClose, onMove }: QuickMoveModalProp
   const [selectedDepartment, setSelectedDepartment] = useState<Department | ''>('');
   const [estimatedDays, setEstimatedDays] = useState<number | ''>('');
   const [notes, setNotes] = useState('');
+  const [isMoving, setIsMoving] = useState(false);
+  const [errorAlert, setErrorAlert] = useState<{ title: string; message: string; suggestion?: string } | null>(null);
   
   const currentIndex = departmentOrder.indexOf(project.currentDepartment);
   const availableDepartments = departmentOrder.slice(currentIndex + 1);
   
-  const handleMove = () => {
+  const handleMove = async () => {
     if (!selectedDepartment) return;
     
-    onMove({
-      toDepartment: selectedDepartment as Department,
-      estimatedDays: estimatedDays || undefined,
-      notes: notes || undefined
-    });
-    
-    setSelectedDepartment('');
-    setEstimatedDays('');
-    setNotes('');
-    onClose();
+    setIsMoving(true);
+    try {
+      await onMove({
+        toDepartment: selectedDepartment as Department,
+        estimatedDays: estimatedDays || undefined,
+        notes: notes || undefined
+      });
+      
+      setSelectedDepartment('');
+      setEstimatedDays('');
+      setNotes('');
+      onClose();
+    } catch (error: any) {
+      const technicalMessage = error.message || 'Failed to move project to the selected department. Please try again.';
+      setErrorAlert({
+        title: 'Cannot Change Project Stage',
+        message: standardizeErrorMessage(technicalMessage),
+        suggestion: getErrorSuggestion(technicalMessage)
+      });
+    } finally {
+      setIsMoving(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -130,15 +146,26 @@ function QuickMoveModal({ project, isOpen, onClose, onMove }: QuickMoveModalProp
             </Button>
             <Button 
               onClick={handleMove} 
-              disabled={!selectedDepartment}
+              disabled={!selectedDepartment || isMoving}
               className="flex-1"
             >
               <ArrowRight className="h-4 w-4 mr-1" />
-              Move Project
+              {isMoving ? 'Moving...' : 'Move Project'}
             </Button>
           </div>
         </CardContent>
       </Card>
+      
+      {errorAlert && (
+        <AlertDialog
+          isOpen={!!errorAlert}
+          onClose={() => setErrorAlert(null)}
+          title={errorAlert.title}
+          message={errorAlert.message}
+          suggestion={errorAlert.suggestion}
+          type="error"
+        />
+      )}
     </div>
   );
 }
@@ -280,8 +307,10 @@ export default function ProjectQuickActions({
     }
   ];
 
-  const handleMove = (data: CreateDepartmentTransitionDto) => {
-    onMoveProject?.(project.id, data);
+  const handleMove = async (data: CreateDepartmentTransitionDto) => {
+    if (onMoveProject) {
+      await onMoveProject(project.id, data);
+    }
     setShowMoveModal(false);
   };
 

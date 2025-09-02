@@ -19,99 +19,141 @@ export interface WorkflowGate {
 
 @Injectable()
 export class WorkflowRulesService {
-  // Define the strict workflow sequence
+  // Define the strict workflow sequence (PC manages the flow)
   private readonly workflowSequence: Department[] = [
-    Department.PMO,
-    Department.DESIGN,
-    Department.HTML,
-    Department.PHP,    // or REACT depending on project category
-    Department.REACT,  // or PHP depending on project category
-    Department.QA,
-    Department.DELIVERY,
+    Department.PMO,      // PC prepares sections for website
+    Department.DESIGN,   // PC shares KT to Designer, Designer completes design
+    Department.HTML,     // HTML team converts design to HTML
+    Department.PHP,      // or REACT depending on project category (Development)
+    Department.REACT,    // or PHP depending on project category (Development)
+    Department.QA,       // QA testing for both HTML and DEV
+    Department.DELIVERY, // Final delivery after all approvals
   ];
 
-  // Define valid department transitions with requirements
+  // Define valid department transitions based on documented workflow
   private readonly validTransitions: WorkflowTransition[] = [
-    // PMO can move to DESIGN without restrictions
+    // PC prepares sections, gets client approval, then moves to DESIGN
     {
       from: Department.PMO,
       to: Department.DESIGN,
       requiredStatus: DepartmentWorkStatus.COMPLETED,
+      requiresApproval: true, // Client approval of sections
+      allowedRoles: ['PROJECT_COORDINATOR', 'ADMIN'],
     },
     
-    // DESIGN requires client approval before moving to HTML
+    // PC shares KT to Designer, Design team completes and sends to PC
+    // PC verifies design QA and sends for client approval
     {
       from: Department.DESIGN,
       to: Department.HTML,
       requiredStatus: DepartmentWorkStatus.COMPLETED,
-      requiresApproval: true,
+      requiresApproval: true, // Client approval of design
+      allowedRoles: ['PROJECT_COORDINATOR', 'ADMIN'],
     },
     
-    // HTML requires QA testing pass before moving to development
+    // HTML sends to QA, QA reports bugs and moves back to HTML for corrections
+    // After QA approval, HTML moves to DEV
     {
       from: Department.HTML,
       to: Department.PHP,
       requiredStatus: DepartmentWorkStatus.COMPLETED,
-      requiresQAPassing: true,
+      requiresQAPassing: true, // HTML QA must pass
+      allowedRoles: ['PROJECT_COORDINATOR', 'QA_TESTER', 'ADMIN'],
     },
     
     {
       from: Department.HTML,
       to: Department.REACT,
       requiredStatus: DepartmentWorkStatus.COMPLETED,
-      requiresQAPassing: true,
+      requiresQAPassing: true, // HTML QA must pass
+      allowedRoles: ['PROJECT_COORDINATOR', 'QA_TESTER', 'ADMIN'],
     },
     
-    // Development (PHP/REACT) requires DEV QA rounds before final QA
+    // After DEV complete, send to QA for DEV testing
+    // QA separates HTML and DEV bugs, both teams fix in parallel
     {
       from: Department.PHP,
       to: Department.QA,
       requiredStatus: DepartmentWorkStatus.COMPLETED,
-      requiresQAPassing: true,
+      allowedRoles: ['DEVELOPER', 'PROJECT_COORDINATOR', 'ADMIN'],
     },
     
     {
       from: Department.REACT,
       to: Department.QA,
       requiredStatus: DepartmentWorkStatus.COMPLETED,
-      requiresQAPassing: true,
+      allowedRoles: ['DEVELOPER', 'PROJECT_COORDINATOR', 'ADMIN'],
     },
     
-    // Final QA requires before-live QA approval before delivery
+    // Final QA validates fixes, if no issues move to DELIVERY
     {
       from: Department.QA,
       to: Department.DELIVERY,
       requiredStatus: DepartmentWorkStatus.READY_FOR_DELIVERY,
-      requiresApproval: true,
+      requiresApproval: true, // Manager review if project was rejected
+      allowedRoles: ['QA_TESTER', 'PROJECT_COORDINATOR', 'ADMIN'],
+    },
+    
+    // Allow corrections to flow back to previous departments
+    {
+      from: Department.HTML,
+      to: Department.DESIGN,
+      requiredStatus: DepartmentWorkStatus.CORRECTIONS_NEEDED,
+      allowedRoles: ['PROJECT_COORDINATOR', 'QA_TESTER', 'ADMIN'],
+    },
+    
+    {
+      from: Department.QA,
+      to: Department.HTML,
+      requiredStatus: DepartmentWorkStatus.BUGFIX_IN_PROGRESS,
+      allowedRoles: ['QA_TESTER', 'PROJECT_COORDINATOR', 'ADMIN'],
+    },
+    
+    {
+      from: Department.QA,
+      to: Department.PHP,
+      requiredStatus: DepartmentWorkStatus.BUGFIX_IN_PROGRESS,
+      allowedRoles: ['QA_TESTER', 'PROJECT_COORDINATOR', 'ADMIN'],
+    },
+    
+    {
+      from: Department.QA,
+      to: Department.REACT,
+      requiredStatus: DepartmentWorkStatus.BUGFIX_IN_PROGRESS,
+      allowedRoles: ['QA_TESTER', 'PROJECT_COORDINATOR', 'ADMIN'],
     },
   ];
 
-  // Define approval gates for each critical department
+  // Define approval gates matching documented workflow
   private readonly approvalGates: WorkflowGate[] = [
     {
+      department: Department.PMO,
+      requiredApprovals: ['CLIENT_APPROVAL'], // Client approval of sections
+      minimumWorkStatus: DepartmentWorkStatus.PENDING_CLIENT_APPROVAL,
+    },
+    {
       department: Department.DESIGN,
-      requiredApprovals: ['CLIENT_APPROVAL'],
-      minimumWorkStatus: DepartmentWorkStatus.COMPLETED,
+      requiredApprovals: ['CLIENT_APPROVAL'], // Client approval of design
+      minimumWorkStatus: DepartmentWorkStatus.PENDING_CLIENT_APPROVAL,
     },
     {
       department: Department.HTML,
-      requiredQAStatus: QAStatus.PASSED,
-      minimumWorkStatus: DepartmentWorkStatus.COMPLETED,
+      requiredQAStatus: QAStatus.PASSED, // QA testing of HTML
+      minimumWorkStatus: DepartmentWorkStatus.QA_TESTING,
     },
     {
       department: Department.PHP,
-      requiredQAStatus: QAStatus.PASSED,
-      minimumWorkStatus: DepartmentWorkStatus.COMPLETED,
+      requiredQAStatus: QAStatus.PASSED, // DEV QA testing
+      minimumWorkStatus: DepartmentWorkStatus.QA_TESTING,
     },
     {
       department: Department.REACT,
-      requiredQAStatus: QAStatus.PASSED,
-      minimumWorkStatus: DepartmentWorkStatus.COMPLETED,
+      requiredQAStatus: QAStatus.PASSED, // DEV QA testing
+      minimumWorkStatus: DepartmentWorkStatus.QA_TESTING,
     },
     {
       department: Department.QA,
-      requiredApprovals: ['BEFORE_LIVE_QA'],
-      minimumWorkStatus: DepartmentWorkStatus.BEFORE_LIVE_QA,
+      minimumWorkStatus: DepartmentWorkStatus.READY_FOR_DELIVERY, // All fixes validated
     },
   ];
 
@@ -233,6 +275,43 @@ export class WorkflowRulesService {
     }
     
     return reason.toLowerCase().includes('emergency');
+  }
+
+  /**
+   * Determine target department for bug fixes based on bug type
+   * This implements the HTML/DEV bug separation logic
+   */
+  getBugFixDepartment(bugDescription: string, bugTitle: string): Department[] {
+    const content = (bugDescription + ' ' + bugTitle).toLowerCase();
+    const possibleDepartments: Department[] = [];
+    
+    // HTML-related keywords
+    const htmlKeywords = ['layout', 'css', 'styling', 'responsive', 'alignment', 'ui', 'visual', 'design', 'html', 'frontend'];
+    // DEV-related keywords  
+    const devKeywords = ['function', 'api', 'database', 'backend', 'logic', 'validation', 'calculation', 'data', 'server'];
+    
+    const hasHtmlKeywords = htmlKeywords.some(keyword => content.includes(keyword));
+    const hasDevKeywords = devKeywords.some(keyword => content.includes(keyword));
+    
+    if (hasHtmlKeywords) possibleDepartments.push(Department.HTML);
+    if (hasDevKeywords) {
+      possibleDepartments.push(Department.PHP);
+      possibleDepartments.push(Department.REACT);
+    }
+    
+    // If unclear, assign to both for manual review
+    if (possibleDepartments.length === 0) {
+      possibleDepartments.push(Department.HTML, Department.PHP, Department.REACT);
+    }
+    
+    return possibleDepartments;
+  }
+
+  /**
+   * Check if project requires manager review due to rejection
+   */
+  requiresManagerReview(projectRejectionCount: number, criticalBugsCount: number): boolean {
+    return projectRejectionCount > 0 || criticalBugsCount > 2;
   }
 
   /**

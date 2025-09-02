@@ -96,6 +96,12 @@ let ProjectsController = class ProjectsController {
     getWorkflowValidationStatus(id, user) {
         return this.projectsService.getWorkflowValidationStatus(id, user);
     }
+    requestManagerReview(projectId, reviewData, user) {
+        return this.projectsService.requestManagerReview(projectId, reviewData.reason, user);
+    }
+    submitManagerReview(approvalId, reviewDecision, user) {
+        return this.projectsService.submitManagerReview(approvalId, reviewDecision.decision, reviewDecision.comments, user);
+    }
 };
 exports.ProjectsController = ProjectsController;
 __decorate([
@@ -332,6 +338,28 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], ProjectsController.prototype, "getWorkflowValidationStatus", null);
+__decorate([
+    (0, common_1.Post)(':id/manager-review'),
+    (0, swagger_1.ApiOperation)({ summary: 'Request manager review for rejected project' }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'Manager review requested successfully' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, user_decorator_1.User)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "requestManagerReview", null);
+__decorate([
+    (0, common_1.Patch)('manager-review/:approvalId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Submit manager review decision' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Manager review submitted successfully' }),
+    __param(0, (0, common_1.Param)('approvalId')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, user_decorator_1.User)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "submitManagerReview", null);
 exports.ProjectsController = ProjectsController = __decorate([
     (0, swagger_1.ApiTags)('Projects'),
     (0, swagger_1.ApiBearerAuth)('JWT'),

@@ -66,11 +66,29 @@ export const usersApi = {
   getById: (id: string): Promise<User> =>
     api.get(`/users/${id}`).then((res) => res.data),
   
+  create: (data: { name: string; email: string; password?: string; roleId: string; departmentId: string; avatar?: string }) =>
+    api.post('/users', data).then((res) => res.data),
+  
   update: (id: string, data: Partial<User>): Promise<User> =>
     api.patch(`/users/${id}`, data).then((res) => res.data),
   
   delete: (id: string): Promise<void> =>
     api.delete(`/users/${id}`).then((res) => res.data),
+};
+
+// Departments API
+export const departmentsApi = {
+  getAll: () =>
+    api.get('/departments').then((res) => res.data),
+};
+
+// Roles API
+export const rolesApi = {
+  getAll: () =>
+    api.get('/roles').then((res) => res.data),
+  
+  getByDepartment: (departmentId: string) =>
+    api.get(`/roles/by-department?departmentId=${departmentId}`).then((res) => res.data),
 };
 
 // Projects API

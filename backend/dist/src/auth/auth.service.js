@@ -14,10 +14,12 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = require("bcrypt");
 const users_service_1 = require("../users/users.service");
+const prisma_service_1 = require("../database/prisma.service");
 let AuthService = class AuthService {
-    constructor(usersService, jwtService) {
+    constructor(usersService, jwtService, prisma) {
         this.usersService = usersService;
         this.jwtService = jwtService;
+        this.prisma = prisma;
     }
     async validateUser(email, password) {
         const user = await this.usersService.findByEmail(email);
@@ -49,10 +51,21 @@ let AuthService = class AuthService {
         if (existingUser) {
             throw new common_1.ConflictException('User with this email already exists');
         }
-        const hashedPassword = await bcrypt.hash(registerDto.password, 12);
+        const defaultDepartment = await this.prisma.departmentMaster.findFirst({
+            where: { isActive: true }
+        });
+        const defaultRole = await this.prisma.roleMaster.findFirst({
+            where: { isActive: true }
+        });
+        if (!defaultDepartment || !defaultRole) {
+            throw new Error('No active departments or roles found');
+        }
         const user = await this.usersService.create({
-            ...registerDto,
-            password: hashedPassword,
+            email: registerDto.email,
+            name: registerDto.name,
+            roleId: defaultRole.id,
+            departmentId: defaultDepartment.id,
+            avatar: registerDto.avatar,
         });
         const { password, ...result } = user;
         const payload = { sub: result.id, email: result.email, role: result.role };
@@ -72,6 +85,7 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [users_service_1.UsersService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        prisma_service_1.PrismaService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

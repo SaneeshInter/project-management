@@ -2,6 +2,8 @@ import { NavLink } from 'react-router-dom';
 import { 
   FolderOpen, 
   Users, 
+  Building2,
+  UserCheck,
   LogOut 
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
@@ -11,6 +13,8 @@ import { cn } from '@/lib/utils';
 const navigation = [
   { name: 'Projects', href: '/projects', icon: FolderOpen },
   { name: 'Users', href: '/users', icon: Users },
+  { name: 'Departments', href: '/departments', icon: Building2 },
+  { name: 'Roles', href: '/roles', icon: UserCheck },
 ];
 
 export default function Sidebar() {

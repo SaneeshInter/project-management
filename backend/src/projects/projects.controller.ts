@@ -242,4 +242,31 @@ export class ProjectsController {
   getWorkflowValidationStatus(@Param('id') id: string, @User() user: UserEntity) {
     return this.projectsService.getWorkflowValidationStatus(id, user);
   }
+
+  @Post(':id/manager-review')
+  @ApiOperation({ summary: 'Request manager review for rejected project' })
+  @ApiResponse({ status: 201, description: 'Manager review requested successfully' })
+  requestManagerReview(
+    @Param('id') projectId: string,
+    @Body() reviewData: { reason: string },
+    @User() user: UserEntity,
+  ) {
+    return this.projectsService.requestManagerReview(projectId, reviewData.reason, user);
+  }
+
+  @Patch('manager-review/:approvalId')
+  @ApiOperation({ summary: 'Submit manager review decision' })
+  @ApiResponse({ status: 200, description: 'Manager review submitted successfully' })
+  submitManagerReview(
+    @Param('approvalId') approvalId: string,
+    @Body() reviewDecision: { decision: 'PROCEED' | 'REVISE' | 'CANCEL'; comments: string },
+    @User() user: UserEntity,
+  ) {
+    return this.projectsService.submitManagerReview(
+      approvalId, 
+      reviewDecision.decision, 
+      reviewDecision.comments, 
+      user
+    );
+  }
 }
