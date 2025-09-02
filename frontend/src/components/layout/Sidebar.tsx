@@ -9,8 +9,9 @@ import {
 import { useAuthStore } from '@/stores/auth';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { Role } from '@/types';
 
-const navigation = [
+const allNavigation = [
   { name: 'Projects', href: '/projects', icon: FolderOpen },
   { name: 'Users', href: '/users', icon: Users },
   { name: 'Departments', href: '/departments', icon: Building2 },
@@ -19,6 +20,28 @@ const navigation = [
 
 export default function Sidebar() {
   const { user, logout } = useAuthStore();
+
+  // Filter navigation based on role and department
+  const getFilteredNavigation = () => {
+    if (!user) return [];
+    
+    // Super users (ADMIN and PROJECT_MANAGER) see all menus
+    if (user.role === Role.ADMIN || user.role === Role.PROJECT_MANAGER || 
+        user.role === 'ADMIN' || user.role === 'PROJECT_MANAGER') {
+      return allNavigation;
+    }
+    
+    // PMO department users only see Projects menu
+    if (user.departmentMaster?.code === 'PMO') {
+      return allNavigation.filter(item => item.name === 'Projects');
+    }
+    
+    // Other departments see Projects by default
+    // Can be extended for department-specific menus
+    return allNavigation.filter(item => item.name === 'Projects');
+  };
+
+  const navigation = getFilteredNavigation();
 
   return (
     <div className="flex flex-col w-64 bg-card border-r">
@@ -63,7 +86,7 @@ export default function Sidebar() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">{user?.name}</p>
-            <p className="text-xs text-muted-foreground truncate">{user?.role}</p>
+            <p className="text-xs text-muted-foreground truncate">{user?.roleMaster?.name || user?.role}</p>
           </div>
         </div>
         

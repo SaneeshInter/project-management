@@ -59,12 +59,18 @@ export declare class ProjectsService {
         projectCoordinatorId: string | null;
         pcTeamLeadId: string | null;
     }>;
-    findAll(userId?: string, role?: Role): Promise<({
+    findAll(userId?: string, role?: Role, user?: User): Promise<({
         _count: {
             comments: number;
             tasks: number;
         };
         owner: {
+            name: string;
+            email: string;
+            id: string;
+            role: import(".prisma/client").$Enums.Role;
+        };
+        projectCoordinator: {
             name: string;
             email: string;
             id: string;

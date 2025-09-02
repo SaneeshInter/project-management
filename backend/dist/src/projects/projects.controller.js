@@ -37,7 +37,7 @@ let ProjectsController = class ProjectsController {
         return this.projectsService.create(createProjectDto, user);
     }
     findAll(user) {
-        return this.projectsService.findAll(user.id, user.role);
+        return this.projectsService.findAll(user.id, user.role, user);
     }
     findOne(id, user) {
         return this.projectsService.findOne(id, user);

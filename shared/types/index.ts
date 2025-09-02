@@ -267,8 +267,8 @@ export interface CreateProjectDto {
   office: string;
   category: ProjectCategory;
   pagesCount?: number;
-  currentDepartment: Department;
-  nextDepartment?: Department;
+  currentDepartmentId: string;
+  nextDepartmentId?: string;
   targetDate: string;
   status?: ProjectStatus;
   clientName?: string;

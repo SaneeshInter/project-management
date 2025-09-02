@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   User, AlertTriangle, CheckCircle, 
-  Play, Pause, ArrowRight, Eye, Edit, 
-  MessageCircle, ListTodo
+  Play, Pause, ArrowRight, Eye, Edit
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -210,15 +209,13 @@ export default function ProjectListItem({
         </div>
       </div>
 
-      {/* Project Stats */}
+      {/* PMO Assignment */}
       <div className="flex-shrink-0 flex items-center gap-3 text-xs text-gray-500">
-        <div className="flex items-center gap-1" title="Tasks">
-          <ListTodo className="h-3 w-3" />
-          <span>{project._count?.tasks || 0}</span>
-        </div>
-        <div className="flex items-center gap-1" title="Comments">
-          <MessageCircle className="h-3 w-3" />
-          <span>{project._count?.comments || 0}</span>
+        <div className="flex items-center gap-1" title="Project Coordinator (PMO)">
+          <User className="h-3 w-3" />
+          <span className="max-w-20 truncate">
+            PC: {project.projectCoordinator?.name || 'Not assigned'}
+          </span>
         </div>
       </div>
 

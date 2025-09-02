@@ -25,9 +25,39 @@ let ProjectsService = class ProjectsService {
     async create(createProjectDto, user) {
         console.log('🔍 Creating project with data:', createProjectDto);
         console.log('🔍 User creating project:', user.id, user.name);
+        const currentDepartment = await this.prisma.departmentMaster.findUnique({
+            where: { id: createProjectDto.currentDepartmentId }
+        });
+        if (!currentDepartment) {
+            throw new common_1.NotFoundException(`Current department with ID ${createProjectDto.currentDepartmentId} not found`);
+        }
+        if (createProjectDto.nextDepartmentId) {
+            const nextDepartment = await this.prisma.departmentMaster.findUnique({
+                where: { id: createProjectDto.nextDepartmentId }
+            });
+            if (!nextDepartment) {
+                throw new common_1.NotFoundException(`Next department with ID ${createProjectDto.nextDepartmentId} not found`);
+            }
+        }
         const project = await this.prisma.project.create({
             data: {
-                ...createProjectDto,
+                name: createProjectDto.name,
+                office: createProjectDto.office,
+                category: createProjectDto.category,
+                pagesCount: createProjectDto.pagesCount,
+                currentDepartment: currentDepartment.code,
+                nextDepartment: createProjectDto.nextDepartmentId ?
+                    (await this.prisma.departmentMaster.findUnique({ where: { id: createProjectDto.nextDepartmentId } }))?.code :
+                    undefined,
+                targetDate: createProjectDto.targetDate,
+                status: createProjectDto.status,
+                clientName: createProjectDto.clientName,
+                observations: createProjectDto.observations,
+                deviationReason: createProjectDto.deviationReason,
+                dependency: createProjectDto.dependency,
+                startDate: createProjectDto.startDate,
+                projectCoordinatorId: createProjectDto.projectCoordinatorId,
+                pcTeamLeadId: createProjectDto.pcTeamLeadId,
                 ownerId: user.id,
             },
             include: {
@@ -69,7 +99,7 @@ let ProjectsService = class ProjectsService {
                 data: {
                     projectId: project.id,
                     fromDepartment: null,
-                    toDepartment: createProjectDto.currentDepartment,
+                    toDepartment: currentDepartment.code,
                     workStatus: client_1.DepartmentWorkStatus.NOT_STARTED,
                     movedById: user.id,
                     permissionGrantedById: user.id,
@@ -110,14 +140,56 @@ let ProjectsService = class ProjectsService {
         }
         return project;
     }
-    async findAll(userId, role) {
-        const where = role === client_1.Role.CLIENT
-            ? { ownerId: userId }
-            : {};
+    async findAll(userId, role, user) {
+        let where = {};
+        const userWithDept = userId ? await this.prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                departmentMaster: true,
+                roleMaster: true,
+            },
+        }) : null;
+        const roleCode = userWithDept?.roleMaster?.code || role?.toString();
+        if (roleCode === 'CLIENT') {
+            where = { ownerId: userId };
+        }
+        else if (roleCode === 'ADMIN' || roleCode === 'PROJECT_MANAGER') {
+            where = {};
+        }
+        else if (userWithDept?.departmentMaster?.code === 'PMO') {
+            where = {
+                OR: [
+                    { projectCoordinatorId: userId },
+                    { pcTeamLeadId: userId },
+                ],
+            };
+        }
+        else if (userWithDept?.departmentMaster?.code) {
+            where = {
+                OR: [
+                    { currentDepartment: userWithDept.departmentMaster.code },
+                    {
+                        departmentHistory: {
+                            some: {
+                                toDepartment: userWithDept.departmentMaster.code,
+                            },
+                        },
+                    },
+                ],
+            };
+        }
         return this.prisma.project.findMany({
             where,
             include: {
                 owner: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        role: true,
+                    },
+                },
+                projectCoordinator: {
                     select: {
                         id: true,
                         name: true,

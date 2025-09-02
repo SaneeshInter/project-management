@@ -71,6 +71,12 @@ export declare class ProjectsController {
             id: string;
             role: import(".prisma/client").$Enums.Role;
         };
+        projectCoordinator: {
+            name: string;
+            email: string;
+            id: string;
+            role: import(".prisma/client").$Enums.Role;
+        };
     } & {
         name: string;
         id: string;

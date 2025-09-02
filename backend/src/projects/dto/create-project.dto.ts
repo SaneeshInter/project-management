@@ -1,6 +1,6 @@
 import { IsString, IsEnum, IsOptional, IsInt, IsBoolean, IsDateString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ProjectCategory, ProjectStatus, Department } from '@prisma/client';
+import { ProjectCategory, ProjectStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
 
 export class CreateProjectDto {
@@ -22,14 +22,14 @@ export class CreateProjectDto {
   @Type(() => Number)
   pagesCount?: number;
 
-  @ApiProperty({ enum: Department, example: Department.PMO })
-  @IsEnum(Department)
-  currentDepartment: Department;
+  @ApiProperty({ example: 'dept-id-123' })
+  @IsString()
+  currentDepartmentId: string;
 
-  @ApiPropertyOptional({ enum: Department, example: Department.DESIGN })
-  @IsEnum(Department)
+  @ApiPropertyOptional({ example: 'dept-id-456' })
+  @IsString()
   @IsOptional()
-  nextDepartment?: Department;
+  nextDepartmentId?: string;
 
   @ApiProperty({ example: '2024-12-31T00:00:00Z' })
   @IsDateString()

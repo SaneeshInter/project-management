@@ -7,15 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProjectsStore } from '@/stores/projects';
-import { CreateProjectDto, ProjectCategory, ProjectStatus, Department, Office, Role, User, usersApi } from '@/types';
+import { CreateProjectDto, ProjectCategory, ProjectStatus, Office, User, DepartmentMaster, usersApi, departmentsApi } from '@/types';
 
 const createProjectSchema = z.object({
   name: z.string().min(1, 'Project name is required'),
   office: z.string().min(1, 'Office is required'),
   category: z.nativeEnum(ProjectCategory),
   pagesCount: z.number().min(1).optional(),
-  currentDepartment: z.nativeEnum(Department),
-  nextDepartment: z.nativeEnum(Department).optional(),
+  currentDepartmentId: z.string().min(1, 'Current department is required'),
+  nextDepartmentId: z.string().optional(),
   targetDate: z.string().min(1, 'Target date is required'),
   status: z.nativeEnum(ProjectStatus).optional(),
   clientName: z.string().optional(),
@@ -24,7 +24,6 @@ const createProjectSchema = z.object({
   dependency: z.boolean().optional(),
   startDate: z.string().optional(),
   projectCoordinatorId: z.string().optional(),
-  pcTeamLeadId: z.string().optional(),
 });
 
 interface CreateProjectModalProps {
@@ -37,6 +36,8 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
   const [error, setError] = useState<string>('');
   const [users, setUsers] = useState<User[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
+  const [departments, setDepartments] = useState<DepartmentMaster[]>([]);
+  const [loadingDepartments, setLoadingDepartments] = useState(false);
 
   const {
     register,
@@ -48,29 +49,35 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
     defaultValues: {
       status: ProjectStatus.ACTIVE,
       dependency: false,
-      currentDepartment: Department.PMO,
       office: 'KOCHI',
     },
   });
 
-  // Fetch users with PC and PC_TL roles
+  // Fetch users and departments
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchData = async () => {
       if (!isOpen) return;
       
       setLoadingUsers(true);
+      setLoadingDepartments(true);
+      
       try {
         // Get PMO users with PC and PC_TL roles
         const pmoUsers = await usersApi.getPMOCoordinators();
         setUsers(pmoUsers);
+        
+        // Get all departments
+        const departmentData = await departmentsApi.getAll();
+        setDepartments(departmentData);
       } catch (err) {
-        console.error('Failed to fetch users:', err);
+        console.error('Failed to fetch data:', err);
       } finally {
         setLoadingUsers(false);
+        setLoadingDepartments(false);
       }
     };
 
-    fetchUsers();
+    fetchData();
   }, [isOpen]);
 
   const onSubmit = async (data: CreateProjectDto) => {
@@ -178,43 +185,46 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label htmlFor="currentDepartment" className="text-sm font-medium">
+                <label htmlFor="currentDepartmentId" className="text-sm font-medium">
                   Current Department *
                 </label>
                 <select
-                  id="currentDepartment"
-                  {...register('currentDepartment')}
+                  id="currentDepartmentId"
+                  {...register('currentDepartmentId')}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  disabled={loadingDepartments}
                 >
-                  {Object.values(Department).map(dept => (
-                    <option key={dept} value={dept}>
-                      {dept.replace('_', ' ')}
+                  <option value="">Select current department</option>
+                  {departments.map(dept => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.name}
                     </option>
                   ))}
                 </select>
-                {errors.currentDepartment && (
-                  <p className="text-sm text-red-500">{errors.currentDepartment.message}</p>
+                {errors.currentDepartmentId && (
+                  <p className="text-sm text-red-500">{errors.currentDepartmentId.message}</p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="nextDepartment" className="text-sm font-medium">
+                <label htmlFor="nextDepartmentId" className="text-sm font-medium">
                   Next Department
                 </label>
                 <select
-                  id="nextDepartment"
-                  {...register('nextDepartment')}
+                  id="nextDepartmentId"
+                  {...register('nextDepartmentId')}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  disabled={loadingDepartments}
                 >
                   <option value="">Select next department (optional)</option>
-                  {Object.values(Department).map(dept => (
-                    <option key={dept} value={dept}>
-                      {dept.replace('_', ' ')}
+                  {departments.map(dept => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.name}
                     </option>
                   ))}
                 </select>
-                {errors.nextDepartment && (
-                  <p className="text-sm text-red-500">{errors.nextDepartment.message}</p>
+                {errors.nextDepartmentId && (
+                  <p className="text-sm text-red-500">{errors.nextDepartmentId.message}</p>
                 )}
               </div>
 
@@ -234,54 +244,28 @@ export default function CreateProjectModal({ isOpen, onClose }: CreateProjectMod
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="projectCoordinatorId" className="text-sm font-medium">
-                  Project Coordinator (PC)
-                </label>
-                <select
-                  id="projectCoordinatorId"
-                  {...register('projectCoordinatorId')}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  disabled={loadingUsers}
-                >
-                  <option value="">Select Project Coordinator (optional)</option>
-                  {users
-                    .filter(user => user.roleMaster?.code === 'PC')
-                    .map(user => (
-                      <option key={user.id} value={user.id}>
-                        {user.name} ({user.email})
-                      </option>
-                    ))}
-                </select>
-                {errors.projectCoordinatorId && (
-                  <p className="text-sm text-red-500">{errors.projectCoordinatorId.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="pcTeamLeadId" className="text-sm font-medium">
-                  PC Team Lead
-                </label>
-                <select
-                  id="pcTeamLeadId"
-                  {...register('pcTeamLeadId')}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  disabled={loadingUsers}
-                >
-                  <option value="">Select PC Team Lead (optional)</option>
-                  {users
-                    .filter(user => ['PC_TL1', 'PC_TL2'].includes(user.roleMaster?.code || ''))
-                    .map(user => (
-                      <option key={user.id} value={user.id}>
-                        {user.name} ({user.email}) - {user.roleMaster?.code}
-                      </option>
-                    ))}
-                </select>
-                {errors.pcTeamLeadId && (
-                  <p className="text-sm text-red-500">{errors.pcTeamLeadId.message}</p>
-                )}
-              </div>
+            <div className="space-y-2">
+              <label htmlFor="projectCoordinatorId" className="text-sm font-medium">
+                Project Coordinator (PC)
+              </label>
+              <select
+                id="projectCoordinatorId"
+                {...register('projectCoordinatorId')}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                disabled={loadingUsers}
+              >
+                <option value="">Select Project Coordinator (optional)</option>
+                {users
+                  .filter(user => user.roleMaster?.code === 'PC')
+                  .map(user => (
+                    <option key={user.id} value={user.id}>
+                      {user.name} ({user.email})
+                    </option>
+                  ))}
+              </select>
+              {errors.projectCoordinatorId && (
+                <p className="text-sm text-red-500">{errors.projectCoordinatorId.message}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

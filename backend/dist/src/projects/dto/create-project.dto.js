@@ -40,16 +40,16 @@ __decorate([
     __metadata("design:type", Number)
 ], CreateProjectDto.prototype, "pagesCount", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ enum: client_1.Department, example: client_1.Department.PMO }),
-    (0, class_validator_1.IsEnum)(client_1.Department),
+    (0, swagger_1.ApiProperty)({ example: 'dept-id-123' }),
+    (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CreateProjectDto.prototype, "currentDepartment", void 0);
+], CreateProjectDto.prototype, "currentDepartmentId", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ enum: client_1.Department, example: client_1.Department.DESIGN }),
-    (0, class_validator_1.IsEnum)(client_1.Department),
+    (0, swagger_1.ApiPropertyOptional)({ example: 'dept-id-456' }),
+    (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], CreateProjectDto.prototype, "nextDepartment", void 0);
+], CreateProjectDto.prototype, "nextDepartmentId", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: '2024-12-31T00:00:00Z' }),
     (0, class_validator_1.IsDateString)(),

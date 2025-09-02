@@ -6,7 +6,7 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Role, User, ProjectAssignmentHistory, ReassignPCDto, usersApi, projectsApi } from '@/types';
+import { User, ProjectAssignmentHistory, ReassignPCDto, usersApi, projectsApi } from '@/types';
 
 const reassignSchema = z.object({
   assignmentType: z.enum(['PROJECT_COORDINATOR', 'PC_TEAM_LEAD']),

@@ -29,15 +29,34 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    // Get user with department information
+    const userWithDept = await this.prisma.user.findUnique({
+      where: { id: user.id },
+      include: {
+        departmentMaster: true,
+        roleMaster: true,
+      },
+    });
+
+    const payload = { 
+      sub: user.id, 
+      email: user.email, 
+      role: userWithDept?.roleMaster?.code || user.role,
+      departmentId: userWithDept?.departmentId,
+      departmentCode: userWithDept?.departmentMaster?.code
+    };
+    
     return {
       access_token: this.jwtService.sign(payload),
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
-        role: user.role,
+        role: userWithDept?.roleMaster?.code || user.role,
         avatar: user.avatar,
+        department: user.department,
+        departmentMaster: userWithDept?.departmentMaster,
+        roleMaster: userWithDept?.roleMaster,
       },
     };
   }
@@ -70,7 +89,13 @@ export class AuthService {
     });
 
     const { password, ...result } = user;
-    const payload = { sub: result.id, email: result.email, role: result.role };
+    const payload = { 
+      sub: result.id, 
+      email: result.email, 
+      role: result.roleMaster?.code || result.role,
+      departmentId: result.departmentId,
+      departmentCode: result.departmentMaster?.code
+    };
 
     return {
       access_token: this.jwtService.sign(payload),
@@ -78,8 +103,11 @@ export class AuthService {
         id: result.id,
         email: result.email,
         name: result.name,
-        role: result.role,
+        role: result.roleMaster?.code || result.role,
         avatar: result.avatar,
+        department: result.department,
+        departmentMaster: result.departmentMaster,
+        roleMaster: result.roleMaster,
       },
     };
   }

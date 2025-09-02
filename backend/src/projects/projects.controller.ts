@@ -34,7 +34,7 @@ export class ProjectsController {
   @ApiOperation({ summary: 'Get all projects' })
   @ApiResponse({ status: 200, description: 'Projects retrieved successfully' })
   findAll(@User() user: UserEntity) {
-    return this.projectsService.findAll(user.id, user.role);
+    return this.projectsService.findAll(user.id, user.role, user);
   }
 
   @Get(':id')

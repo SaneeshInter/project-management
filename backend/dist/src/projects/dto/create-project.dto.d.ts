@@ -1,11 +1,11 @@
-import { ProjectCategory, ProjectStatus, Department } from '@prisma/client';
+import { ProjectCategory, ProjectStatus } from '@prisma/client';
 export declare class CreateProjectDto {
     name: string;
     office: string;
     category: ProjectCategory;
     pagesCount?: number;
-    currentDepartment: Department;
-    nextDepartment?: Department;
+    currentDepartmentId: string;
+    nextDepartmentId?: string;
     targetDate: string;
     status?: ProjectStatus;
     clientName?: string;

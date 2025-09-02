@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Clock, User, AlertTriangle, CheckCircle, 
-  Play, Pause, ArrowRight, MessageCircle, ListTodo, 
-  TrendingDown, Eye, Edit
+  Play, Pause, ArrowRight, TrendingDown, Eye, Edit
 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -290,25 +289,15 @@ export default function EnhancedProjectCard({
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-3 gap-4 pt-3 border-t">
+        <div className="grid grid-cols-2 gap-4 pt-3 border-t">
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
-              <ListTodo className="h-4 w-4 text-blue-600" />
-              <span className="text-lg font-bold text-blue-600">
-                {project._count?.tasks || 0}
+              <User className="h-4 w-4 text-blue-600" />
+              <span className="text-xs font-medium text-blue-600 truncate max-w-20">
+                {project.projectCoordinator?.name || 'Not assigned'}
               </span>
             </div>
-            <p className="text-xs text-muted-foreground">Tasks</p>
-          </div>
-          
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-1 mb-1">
-              <MessageCircle className="h-4 w-4 text-green-600" />
-              <span className="text-lg font-bold text-green-600">
-                {project._count?.comments || 0}
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground">Comments</p>
+            <p className="text-xs text-muted-foreground">PC (PMO)</p>
           </div>
           
           <div className="text-center">
