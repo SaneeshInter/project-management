@@ -13,6 +13,7 @@ export declare class DepartmentsController {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         };
         children: {
             name: string;
@@ -22,6 +23,7 @@ export declare class DepartmentsController {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         }[];
     } & {
         name: string;
@@ -31,6 +33,7 @@ export declare class DepartmentsController {
         createdAt: Date;
         updatedAt: Date;
         parentId: string | null;
+        order: number;
     }>;
     findAll(): Promise<({
         parent: {
@@ -41,6 +44,7 @@ export declare class DepartmentsController {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         };
         children: {
             name: string;
@@ -50,6 +54,7 @@ export declare class DepartmentsController {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         }[];
     } & {
         name: string;
@@ -59,6 +64,28 @@ export declare class DepartmentsController {
         createdAt: Date;
         updatedAt: Date;
         parentId: string | null;
+        order: number;
+    })[]>;
+    findMainDepartments(): Promise<({
+        children: {
+            name: string;
+            id: string;
+            code: string;
+            isActive: boolean;
+            createdAt: Date;
+            updatedAt: Date;
+            parentId: string | null;
+            order: number;
+        }[];
+    } & {
+        name: string;
+        id: string;
+        code: string;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+        parentId: string | null;
+        order: number;
     })[]>;
     findByParent(parentId?: string): Promise<({
         children: {
@@ -69,6 +96,7 @@ export declare class DepartmentsController {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         }[];
     } & {
         name: string;
@@ -78,6 +106,7 @@ export declare class DepartmentsController {
         createdAt: Date;
         updatedAt: Date;
         parentId: string | null;
+        order: number;
     })[]>;
     findOne(id: string): Promise<{
         parent: {
@@ -88,6 +117,7 @@ export declare class DepartmentsController {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         };
         children: {
             name: string;
@@ -97,6 +127,7 @@ export declare class DepartmentsController {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         }[];
     } & {
         name: string;
@@ -106,6 +137,7 @@ export declare class DepartmentsController {
         createdAt: Date;
         updatedAt: Date;
         parentId: string | null;
+        order: number;
     }>;
     update(id: string, updateDepartmentDto: UpdateDepartmentDto): Promise<{
         parent: {
@@ -116,6 +148,7 @@ export declare class DepartmentsController {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         };
         children: {
             name: string;
@@ -125,6 +158,7 @@ export declare class DepartmentsController {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         }[];
     } & {
         name: string;
@@ -134,6 +168,7 @@ export declare class DepartmentsController {
         createdAt: Date;
         updatedAt: Date;
         parentId: string | null;
+        order: number;
     }>;
     remove(id: string): Promise<{
         name: string;
@@ -143,5 +178,6 @@ export declare class DepartmentsController {
         createdAt: Date;
         updatedAt: Date;
         parentId: string | null;
+        order: number;
     }>;
 }

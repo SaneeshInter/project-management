@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Project, Department } from '@/types';
+import { Project, Department, DepartmentMaster } from '@/types';
 import { formatDate } from '@/lib/utils';
 
 interface ProjectListItemProps {
@@ -14,35 +14,44 @@ interface ProjectListItemProps {
   onQuickEdit?: (project: Project) => void;
   onMoveProject?: (project: Project) => void;
   onViewDetails?: (project: Project) => void;
+  departments?: DepartmentMaster[];
 }
 
-const departmentOrder: Department[] = [
-  Department.PMO,
-  Department.DESIGN,
-  Department.HTML,
-  Department.PHP,
-  Department.REACT,
-  Department.WORDPRESS,
-  Department.QA,
-  Department.DELIVERY,
-  Department.MANAGER
-];
-
-const departmentConfig = {
-  [Department.PMO]: { icon: '📋', color: 'bg-blue-100 text-blue-800 border-blue-300' },
-  [Department.DESIGN]: { icon: '🎨', color: 'bg-purple-100 text-purple-800 border-purple-300' },
-  [Department.HTML]: { icon: '🏗️', color: 'bg-orange-100 text-orange-800 border-orange-300' },
-  [Department.PHP]: { icon: '🔧', color: 'bg-red-100 text-red-800 border-red-300' },
-  [Department.REACT]: { icon: '⚛️', color: 'bg-cyan-100 text-cyan-800 border-cyan-300' },
-  [Department.WORDPRESS]: { icon: '📝', color: 'bg-green-100 text-green-800 border-green-300' },
-  [Department.QA]: { icon: '🧪', color: 'bg-yellow-100 text-yellow-800 border-yellow-300' },
-  [Department.DELIVERY]: { icon: '🚀', color: 'bg-emerald-100 text-emerald-800 border-emerald-300' },
-  [Department.MANAGER]: { icon: '👔', color: 'bg-slate-100 text-slate-800 border-slate-300' }
+const getDepartmentConfig = (code: string, name: string) => {
+  const configs = {
+    'PMO': { icon: '📋', color: 'bg-blue-100 text-blue-800 border-blue-300' },
+    'DESIGN': { icon: '🎨', color: 'bg-purple-100 text-purple-800 border-purple-300' },
+    'HTML': { icon: '🏗️', color: 'bg-orange-100 text-orange-800 border-orange-300' },
+    'PHP': { icon: '🔧', color: 'bg-red-100 text-red-800 border-red-300' },
+    'REACT': { icon: '⚛️', color: 'bg-cyan-100 text-cyan-800 border-cyan-300' },
+    'WORDPRESS': { icon: '📝', color: 'bg-green-100 text-green-800 border-green-300' },
+    'QA': { icon: '🧪', color: 'bg-yellow-100 text-yellow-800 border-yellow-300' },
+    'DELIVERY': { icon: '🚀', color: 'bg-emerald-100 text-emerald-800 border-emerald-300' },
+    'MANAGER': { icon: '👔', color: 'bg-slate-100 text-slate-800 border-slate-300' },
+    'DEV': { icon: '💻', color: 'bg-indigo-100 text-indigo-800 border-indigo-300' },
+    'APP': { icon: '📱', color: 'bg-teal-100 text-teal-800 border-teal-300' }
+  };
+  
+  return {
+    icon: configs[code as keyof typeof configs]?.icon || '🏢',
+    color: configs[code as keyof typeof configs]?.color || 'bg-gray-100 text-gray-800 border-gray-300',
+    name: name
+  };
 };
 
-const getDepartmentProgress = (currentDept: Department): number => {
-  const currentIndex = departmentOrder.indexOf(currentDept);
-  return ((currentIndex + 1) / departmentOrder.length) * 100;
+const getDepartmentProgress = (currentDept: Department, departments: DepartmentMaster[] = []): number => {
+  // Filter root level departments (no parent) and sort by common order
+  const rootDepartments = departments.filter(d => !d.parentId);
+  const departmentOrder = ['PMO', 'DESIGN', 'HTML', 'DEV', 'QA', 'DELIVERY', 'MANAGER'];
+  
+  const sortedDepts = rootDepartments.sort((a, b) => {
+    const aIndex = departmentOrder.indexOf(a.code);
+    const bIndex = departmentOrder.indexOf(b.code);
+    return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+  });
+  
+  const currentIndex = sortedDepts.findIndex(d => d.code === currentDept);
+  return currentIndex !== -1 ? ((currentIndex + 1) / sortedDepts.length) * 100 : 0;
 };
 
 const getProjectHealthScore = (project: Project): { score: number; color: string; indicator: string } => {
@@ -121,14 +130,18 @@ export default function ProjectListItem({
   project,
   onQuickEdit,
   onMoveProject,
-  onViewDetails
+  onViewDetails,
+  departments = []
 }: ProjectListItemProps) {
   const [showActions, setShowActions] = useState(false);
   
   const health = getProjectHealthScore(project);
-  const progress = getDepartmentProgress(project.currentDepartment);
+  const progress = getDepartmentProgress(project.currentDepartment, departments);
   const timeStatus = getTimeStatus(project.targetDate);
-  const deptConfig = departmentConfig[project.currentDepartment];
+  const currentDeptMaster = departments.find(d => d.code === project.currentDepartment);
+  const deptConfig = currentDeptMaster ? 
+    getDepartmentConfig(currentDeptMaster.code, currentDeptMaster.name) :
+    { icon: '🏢', color: 'bg-gray-100 text-gray-800 border-gray-300', name: project.currentDepartment };
 
   return (
     <div 
@@ -186,14 +199,14 @@ export default function ProjectListItem({
         <Badge className={`${deptConfig.color} border flex items-center gap-1 px-2 py-1`}>
           <span className="text-sm">{deptConfig.icon}</span>
           <span className="text-xs font-medium">
-            {project.currentDepartment.replace('_', ' ')}
+            {deptConfig.name}
           </span>
         </Badge>
         {project.nextDepartment && (
           <div className="flex items-center gap-1 mt-1">
             <ArrowRight className="h-3 w-3 text-gray-400" />
             <span className="text-xs text-gray-500">
-              {project.nextDepartment.replace('_', ' ')}
+              {departments.find(d => d.code === project.nextDepartment)?.name || project.nextDepartment.replace('_', ' ')}
             </span>
           </div>
         )}

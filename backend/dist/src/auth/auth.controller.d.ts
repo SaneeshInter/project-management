@@ -21,6 +21,7 @@ export declare class AuthController {
                 createdAt: Date;
                 updatedAt: Date;
                 parentId: string | null;
+                order: number;
             };
             roleMaster: {
                 name: string;
@@ -51,6 +52,7 @@ export declare class AuthController {
                 createdAt: Date;
                 updatedAt: Date;
                 parentId: string | null;
+                order: number;
             };
             roleMaster: {
                 name: string;

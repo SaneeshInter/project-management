@@ -9,6 +9,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { CommentsModule } from './comments/comments.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { RolesModule } from './roles/roles.module';
+import { ChecklistTemplatesModule } from './checklist-templates/checklist-templates.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { RolesModule } from './roles/roles.module';
     CommentsModule,
     DepartmentsModule,
     RolesModule,
+    ChecklistTemplatesModule,
   ],
   controllers: [],
   providers: [],

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Clock, Users, History } from 'lucide-react';
+import { ArrowRight, Clock, Users, History, CheckCircle, FileText } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -120,6 +120,29 @@ export default function DepartmentWorkflowCard({
               </div>
             </div>
           )}
+        </div>
+
+        {/* Department Checklist Status */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <FileText className="h-5 w-5 text-blue-600" />
+              <div>
+                <p className="text-sm font-medium text-blue-900">
+                  {project.currentDepartment} Department Checklist
+                </p>
+                <p className="text-xs text-blue-700">
+                  Complete all required items before moving to next department
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-medium text-blue-900">
+                Ready to proceed
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Department Progress Bar */}

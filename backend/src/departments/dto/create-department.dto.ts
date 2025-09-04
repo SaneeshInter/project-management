@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsInt, Min } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateDepartmentDto {
@@ -14,6 +14,12 @@ export class CreateDepartmentDto {
   @IsOptional()
   @IsString()
   parentId?: string;
+
+  @ApiPropertyOptional({ description: 'Display order', default: 0 })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  order?: number;
 
   @ApiPropertyOptional({ description: 'Whether department is active', default: true })
   @IsOptional()

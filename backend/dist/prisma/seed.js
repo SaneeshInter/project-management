@@ -474,6 +474,39 @@ async function main() {
         ],
     });
     console.log('✅ Comments created');
+    const checklistTemplates = await prisma.checklistTemplate.createMany({
+        data: [
+            { department: 'PMO', title: 'Client requirements documented and approved', description: 'All client requirements have been documented in detail and formally approved', isRequired: true, order: 0 },
+            { department: 'PMO', title: 'Project scope clearly defined', description: 'Project scope, deliverables, and boundaries are well-defined', isRequired: true, order: 1 },
+            { department: 'PMO', title: 'Timeline and milestones established', description: 'Project timeline with clear milestones has been created and approved', isRequired: true, order: 2 },
+            { department: 'PMO', title: 'Resource allocation confirmed', description: 'Team members and resources have been allocated and confirmed', isRequired: true, order: 3 },
+            { department: 'PMO', title: 'Technical specifications reviewed', description: 'Technical requirements and specifications have been reviewed and approved', isRequired: true, order: 4 },
+            { department: 'PMO', title: 'Risk assessment completed', description: 'Project risks have been identified and mitigation strategies defined', isRequired: false, order: 5 },
+            { department: 'PMO', title: 'Client approval obtained for project sections', description: 'Client has approved the project structure and content sections', isRequired: true, order: 6 },
+            { department: 'DESIGN', title: 'Design brief received from PMO', description: 'Complete design brief with requirements received from PMO team', isRequired: true, order: 0 },
+            { department: 'DESIGN', title: 'Wireframes completed', description: 'All wireframes for the project have been created and reviewed', isRequired: true, order: 1 },
+            { department: 'DESIGN', title: 'Design mockups created', description: 'High-fidelity design mockups completed for all pages/screens', isRequired: true, order: 2 },
+            { department: 'DESIGN', title: 'Client design approval obtained', description: 'Client has approved all design mockups and variations', isRequired: true, order: 3 },
+            { department: 'DESIGN', title: 'Design assets organized', description: 'All design files organized and ready for handoff', isRequired: true, order: 4 },
+            { department: 'DESIGN', title: 'Design system documentation', description: 'Color schemes, typography, and component guidelines documented', isRequired: false, order: 5 },
+            { department: 'HTML', title: 'Design files received from DESIGN', description: 'All approved design files and assets received from design team', isRequired: true, order: 0 },
+            { department: 'HTML', title: 'HTML structure completed', description: 'Complete HTML structure implemented according to designs', isRequired: true, order: 1 },
+            { department: 'HTML', title: 'CSS styling implemented', description: 'All CSS styling completed to match approved designs', isRequired: true, order: 2 },
+            { department: 'HTML', title: 'Responsive design tested', description: 'Design tested and working on mobile, tablet, and desktop', isRequired: true, order: 3 },
+            { department: 'HTML', title: 'Cross-browser compatibility verified', description: 'Tested on Chrome, Firefox, Safari, and Edge browsers', isRequired: true, order: 4 },
+            { department: 'HTML', title: 'HTML QA testing passed', description: 'Internal HTML QA testing completed successfully', isRequired: true, order: 5 },
+            { department: 'HTML', title: 'Code optimization completed', description: 'HTML/CSS code optimized for performance and maintainability', isRequired: false, order: 6 },
+            { department: 'QA', title: 'Test plan created', description: 'Comprehensive test plan covering all functionality', isRequired: true, order: 0 },
+            { department: 'QA', title: 'Functional testing completed', description: 'All features tested according to requirements', isRequired: true, order: 1 },
+            { department: 'QA', title: 'Cross-browser testing completed', description: 'Testing completed on all required browsers', isRequired: true, order: 2 },
+            { department: 'QA', title: 'Mobile responsiveness tested', description: 'Responsive design tested on various devices', isRequired: true, order: 3 },
+            { department: 'QA', title: 'Performance testing completed', description: 'Load times and performance metrics verified', isRequired: true, order: 4 },
+            { department: 'QA', title: 'Security testing completed', description: 'Basic security vulnerabilities checked', isRequired: true, order: 5 },
+            { department: 'QA', title: 'Bug report documentation', description: 'All bugs documented with steps to reproduce', isRequired: true, order: 6 },
+            { department: 'QA', title: 'Final QA approval', description: 'QA team lead approval for release', isRequired: true, order: 7 },
+        ],
+    });
+    console.log('✅ Checklist templates created');
     const roomAppHistory = await prisma.projectDepartmentHistory.findFirst({
         where: { projectId: roomApp.id },
         orderBy: { createdAt: 'asc' },

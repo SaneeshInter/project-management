@@ -49,6 +49,11 @@ export class UsersService {
         roleMaster: true,
         departmentMaster: true,
       },
+      orderBy: [
+        { departmentMaster: { order: 'asc' } },
+        { roleMaster: { name: 'asc' } },
+        { name: 'asc' }
+      ],
     });
   }
 
@@ -221,6 +226,7 @@ export class UsersService {
         departmentMaster: true,
       },
       orderBy: [
+        { departmentMaster: { order: 'asc' } },
         { roleMaster: { code: 'asc' } },
         { name: 'asc' }
       ]

@@ -1187,6 +1187,221 @@ let ProjectsService = class ProjectsService {
             orderBy: { assignedAt: 'desc' },
         });
     }
+    async getChecklistProgress(projectId, department, user) {
+        const project = await this.prisma.project.findUnique({ where: { id: projectId } });
+        if (!project) {
+            throw new common_1.NotFoundException(`Project with ID ${projectId} not found`);
+        }
+        const targetDepartment = department || project.currentDepartment;
+        let checklistItems = await this.prisma.projectChecklistItem.findMany({
+            where: {
+                projectId,
+                department: targetDepartment
+            },
+            include: {
+                template: true,
+                completedBy: { select: { id: true, name: true, email: true } },
+                lastUpdatedBy: { select: { id: true, name: true, email: true } },
+                links: {
+                    include: {
+                        addedBy: { select: { id: true, name: true, email: true } }
+                    }
+                },
+                updateHistory: {
+                    include: {
+                        updatedBy: { select: { id: true, name: true, email: true } }
+                    },
+                    orderBy: { updatedAt: 'desc' }
+                }
+            },
+            orderBy: { order: 'asc' }
+        });
+        if (checklistItems.length === 0) {
+            const templates = await this.prisma.checklistTemplate.findMany({
+                where: {
+                    department: targetDepartment,
+                    isActive: true
+                },
+                orderBy: { order: 'asc' }
+            });
+            if (templates.length > 0) {
+                const createData = templates.map(template => ({
+                    projectId,
+                    templateId: template.id,
+                    department: targetDepartment,
+                    title: template.title,
+                    description: template.description,
+                    isRequired: template.isRequired,
+                    order: template.order
+                }));
+                await this.prisma.projectChecklistItem.createMany({
+                    data: createData
+                });
+                checklistItems = await this.prisma.projectChecklistItem.findMany({
+                    where: {
+                        projectId,
+                        department: targetDepartment
+                    },
+                    include: {
+                        template: true,
+                        completedBy: { select: { id: true, name: true, email: true } },
+                        lastUpdatedBy: { select: { id: true, name: true, email: true } },
+                        links: {
+                            include: {
+                                addedBy: { select: { id: true, name: true, email: true } }
+                            }
+                        },
+                        updateHistory: {
+                            include: {
+                                updatedBy: { select: { id: true, name: true, email: true } }
+                            },
+                            orderBy: { updatedAt: 'desc' }
+                        }
+                    },
+                    orderBy: { order: 'asc' }
+                });
+            }
+        }
+        const totalItems = checklistItems.length;
+        const completedItems = checklistItems.filter(item => item.isCompleted).length;
+        const requiredItems = checklistItems.filter(item => item.isRequired).length;
+        const completedRequiredItems = checklistItems.filter(item => item.isCompleted && item.isRequired).length;
+        return {
+            department: targetDepartment,
+            totalItems,
+            completedItems,
+            requiredItems,
+            completedRequiredItems,
+            completionPercentage: totalItems > 0 ? (completedItems / totalItems) * 100 : 0,
+            requiredCompletionPercentage: requiredItems > 0 ? (completedRequiredItems / requiredItems) * 100 : 0,
+            canProceedToNext: completedRequiredItems === requiredItems,
+            items: checklistItems
+        };
+    }
+    async updateChecklistItem(projectId, itemId, data, user) {
+        const item = await this.prisma.projectChecklistItem.findUnique({
+            where: { id: itemId, projectId }
+        });
+        if (!item) {
+            throw new common_1.NotFoundException(`Checklist item with ID ${itemId} not found`);
+        }
+        const updateData = {
+            isCompleted: data.isCompleted,
+            notes: data.notes,
+            lastUpdatedAt: new Date(),
+            lastUpdatedById: user.id
+        };
+        if (data.isCompleted) {
+            updateData.completedAt = new Date();
+            updateData.completedById = user.id;
+            if (data.completedDate) {
+                updateData.completedDate = new Date(data.completedDate);
+            }
+        }
+        else {
+            updateData.completedAt = null;
+            updateData.completedById = null;
+            updateData.completedDate = null;
+        }
+        const updatedItem = await this.prisma.projectChecklistItem.update({
+            where: { id: itemId },
+            data: updateData,
+            include: {
+                template: true,
+                completedBy: { select: { id: true, name: true, email: true } },
+                lastUpdatedBy: { select: { id: true, name: true, email: true } },
+                links: {
+                    include: {
+                        addedBy: { select: { id: true, name: true, email: true } }
+                    }
+                },
+                updateHistory: {
+                    include: {
+                        updatedBy: { select: { id: true, name: true, email: true } }
+                    },
+                    orderBy: { updatedAt: 'desc' }
+                }
+            }
+        });
+        if (data.links) {
+            await this.prisma.checklistItemLink.deleteMany({
+                where: { itemId }
+            });
+            if (data.links.length > 0) {
+                await this.prisma.checklistItemLink.createMany({
+                    data: data.links.map(link => ({
+                        itemId,
+                        url: link.url,
+                        title: link.title,
+                        type: link.type,
+                        addedById: user.id
+                    }))
+                });
+            }
+        }
+        if (data.notes || data.isCompleted !== item.isCompleted) {
+            await this.prisma.checklistItemUpdate.create({
+                data: {
+                    itemId,
+                    date: data.completedDate ? new Date(data.completedDate) : new Date(),
+                    notes: data.notes || `Item ${data.isCompleted ? 'completed' : 'unchecked'}`,
+                    updatedById: user.id
+                }
+            });
+        }
+        return updatedItem;
+    }
+    async addChecklistItemLink(projectId, itemId, linkData, user) {
+        const item = await this.prisma.projectChecklistItem.findUnique({
+            where: { id: itemId, projectId }
+        });
+        if (!item) {
+            throw new common_1.NotFoundException(`Checklist item with ID ${itemId} not found`);
+        }
+        return this.prisma.checklistItemLink.create({
+            data: {
+                itemId,
+                url: linkData.url,
+                title: linkData.title,
+                type: linkData.type,
+                addedById: user.id
+            },
+            include: {
+                addedBy: { select: { id: true, name: true, email: true } }
+            }
+        });
+    }
+    async removeChecklistItemLink(projectId, itemId, linkId, user) {
+        const item = await this.prisma.projectChecklistItem.findUnique({
+            where: { id: itemId, projectId }
+        });
+        if (!item) {
+            throw new common_1.NotFoundException(`Checklist item with ID ${itemId} not found`);
+        }
+        await this.prisma.checklistItemLink.delete({
+            where: { id: linkId, itemId }
+        });
+        return { success: true };
+    }
+    async addChecklistItemUpdate(projectId, itemId, updateData, user) {
+        const item = await this.prisma.projectChecklistItem.findUnique({
+            where: { id: itemId, projectId }
+        });
+        if (!item) {
+            throw new common_1.NotFoundException(`Checklist item with ID ${itemId} not found`);
+        }
+        return this.prisma.checklistItemUpdate.create({
+            data: {
+                itemId,
+                date: new Date(updateData.date),
+                notes: updateData.notes,
+                updatedById: user.id
+            },
+            include: {
+                updatedBy: { select: { id: true, name: true, email: true } }
+            }
+        });
+    }
 };
 exports.ProjectsService = ProjectsService;
 exports.ProjectsService = ProjectsService = __decorate([

@@ -10,102 +10,103 @@ import { CreateApprovalDto } from './dto/create-approval.dto';
 import { UpdateApprovalDto } from './dto/update-approval.dto';
 import { CreateQATestingRoundDto } from './dto/create-qa-round.dto';
 import { CreateQABugDto } from './dto/create-qa-bug.dto';
+import { UpdateChecklistItemDto, CreateChecklistItemLinkDto, CreateChecklistItemUpdateDto } from './dto/update-checklist-item.dto';
 import { User as UserEntity } from '@prisma/client';
 export declare class ProjectsController {
     private readonly projectsService;
     constructor(projectsService: ProjectsService);
     create(createProjectDto: CreateProjectDto, user: UserEntity): Promise<{
-        owner: {
-            id: string;
-            name: string;
-            email: string;
-            role: import(".prisma/client").$Enums.Role;
-        };
-        projectCoordinator: {
-            id: string;
-            name: string;
-            email: string;
-            role: import(".prisma/client").$Enums.Role;
-        };
-        pcTeamLead: {
-            id: string;
-            name: string;
-            email: string;
-            role: import(".prisma/client").$Enums.Role;
-        };
         _count: {
             comments: number;
             tasks: number;
         };
+        owner: {
+            name: string;
+            email: string;
+            id: string;
+            role: import(".prisma/client").$Enums.Role;
+        };
+        projectCoordinator: {
+            name: string;
+            email: string;
+            id: string;
+            role: import(".prisma/client").$Enums.Role;
+        };
+        pcTeamLead: {
+            name: string;
+            email: string;
+            id: string;
+            role: import(".prisma/client").$Enums.Role;
+        };
     } & {
-        id: string;
         name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
         office: string;
         category: import(".prisma/client").$Enums.ProjectCategory;
         pagesCount: number | null;
         targetDate: Date;
         status: import(".prisma/client").$Enums.ProjectStatus;
+        ownerId: string;
         clientName: string | null;
         observations: string | null;
         monthsPassed: number;
         startDate: Date;
         deviationReason: string | null;
         dependency: boolean;
-        createdAt: Date;
-        updatedAt: Date;
         currentDepartment: import(".prisma/client").$Enums.Department;
         nextDepartment: import(".prisma/client").$Enums.Department | null;
         projectCode: string;
-        ownerId: string;
         projectCoordinatorId: string | null;
         pcTeamLeadId: string | null;
     }>;
     findAll(user: UserEntity): Promise<({
-        owner: {
-            id: string;
-            name: string;
-            email: string;
-            role: import(".prisma/client").$Enums.Role;
-        };
-        projectCoordinator: {
-            id: string;
-            name: string;
-            email: string;
-            role: import(".prisma/client").$Enums.Role;
-        };
         _count: {
             comments: number;
             tasks: number;
         };
+        owner: {
+            name: string;
+            email: string;
+            id: string;
+            role: import(".prisma/client").$Enums.Role;
+        };
+        projectCoordinator: {
+            name: string;
+            email: string;
+            id: string;
+            role: import(".prisma/client").$Enums.Role;
+        };
     } & {
-        id: string;
         name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
         office: string;
         category: import(".prisma/client").$Enums.ProjectCategory;
         pagesCount: number | null;
         targetDate: Date;
         status: import(".prisma/client").$Enums.ProjectStatus;
+        ownerId: string;
         clientName: string | null;
         observations: string | null;
         monthsPassed: number;
         startDate: Date;
         deviationReason: string | null;
         dependency: boolean;
-        createdAt: Date;
-        updatedAt: Date;
         currentDepartment: import(".prisma/client").$Enums.Department;
         nextDepartment: import(".prisma/client").$Enums.Department | null;
         projectCode: string;
-        ownerId: string;
         projectCoordinatorId: string | null;
         pcTeamLeadId: string | null;
     })[]>;
     findOne(id: string, user: UserEntity): Promise<{
         comments: ({
             author: {
-                id: string;
                 name: string;
                 email: string;
+                id: string;
             };
         } & {
             id: string;
@@ -124,76 +125,75 @@ export declare class ProjectsController {
         departmentHistory: ({
             corrections: ({
                 assignedTo: {
-                    id: string;
                     name: string;
                     email: string;
+                    id: string;
                     role: import(".prisma/client").$Enums.Role;
                 };
                 requestedBy: {
-                    id: string;
                     name: string;
                     email: string;
+                    id: string;
                     role: import(".prisma/client").$Enums.Role;
                 };
             } & {
+                description: string;
                 id: string;
                 status: import(".prisma/client").$Enums.CorrectionStatus;
-                requestedAt: Date;
+                priority: import(".prisma/client").$Enums.Priority;
                 historyId: string;
                 correctionType: string;
-                description: string;
                 requestedById: string;
                 assignedToId: string | null;
-                priority: import(".prisma/client").$Enums.Priority;
+                requestedAt: Date;
                 resolvedAt: Date | null;
                 resolutionNotes: string | null;
                 estimatedHours: number | null;
                 actualHours: number | null;
             })[];
             movedBy: {
-                id: string;
                 name: string;
                 email: string;
+                id: string;
                 role: import(".prisma/client").$Enums.Role;
             };
             permissionGrantedBy: {
-                id: string;
                 name: string;
                 email: string;
+                id: string;
                 role: import(".prisma/client").$Enums.Role;
             };
             qaRounds: ({
                 bugs: ({
                     assignedTo: {
-                        id: string;
                         name: string;
                         email: string;
+                        id: string;
                         role: import(".prisma/client").$Enums.Role;
                     };
                 } & {
+                    description: string;
+                    title: string;
                     id: string;
                     status: import(".prisma/client").$Enums.BugStatus;
-                    description: string;
                     assignedToId: string | null;
-                    foundAt: Date;
                     qaRoundId: string;
-                    title: string;
                     severity: import(".prisma/client").$Enums.BugSeverity;
+                    foundAt: Date;
                     fixedAt: Date | null;
                     screenshot: string | null;
                     steps: string | null;
                 })[];
                 testedBy: {
-                    id: string;
                     name: string;
                     email: string;
+                    id: string;
                     role: import(".prisma/client").$Enums.Role;
                 };
             } & {
                 id: string;
                 status: import(".prisma/client").$Enums.QAStatus;
                 historyId: string;
-                rejectionReason: string | null;
                 roundNumber: number;
                 qaType: import(".prisma/client").$Enums.QAType;
                 startedAt: Date;
@@ -202,31 +202,32 @@ export declare class ProjectsController {
                 bugsFound: number;
                 criticalBugs: number;
                 testResults: string | null;
+                rejectionReason: string | null;
             })[];
             approvals: ({
                 requestedBy: {
-                    id: string;
                     name: string;
                     email: string;
+                    id: string;
                     role: import(".prisma/client").$Enums.Role;
                 };
                 reviewedBy: {
-                    id: string;
                     name: string;
                     email: string;
+                    id: string;
                     role: import(".prisma/client").$Enums.Role;
                 };
             } & {
                 id: string;
-                status: import(".prisma/client").$Enums.ApprovalStatus;
                 comments: string | null;
-                requestedAt: Date;
+                status: import(".prisma/client").$Enums.ApprovalStatus;
                 historyId: string;
                 requestedById: string;
+                requestedAt: Date;
+                rejectionReason: string | null;
                 approvalType: import(".prisma/client").$Enums.ApprovalType;
                 reviewedById: string | null;
                 reviewedAt: Date | null;
-                rejectionReason: string | null;
                 attachments: string[];
             })[];
         } & {
@@ -247,9 +248,9 @@ export declare class ProjectsController {
             permissionGrantedById: string | null;
         })[];
         owner: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
         tasks: ({
@@ -257,76 +258,76 @@ export declare class ProjectsController {
                 comments: number;
             };
             assignee: {
-                id: string;
                 name: string;
                 email: string;
+                id: string;
             };
         } & {
+            description: string | null;
+            title: string;
             id: string;
-            status: import(".prisma/client").$Enums.TaskStatus;
             createdAt: Date;
             updatedAt: Date;
+            status: import(".prisma/client").$Enums.TaskStatus;
             projectId: string;
-            description: string | null;
             priority: import(".prisma/client").$Enums.Priority;
-            title: string;
             dueDate: Date | null;
             assigneeId: string | null;
         })[];
     } & {
-        id: string;
         name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
         office: string;
         category: import(".prisma/client").$Enums.ProjectCategory;
         pagesCount: number | null;
         targetDate: Date;
         status: import(".prisma/client").$Enums.ProjectStatus;
+        ownerId: string;
         clientName: string | null;
         observations: string | null;
         monthsPassed: number;
         startDate: Date;
         deviationReason: string | null;
         dependency: boolean;
-        createdAt: Date;
-        updatedAt: Date;
         currentDepartment: import(".prisma/client").$Enums.Department;
         nextDepartment: import(".prisma/client").$Enums.Department | null;
         projectCode: string;
-        ownerId: string;
         projectCoordinatorId: string | null;
         pcTeamLeadId: string | null;
     }>;
     update(id: string, updateProjectDto: UpdateProjectDto, user: UserEntity): Promise<{
-        owner: {
-            id: string;
-            name: string;
-            email: string;
-            role: import(".prisma/client").$Enums.Role;
-        };
         _count: {
             comments: number;
             tasks: number;
         };
+        owner: {
+            name: string;
+            email: string;
+            id: string;
+            role: import(".prisma/client").$Enums.Role;
+        };
     } & {
-        id: string;
         name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
         office: string;
         category: import(".prisma/client").$Enums.ProjectCategory;
         pagesCount: number | null;
         targetDate: Date;
         status: import(".prisma/client").$Enums.ProjectStatus;
+        ownerId: string;
         clientName: string | null;
         observations: string | null;
         monthsPassed: number;
         startDate: Date;
         deviationReason: string | null;
         dependency: boolean;
-        createdAt: Date;
-        updatedAt: Date;
         currentDepartment: import(".prisma/client").$Enums.Department;
         nextDepartment: import(".prisma/client").$Enums.Department | null;
         projectCode: string;
-        ownerId: string;
         projectCoordinatorId: string | null;
         pcTeamLeadId: string | null;
     }>;
@@ -340,11 +341,15 @@ export declare class ProjectsController {
         fieldValue: string;
     }>;
     moveToDepartment(id: string, transitionDto: CreateDepartmentTransitionDto, user: UserEntity): Promise<{
+        _count: {
+            comments: number;
+            tasks: number;
+        };
         departmentHistory: ({
             movedBy: {
-                id: string;
                 name: string;
                 email: string;
+                id: string;
                 role: import(".prisma/client").$Enums.Role;
             };
         } & {
@@ -365,44 +370,40 @@ export declare class ProjectsController {
             permissionGrantedById: string | null;
         })[];
         owner: {
-            id: string;
             name: string;
             email: string;
-            role: import(".prisma/client").$Enums.Role;
+            id: string;
             department: import(".prisma/client").$Enums.Department;
-        };
-        _count: {
-            comments: number;
-            tasks: number;
+            role: import(".prisma/client").$Enums.Role;
         };
     } & {
-        id: string;
         name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
         office: string;
         category: import(".prisma/client").$Enums.ProjectCategory;
         pagesCount: number | null;
         targetDate: Date;
         status: import(".prisma/client").$Enums.ProjectStatus;
+        ownerId: string;
         clientName: string | null;
         observations: string | null;
         monthsPassed: number;
         startDate: Date;
         deviationReason: string | null;
         dependency: boolean;
-        createdAt: Date;
-        updatedAt: Date;
         currentDepartment: import(".prisma/client").$Enums.Department;
         nextDepartment: import(".prisma/client").$Enums.Department | null;
         projectCode: string;
-        ownerId: string;
         projectCoordinatorId: string | null;
         pcTeamLeadId: string | null;
     }>;
     getDepartmentHistory(id: string, user: UserEntity): Promise<({
         movedBy: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
     } & {
@@ -425,42 +426,42 @@ export declare class ProjectsController {
     updateDepartmentWorkStatus(id: string, statusDto: UpdateDepartmentWorkStatusDto, user: UserEntity): Promise<{
         corrections: ({
             assignedTo: {
-                id: string;
                 name: string;
                 email: string;
+                id: string;
                 role: import(".prisma/client").$Enums.Role;
             };
             requestedBy: {
-                id: string;
                 name: string;
                 email: string;
+                id: string;
                 role: import(".prisma/client").$Enums.Role;
             };
         } & {
+            description: string;
             id: string;
             status: import(".prisma/client").$Enums.CorrectionStatus;
-            requestedAt: Date;
+            priority: import(".prisma/client").$Enums.Priority;
             historyId: string;
             correctionType: string;
-            description: string;
             requestedById: string;
             assignedToId: string | null;
-            priority: import(".prisma/client").$Enums.Priority;
+            requestedAt: Date;
             resolvedAt: Date | null;
             resolutionNotes: string | null;
             estimatedHours: number | null;
             actualHours: number | null;
         })[];
         movedBy: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
         permissionGrantedBy: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
     } & {
@@ -482,27 +483,27 @@ export declare class ProjectsController {
     }>;
     createCorrection(projectId: string, historyId: string, correctionDto: CreateCorrectionDto, user: UserEntity): Promise<{
         assignedTo: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
         requestedBy: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
     } & {
+        description: string;
         id: string;
         status: import(".prisma/client").$Enums.CorrectionStatus;
-        requestedAt: Date;
+        priority: import(".prisma/client").$Enums.Priority;
         historyId: string;
         correctionType: string;
-        description: string;
         requestedById: string;
         assignedToId: string | null;
-        priority: import(".prisma/client").$Enums.Priority;
+        requestedAt: Date;
         resolvedAt: Date | null;
         resolutionNotes: string | null;
         estimatedHours: number | null;
@@ -515,27 +516,27 @@ export declare class ProjectsController {
             toDepartment: import(".prisma/client").$Enums.Department;
         };
         assignedTo: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
         requestedBy: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
     } & {
+        description: string;
         id: string;
         status: import(".prisma/client").$Enums.CorrectionStatus;
-        requestedAt: Date;
+        priority: import(".prisma/client").$Enums.Priority;
         historyId: string;
         correctionType: string;
-        description: string;
         requestedById: string;
         assignedToId: string | null;
-        priority: import(".prisma/client").$Enums.Priority;
+        requestedAt: Date;
         resolvedAt: Date | null;
         resolutionNotes: string | null;
         estimatedHours: number | null;
@@ -543,27 +544,27 @@ export declare class ProjectsController {
     })[]>;
     updateCorrection(projectId: string, correctionId: string, updateDto: UpdateCorrectionDto, user: UserEntity): Promise<{
         assignedTo: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
         requestedBy: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
     } & {
+        description: string;
         id: string;
         status: import(".prisma/client").$Enums.CorrectionStatus;
-        requestedAt: Date;
+        priority: import(".prisma/client").$Enums.Priority;
         historyId: string;
         correctionType: string;
-        description: string;
         requestedById: string;
         assignedToId: string | null;
-        priority: import(".prisma/client").$Enums.Priority;
+        requestedAt: Date;
         resolvedAt: Date | null;
         resolutionNotes: string | null;
         estimatedHours: number | null;
@@ -589,62 +590,61 @@ export declare class ProjectsController {
     }>;
     requestApproval(projectId: string, historyId: string, approvalDto: CreateApprovalDto, user: UserEntity): Promise<{
         requestedBy: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
     } & {
         id: string;
-        status: import(".prisma/client").$Enums.ApprovalStatus;
         comments: string | null;
-        requestedAt: Date;
+        status: import(".prisma/client").$Enums.ApprovalStatus;
         historyId: string;
         requestedById: string;
+        requestedAt: Date;
+        rejectionReason: string | null;
         approvalType: import(".prisma/client").$Enums.ApprovalType;
         reviewedById: string | null;
         reviewedAt: Date | null;
-        rejectionReason: string | null;
         attachments: string[];
     }>;
     submitApproval(projectId: string, approvalId: string, updateDto: UpdateApprovalDto, user: UserEntity): Promise<{
         requestedBy: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
         reviewedBy: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
     } & {
         id: string;
-        status: import(".prisma/client").$Enums.ApprovalStatus;
         comments: string | null;
-        requestedAt: Date;
+        status: import(".prisma/client").$Enums.ApprovalStatus;
         historyId: string;
         requestedById: string;
+        requestedAt: Date;
+        rejectionReason: string | null;
         approvalType: import(".prisma/client").$Enums.ApprovalType;
         reviewedById: string | null;
         reviewedAt: Date | null;
-        rejectionReason: string | null;
         attachments: string[];
     }>;
     startQATesting(projectId: string, historyId: string, qaDto: CreateQATestingRoundDto, user: UserEntity): Promise<{
         testedBy: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
     } & {
         id: string;
         status: import(".prisma/client").$Enums.QAStatus;
         historyId: string;
-        rejectionReason: string | null;
         roundNumber: number;
         qaType: import(".prisma/client").$Enums.QAType;
         startedAt: Date;
@@ -653,32 +653,32 @@ export declare class ProjectsController {
         bugsFound: number;
         criticalBugs: number;
         testResults: string | null;
+        rejectionReason: string | null;
     }>;
     completeQATesting(projectId: string, qaRoundId: string, completeDto: any, user: UserEntity): Promise<{
         bugs: {
+            description: string;
+            title: string;
             id: string;
             status: import(".prisma/client").$Enums.BugStatus;
-            description: string;
             assignedToId: string | null;
-            foundAt: Date;
             qaRoundId: string;
-            title: string;
             severity: import(".prisma/client").$Enums.BugSeverity;
+            foundAt: Date;
             fixedAt: Date | null;
             screenshot: string | null;
             steps: string | null;
         }[];
         testedBy: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
     } & {
         id: string;
         status: import(".prisma/client").$Enums.QAStatus;
         historyId: string;
-        rejectionReason: string | null;
         roundNumber: number;
         qaType: import(".prisma/client").$Enums.QAType;
         startedAt: Date;
@@ -687,23 +687,24 @@ export declare class ProjectsController {
         bugsFound: number;
         criticalBugs: number;
         testResults: string | null;
+        rejectionReason: string | null;
     }>;
     createQABug(projectId: string, qaRoundId: string, bugDto: CreateQABugDto, user: UserEntity): Promise<{
         assignedTo: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
     } & {
+        description: string;
+        title: string;
         id: string;
         status: import(".prisma/client").$Enums.BugStatus;
-        description: string;
         assignedToId: string | null;
-        foundAt: Date;
         qaRoundId: string;
-        title: string;
         severity: import(".prisma/client").$Enums.BugSeverity;
+        foundAt: Date;
         fixedAt: Date | null;
         screenshot: string | null;
         steps: string | null;
@@ -712,27 +713,27 @@ export declare class ProjectsController {
         departmentHistory: ({
             corrections: ({
                 assignedTo: {
-                    id: string;
                     name: string;
                     email: string;
+                    id: string;
                     role: import(".prisma/client").$Enums.Role;
                 };
                 requestedBy: {
-                    id: string;
                     name: string;
                     email: string;
+                    id: string;
                     role: import(".prisma/client").$Enums.Role;
                 };
             } & {
+                description: string;
                 id: string;
                 status: import(".prisma/client").$Enums.CorrectionStatus;
-                requestedAt: Date;
+                priority: import(".prisma/client").$Enums.Priority;
                 historyId: string;
                 correctionType: string;
-                description: string;
                 requestedById: string;
                 assignedToId: string | null;
-                priority: import(".prisma/client").$Enums.Priority;
+                requestedAt: Date;
                 resolvedAt: Date | null;
                 resolutionNotes: string | null;
                 estimatedHours: number | null;
@@ -741,35 +742,34 @@ export declare class ProjectsController {
             qaRounds: ({
                 bugs: ({
                     assignedTo: {
-                        id: string;
                         name: string;
                         email: string;
+                        id: string;
                         role: import(".prisma/client").$Enums.Role;
                     };
                 } & {
+                    description: string;
+                    title: string;
                     id: string;
                     status: import(".prisma/client").$Enums.BugStatus;
-                    description: string;
                     assignedToId: string | null;
-                    foundAt: Date;
                     qaRoundId: string;
-                    title: string;
                     severity: import(".prisma/client").$Enums.BugSeverity;
+                    foundAt: Date;
                     fixedAt: Date | null;
                     screenshot: string | null;
                     steps: string | null;
                 })[];
                 testedBy: {
-                    id: string;
                     name: string;
                     email: string;
+                    id: string;
                     role: import(".prisma/client").$Enums.Role;
                 };
             } & {
                 id: string;
                 status: import(".prisma/client").$Enums.QAStatus;
                 historyId: string;
-                rejectionReason: string | null;
                 roundNumber: number;
                 qaType: import(".prisma/client").$Enums.QAType;
                 startedAt: Date;
@@ -778,31 +778,32 @@ export declare class ProjectsController {
                 bugsFound: number;
                 criticalBugs: number;
                 testResults: string | null;
+                rejectionReason: string | null;
             })[];
             approvals: ({
                 requestedBy: {
-                    id: string;
                     name: string;
                     email: string;
+                    id: string;
                     role: import(".prisma/client").$Enums.Role;
                 };
                 reviewedBy: {
-                    id: string;
                     name: string;
                     email: string;
+                    id: string;
                     role: import(".prisma/client").$Enums.Role;
                 };
             } & {
                 id: string;
-                status: import(".prisma/client").$Enums.ApprovalStatus;
                 comments: string | null;
-                requestedAt: Date;
+                status: import(".prisma/client").$Enums.ApprovalStatus;
                 historyId: string;
                 requestedById: string;
+                requestedAt: Date;
+                rejectionReason: string | null;
                 approvalType: import(".prisma/client").$Enums.ApprovalType;
                 reviewedById: string | null;
                 reviewedAt: Date | null;
-                rejectionReason: string | null;
                 attachments: string[];
             })[];
         } & {
@@ -823,25 +824,25 @@ export declare class ProjectsController {
             permissionGrantedById: string | null;
         })[];
     } & {
-        id: string;
         name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
         office: string;
         category: import(".prisma/client").$Enums.ProjectCategory;
         pagesCount: number | null;
         targetDate: Date;
         status: import(".prisma/client").$Enums.ProjectStatus;
+        ownerId: string;
         clientName: string | null;
         observations: string | null;
         monthsPassed: number;
         startDate: Date;
         deviationReason: string | null;
         dependency: boolean;
-        createdAt: Date;
-        updatedAt: Date;
         currentDepartment: import(".prisma/client").$Enums.Department;
         nextDepartment: import(".prisma/client").$Enums.Department | null;
         projectCode: string;
-        ownerId: string;
         projectCoordinatorId: string | null;
         pcTeamLeadId: string | null;
     }>;
@@ -862,47 +863,47 @@ export declare class ProjectsController {
         reason: string;
     }, user: UserEntity): Promise<{
         requestedBy: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
     } & {
         id: string;
-        status: import(".prisma/client").$Enums.ApprovalStatus;
         comments: string | null;
-        requestedAt: Date;
+        status: import(".prisma/client").$Enums.ApprovalStatus;
         historyId: string;
         requestedById: string;
+        requestedAt: Date;
+        rejectionReason: string | null;
         approvalType: import(".prisma/client").$Enums.ApprovalType;
         reviewedById: string | null;
         reviewedAt: Date | null;
-        rejectionReason: string | null;
         attachments: string[];
     }>;
     submitManagerReview(approvalId: string, reviewDecision: {
         decision: 'PROCEED' | 'REVISE' | 'CANCEL';
         comments: string;
     }, user: UserEntity): Promise<{
-        id: string;
         name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
         office: string;
         category: import(".prisma/client").$Enums.ProjectCategory;
         pagesCount: number | null;
         targetDate: Date;
         status: import(".prisma/client").$Enums.ProjectStatus;
+        ownerId: string;
         clientName: string | null;
         observations: string | null;
         monthsPassed: number;
         startDate: Date;
         deviationReason: string | null;
         dependency: boolean;
-        createdAt: Date;
-        updatedAt: Date;
         currentDepartment: import(".prisma/client").$Enums.Department;
         nextDepartment: import(".prisma/client").$Enums.Department | null;
         projectCode: string;
-        ownerId: string;
         projectCoordinatorId: string | null;
         pcTeamLeadId: string | null;
     }>;
@@ -913,57 +914,57 @@ export declare class ProjectsController {
         notes?: string;
     }, user: UserEntity): Promise<{
         owner: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
         projectCoordinator: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
         pcTeamLead: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
     } & {
-        id: string;
         name: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
         office: string;
         category: import(".prisma/client").$Enums.ProjectCategory;
         pagesCount: number | null;
         targetDate: Date;
         status: import(".prisma/client").$Enums.ProjectStatus;
+        ownerId: string;
         clientName: string | null;
         observations: string | null;
         monthsPassed: number;
         startDate: Date;
         deviationReason: string | null;
         dependency: boolean;
-        createdAt: Date;
-        updatedAt: Date;
         currentDepartment: import(".prisma/client").$Enums.Department;
         nextDepartment: import(".prisma/client").$Enums.Department | null;
         projectCode: string;
-        ownerId: string;
         projectCoordinatorId: string | null;
         pcTeamLeadId: string | null;
     }>;
     getAssignmentHistory(projectId: string, user: UserEntity): Promise<({
         previousUser: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
         assignedBy: {
-            id: string;
             name: string;
             email: string;
+            id: string;
             role: import(".prisma/client").$Enums.Role;
         };
     } & {
@@ -971,10 +972,192 @@ export declare class ProjectsController {
         projectId: string;
         notes: string | null;
         assignmentType: import(".prisma/client").$Enums.ProjectAssignmentType;
-        previousUserId: string | null;
         newUserId: string | null;
-        assignedById: string;
         assignedAt: Date;
         reason: string | null;
+        previousUserId: string | null;
+        assignedById: string;
     })[]>;
+    getChecklistProgress(projectId: string, department: string, user: UserEntity): Promise<{
+        department: string;
+        totalItems: number;
+        completedItems: number;
+        requiredItems: number;
+        completedRequiredItems: number;
+        completionPercentage: number;
+        requiredCompletionPercentage: number;
+        canProceedToNext: boolean;
+        items: ({
+            links: ({
+                addedBy: {
+                    name: string;
+                    email: string;
+                    id: string;
+                };
+            } & {
+                type: string;
+                title: string;
+                id: string;
+                url: string;
+                itemId: string;
+                addedAt: Date;
+                addedById: string | null;
+            })[];
+            template: {
+                description: string | null;
+                title: string;
+                id: string;
+                isActive: boolean;
+                createdAt: Date;
+                updatedAt: Date;
+                department: string;
+                order: number;
+                isRequired: boolean;
+            };
+            completedBy: {
+                name: string;
+                email: string;
+                id: string;
+            };
+            lastUpdatedBy: {
+                name: string;
+                email: string;
+                id: string;
+            };
+            updateHistory: ({
+                updatedBy: {
+                    name: string;
+                    email: string;
+                    id: string;
+                };
+            } & {
+                id: string;
+                updatedAt: Date;
+                notes: string;
+                date: Date;
+                itemId: string;
+                updatedById: string;
+            })[];
+        } & {
+            description: string | null;
+            title: string;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            department: import(".prisma/client").$Enums.Department;
+            order: number;
+            projectId: string;
+            notes: string | null;
+            completedAt: Date | null;
+            isCompleted: boolean;
+            completedDate: Date | null;
+            templateId: string;
+            completedById: string | null;
+            isRequired: boolean;
+            lastUpdatedAt: Date | null;
+            lastUpdatedById: string | null;
+        })[];
+    }>;
+    updateChecklistItem(projectId: string, itemId: string, updateDto: UpdateChecklistItemDto, user: UserEntity): Promise<{
+        links: ({
+            addedBy: {
+                name: string;
+                email: string;
+                id: string;
+            };
+        } & {
+            type: string;
+            title: string;
+            id: string;
+            url: string;
+            itemId: string;
+            addedAt: Date;
+            addedById: string | null;
+        })[];
+        template: {
+            description: string | null;
+            title: string;
+            id: string;
+            isActive: boolean;
+            createdAt: Date;
+            updatedAt: Date;
+            department: string;
+            order: number;
+            isRequired: boolean;
+        };
+        completedBy: {
+            name: string;
+            email: string;
+            id: string;
+        };
+        lastUpdatedBy: {
+            name: string;
+            email: string;
+            id: string;
+        };
+        updateHistory: ({
+            updatedBy: {
+                name: string;
+                email: string;
+                id: string;
+            };
+        } & {
+            id: string;
+            updatedAt: Date;
+            notes: string;
+            date: Date;
+            itemId: string;
+            updatedById: string;
+        })[];
+    } & {
+        description: string | null;
+        title: string;
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        department: import(".prisma/client").$Enums.Department;
+        order: number;
+        projectId: string;
+        notes: string | null;
+        completedAt: Date | null;
+        isCompleted: boolean;
+        completedDate: Date | null;
+        templateId: string;
+        completedById: string | null;
+        isRequired: boolean;
+        lastUpdatedAt: Date | null;
+        lastUpdatedById: string | null;
+    }>;
+    addChecklistItemLink(projectId: string, itemId: string, linkDto: CreateChecklistItemLinkDto, user: UserEntity): Promise<{
+        addedBy: {
+            name: string;
+            email: string;
+            id: string;
+        };
+    } & {
+        type: string;
+        title: string;
+        id: string;
+        url: string;
+        itemId: string;
+        addedAt: Date;
+        addedById: string | null;
+    }>;
+    removeChecklistItemLink(projectId: string, itemId: string, linkId: string, user: UserEntity): Promise<{
+        success: boolean;
+    }>;
+    addChecklistItemUpdate(projectId: string, itemId: string, updateDto: CreateChecklistItemUpdateDto, user: UserEntity): Promise<{
+        updatedBy: {
+            name: string;
+            email: string;
+            id: string;
+        };
+    } & {
+        id: string;
+        updatedAt: Date;
+        notes: string;
+        date: Date;
+        itemId: string;
+        updatedById: string;
+    }>;
 }

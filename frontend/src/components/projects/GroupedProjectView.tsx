@@ -3,7 +3,7 @@ import { ChevronDown, ChevronRight, BarChart3, Clock, AlertTriangle } from 'luci
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Project, Department, ProjectStatus } from '@/types';
+import { Project, Department, ProjectStatus, DepartmentMaster } from '@/types';
 import EnhancedProjectCard from './EnhancedProjectCard';
 import ProjectListItem from './ProjectListItem';
 
@@ -11,6 +11,7 @@ interface GroupedProjectViewProps {
   projects: Project[];
   groupBy: 'department' | 'status' | 'health' | 'dueDate' | 'none';
   viewMode: 'grid' | 'list';
+  departments?: DepartmentMaster[];
   onQuickEdit?: (project: Project) => void;
   onMoveProject?: (project: Project) => void;
   onViewDetails?: (project: Project) => void;
@@ -190,6 +191,7 @@ export default function GroupedProjectView({
   projects,
   groupBy,
   viewMode,
+  departments = [],
   onQuickEdit,
   onMoveProject,
   onViewDetails
@@ -215,6 +217,7 @@ export default function GroupedProjectView({
             <ProjectListItem
               key={project.id}
               project={project}
+              departments={departments}
               onQuickEdit={onQuickEdit}
               onMoveProject={() => onMoveProject?.(project)}
               onViewDetails={() => onViewDetails?.(project)}
@@ -316,6 +319,7 @@ export default function GroupedProjectView({
                       <ProjectListItem
                         key={project.id}
                         project={project}
+                        departments={departments}
                         onQuickEdit={onQuickEdit}
                         onMoveProject={() => onMoveProject?.(project)}
                         onViewDetails={() => onViewDetails?.(project)}

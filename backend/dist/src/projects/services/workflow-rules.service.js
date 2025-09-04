@@ -98,30 +98,36 @@ let WorkflowRulesService = class WorkflowRulesService {
                 department: client_1.Department.PMO,
                 requiredApprovals: ['CLIENT_APPROVAL'],
                 minimumWorkStatus: client_1.DepartmentWorkStatus.PENDING_CLIENT_APPROVAL,
+                requiresChecklistCompletion: true,
             },
             {
                 department: client_1.Department.DESIGN,
                 requiredApprovals: ['CLIENT_APPROVAL'],
                 minimumWorkStatus: client_1.DepartmentWorkStatus.PENDING_CLIENT_APPROVAL,
+                requiresChecklistCompletion: true,
             },
             {
                 department: client_1.Department.HTML,
                 requiredQAStatus: client_1.QAStatus.PASSED,
                 minimumWorkStatus: client_1.DepartmentWorkStatus.QA_TESTING,
+                requiresChecklistCompletion: true,
             },
             {
                 department: client_1.Department.PHP,
                 requiredQAStatus: client_1.QAStatus.PASSED,
                 minimumWorkStatus: client_1.DepartmentWorkStatus.QA_TESTING,
+                requiresChecklistCompletion: true,
             },
             {
                 department: client_1.Department.REACT,
                 requiredQAStatus: client_1.QAStatus.PASSED,
                 minimumWorkStatus: client_1.DepartmentWorkStatus.QA_TESTING,
+                requiresChecklistCompletion: true,
             },
             {
                 department: client_1.Department.QA,
                 minimumWorkStatus: client_1.DepartmentWorkStatus.READY_FOR_DELIVERY,
+                requiresChecklistCompletion: true,
             },
         ];
     }
@@ -134,7 +140,7 @@ let WorkflowRulesService = class WorkflowRulesService {
     getApprovalGate(department) {
         return this.approvalGates.find(gate => gate.department === department) || null;
     }
-    areApprovalGatesSatisfied(department, currentStatus, approvals, qaRounds) {
+    areApprovalGatesSatisfied(department, currentStatus, approvals, qaRounds, checklistCompleted) {
         const gate = this.getApprovalGate(department);
         if (!gate) {
             return { satisfied: true, missingRequirements: [] };
@@ -156,6 +162,9 @@ let WorkflowRulesService = class WorkflowRulesService {
             if (!hasPassingQA) {
                 missingRequirements.push(`QA testing must pass (status: ${gate.requiredQAStatus})`);
             }
+        }
+        if (gate.requiresChecklistCompletion && checklistCompleted === false) {
+            missingRequirements.push(`Department checklist must be completed before proceeding`);
         }
         return {
             satisfied: missingRequirements.length === 0,
@@ -215,7 +224,7 @@ let WorkflowRulesService = class WorkflowRulesService {
     requiresManagerReview(projectRejectionCount, criticalBugsCount) {
         return projectRejectionCount > 0 || criticalBugsCount > 2;
     }
-    validateWorkflowTransition(currentDepartment, targetDepartment, currentStatus, approvals, qaRounds, userRole) {
+    validateWorkflowTransition(currentDepartment, targetDepartment, currentStatus, approvals, qaRounds, userRole, checklistCompleted) {
         const errors = [];
         if (!this.isValidTransition(currentDepartment, targetDepartment)) {
             errors.push(`Invalid transition from ${currentDepartment} to ${targetDepartment}`);
@@ -230,7 +239,7 @@ let WorkflowRulesService = class WorkflowRulesService {
             errors.push(`Current department must be ${requirements.requiredStatus} before moving`);
         }
         if (requirements.requiresApproval) {
-            const gateCheck = this.areApprovalGatesSatisfied(currentDepartment, currentStatus, approvals, qaRounds);
+            const gateCheck = this.areApprovalGatesSatisfied(currentDepartment, currentStatus, approvals, qaRounds, checklistCompleted);
             if (!gateCheck.satisfied) {
                 errors.push(...gateCheck.missingRequirements);
             }

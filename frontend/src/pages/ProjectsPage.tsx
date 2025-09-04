@@ -9,8 +9,10 @@ import {
   ProjectCategory, 
   Department,
   Office,
+  DepartmentMaster,
   CreateDepartmentTransitionDto 
 } from '@/types';
+import { departmentsApi } from '@/lib/api';
 import CreateProjectModal from '@/components/projects/CreateProjectModal';
 import AdvancedProjectFilters from '@/components/projects/AdvancedProjectFilters';
 import ProjectQuickActions from '@/components/projects/ProjectQuickActions';
@@ -54,10 +56,19 @@ const calculateHealthScore = (project: Project): number => {
   return Math.max(0, Math.min(100, score));
 };
 
-const getDepartmentProgress = (currentDept: Department): number => {
-  const departmentOrder = [Department.PMO, Department.DESIGN, Department.HTML, Department.PHP, Department.REACT, Department.WORDPRESS, Department.QA, Department.DELIVERY];
-  const currentIndex = departmentOrder.indexOf(currentDept);
-  return ((currentIndex + 1) / departmentOrder.length) * 100;
+const getDepartmentProgress = (currentDept: Department, departments: DepartmentMaster[]): number => {
+  // Filter root level departments (no parent) and sort by common order
+  const rootDepartments = departments.filter(d => !d.parentId);
+  const departmentOrder = ['PMO', 'DESIGN', 'HTML', 'DEV', 'QA', 'DELIVERY', 'MANAGER'];
+  
+  const sortedDepts = rootDepartments.sort((a, b) => {
+    const aIndex = departmentOrder.indexOf(a.code);
+    const bIndex = departmentOrder.indexOf(b.code);
+    return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+  });
+  
+  const currentIndex = sortedDepts.findIndex(d => d.code === currentDept);
+  return currentIndex !== -1 ? ((currentIndex + 1) / sortedDepts.length) * 100 : 0;
 };
 
 export default function ProjectsPage() {
@@ -69,6 +80,7 @@ export default function ProjectsPage() {
   const [groupBy, setGroupBy] = useState<'department' | 'status' | 'health' | 'dueDate' | 'none'>('department');
   const [showStats, setShowStats] = useState(true);
   const [errorAlert, setErrorAlert] = useState<{ title: string; message: string; suggestion?: string } | null>(null);
+  const [departments, setDepartments] = useState<DepartmentMaster[]>([]);
   
   const [filters, setFilters] = useState<FilterOptions>({
     searchTerm: '',
@@ -87,6 +99,18 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     fetchProjects();
+    
+    // Fetch departments for progress calculation
+    const fetchDepartments = async () => {
+      try {
+        const departmentData = await departmentsApi.getAll();
+        setDepartments(departmentData);
+      } catch (error) {
+        console.error('Failed to fetch departments:', error);
+      }
+    };
+    
+    fetchDepartments();
   }, [fetchProjects]);
 
   useEffect(() => {
@@ -178,8 +202,8 @@ export default function ProjectsPage() {
           bValue = calculateHealthScore(b);
           break;
         case 'progress':
-          aValue = getDepartmentProgress(a.currentDepartment);
-          bValue = getDepartmentProgress(b.currentDepartment);
+          aValue = getDepartmentProgress(a.currentDepartment, departments);
+          bValue = getDepartmentProgress(b.currentDepartment, departments);
           break;
         case 'createdAt':
           aValue = new Date(a.createdAt).getTime();
@@ -399,6 +423,7 @@ export default function ProjectsPage() {
           projects={filteredProjects}
           groupBy={groupBy}
           viewMode={viewMode}
+          departments={departments}
           onQuickEdit={handleQuickEdit}
           onMoveProject={(project) => setQuickActionsProject(project)}
           onViewDetails={(project) => setQuickActionsProject(project)}

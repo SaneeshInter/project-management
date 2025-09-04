@@ -13,6 +13,7 @@ export declare class UsersService {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         };
         roleMaster: {
             name: string;
@@ -46,6 +47,7 @@ export declare class UsersService {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         };
         roleMaster: {
             name: string;
@@ -79,6 +81,7 @@ export declare class UsersService {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         };
         roleMaster: {
             name: string;
@@ -125,6 +128,7 @@ export declare class UsersService {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         };
         roleMaster: {
             name: string;
@@ -161,6 +165,7 @@ export declare class UsersService {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         };
         roleMaster: {
             name: string;

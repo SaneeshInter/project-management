@@ -32,6 +32,13 @@ __decorate([
     __metadata("design:type", String)
 ], CreateDepartmentDto.prototype, "parentId", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Display order', default: 0 }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], CreateDepartmentDto.prototype, "order", void 0);
+__decorate([
     (0, swagger_1.ApiPropertyOptional)({ description: 'Whether department is active', default: true }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),

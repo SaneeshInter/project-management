@@ -36,6 +36,10 @@ model User {
   approvalReviews       WorkflowApproval[]         @relation("ApprovalReviews")
   assignmentHistory     ProjectAssignmentHistory[] @relation("AssignmentUser")
   assignmentsMade       ProjectAssignmentHistory[] @relation("AssignmentAssigner")
+  checklistItemsCompleted ProjectChecklistItem[]   @relation("ChecklistCompletedBy")
+  checklistItemsUpdated ProjectChecklistItem[]     @relation("ChecklistLastUpdatedBy")
+  checklistLinksAdded   ChecklistItemLink[]        @relation("ChecklistLinkAddedBy")
+  checklistUpdateHistory ChecklistItemUpdate[]    @relation("ChecklistUpdateHistory")
 
   @@map("users")
 }
@@ -70,6 +74,7 @@ model Project {
   pcTeamLead           User?                      @relation("PCTeamLead", fields: [pcTeamLeadId], references: [id])
   tasks                Task[]
   assignmentHistory    ProjectAssignmentHistory[]
+  checklistItems       ProjectChecklistItem[]
 
   @@map("projects")
 }
@@ -225,6 +230,7 @@ model DepartmentMaster {
   name             String              @unique
   code             String              @unique
   parentId         String?
+  order            Int                 @default(0)
   isActive         Boolean             @default(true)
   createdAt        DateTime            @default(now())
   updatedAt        DateTime            @updatedAt
@@ -401,4 +407,74 @@ enum DepartmentWorkStatus {
 enum ProjectAssignmentType {
   PROJECT_COORDINATOR
   PC_TEAM_LEAD
+}
+
+model ChecklistTemplate {
+  id           String                  @id @default(cuid())
+  department   String
+  title        String
+  description  String?
+  isRequired   Boolean                 @default(true)
+  order        Int                     @default(0)
+  isActive     Boolean                 @default(true)
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+  items        ProjectChecklistItem[]
+
+  @@map("checklist_templates")
+}
+
+model ProjectChecklistItem {
+  id              String                      @id @default(cuid())
+  projectId       String
+  templateId      String
+  department      Department
+  title           String
+  description     String?
+  isCompleted     Boolean                     @default(false)
+  completedById   String?
+  completedAt     DateTime?
+  completedDate   DateTime?
+  notes           String?
+  isRequired      Boolean                     @default(true)
+  order           Int                         @default(0)
+  lastUpdatedAt   DateTime?
+  lastUpdatedById String?
+  createdAt       DateTime                    @default(now())
+  updatedAt       DateTime                    @updatedAt
+  project         Project                     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  template        ChecklistTemplate           @relation(fields: [templateId], references: [id])
+  completedBy     User?                       @relation("ChecklistCompletedBy", fields: [completedById], references: [id])
+  lastUpdatedBy   User?                       @relation("ChecklistLastUpdatedBy", fields: [lastUpdatedById], references: [id])
+  links           ChecklistItemLink[]
+  updateHistory   ChecklistItemUpdate[]
+
+  @@map("project_checklist_items")
+}
+
+model ChecklistItemLink {
+  id        String               @id @default(cuid())
+  itemId    String
+  url       String
+  title     String
+  type      String               // 'document' | 'link' | 'reference'
+  addedAt   DateTime             @default(now())
+  addedById String?
+  item      ProjectChecklistItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  addedBy   User?                @relation("ChecklistLinkAddedBy", fields: [addedById], references: [id])
+
+  @@map("checklist_item_links")
+}
+
+model ChecklistItemUpdate {
+  id          String               @id @default(cuid())
+  itemId      String
+  date        DateTime
+  notes       String
+  updatedById String
+  updatedAt   DateTime             @default(now())
+  item        ProjectChecklistItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  updatedBy   User                 @relation("ChecklistUpdateHistory", fields: [updatedById], references: [id])
+
+  @@map("checklist_item_updates")
 }

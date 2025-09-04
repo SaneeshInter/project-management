@@ -738,3 +738,94 @@ export interface ReassignPCDto {
   reason?: string;
   notes?: string;
 }
+
+// Department Checklist types
+export interface DepartmentChecklistTemplate {
+  id: string;
+  department: Department;
+  title: string;
+  description?: string;
+  isRequired: boolean;
+  order: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ChecklistItemLink {
+  id: string;
+  url: string;
+  title: string;
+  type: 'document' | 'link' | 'reference';
+  addedAt: string;
+  addedBy?: User;
+}
+
+export interface ChecklistItemUpdate {
+  id: string;
+  date: string;
+  notes: string;
+  updatedBy: User;
+  updatedAt: string;
+}
+
+export interface ProjectChecklistItem {
+  id: string;
+  projectId: string;
+  templateId: string;
+  department: Department;
+  title: string;
+  description?: string;
+  isCompleted: boolean;
+  completedBy?: User;
+  completedById?: string;
+  completedAt?: string;
+  completedDate?: string;
+  notes?: string;
+  isRequired: boolean;
+  order: number;
+  template: DepartmentChecklistTemplate;
+  links?: ChecklistItemLink[];
+  updateHistory?: ChecklistItemUpdate[];
+  lastUpdatedAt?: string;
+  lastUpdatedBy?: User;
+}
+
+export interface DepartmentChecklistProgress {
+  department: Department;
+  totalItems: number;
+  completedItems: number;
+  requiredItems: number;
+  completedRequiredItems: number;
+  completionPercentage: number;
+  requiredCompletionPercentage: number;
+  canProceedToNext: boolean;
+  items: ProjectChecklistItem[];
+}
+
+export interface CreateChecklistItemDto {
+  templateId: string;
+  notes?: string;
+}
+
+export interface UpdateChecklistItemDto {
+  isCompleted: boolean;
+  completedDate?: string;
+  notes?: string;
+  links?: Array<{
+    url: string;
+    title: string;
+    type: 'document' | 'link' | 'reference';
+  }>;
+}
+
+export interface CreateChecklistItemLinkDto {
+  url: string;
+  title: string;
+  type: 'document' | 'link' | 'reference';
+}
+
+export interface CreateChecklistItemUpdateDto {
+  date: string;
+  notes: string;
+}

@@ -32,6 +32,9 @@ let DepartmentsController = class DepartmentsController {
     findAll() {
         return this.departmentsService.findAll();
     }
+    findMainDepartments() {
+        return this.departmentsService.findMainDepartments();
+    }
     findByParent(parentId) {
         return this.departmentsService.findByParent(parentId || null);
     }
@@ -64,6 +67,14 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], DepartmentsController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('main'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get main departments only (no sub-departments)' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Main departments retrieved successfully' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], DepartmentsController.prototype, "findMainDepartments", null);
 __decorate([
     (0, common_1.Get)('by-parent'),
     (0, swagger_1.ApiOperation)({ summary: 'Get departments by parent ID' }),

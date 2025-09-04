@@ -4,6 +4,7 @@ import {
   Users, 
   Building2,
   UserCheck,
+  FileText,
   LogOut 
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
@@ -16,6 +17,7 @@ const allNavigation = [
   { name: 'Users', href: '/users', icon: Users },
   { name: 'Departments', href: '/departments', icon: Building2 },
   { name: 'Roles', href: '/roles', icon: UserCheck },
+  { name: 'Department Checklists', href: '/department-checklists', icon: FileText },
 ];
 
 export default function Sidebar() {
@@ -25,19 +27,26 @@ export default function Sidebar() {
   const getFilteredNavigation = () => {
     if (!user) return [];
     
-    // Super users (ADMIN, SU_ADMIN and PROJECT_MANAGER) see all menus
-    if (user.role === Role.ADMIN || user.role === Role.SU_ADMIN || user.role === Role.PROJECT_MANAGER || 
-        user.role === 'ADMIN' || user.role === 'SU_ADMIN' || user.role === 'PROJECT_MANAGER') {
+    // Admin and Super Admin see all menus (checking both enum and string values)
+    if (user.role === 'ADMIN' || user.role === 'SU_ADMIN') {
       return allNavigation;
     }
     
-    // PMO department users only see Projects menu
+    // Project Managers see Projects, Users, Departments, and Department Checklists
+    if (user.role === Role.PROJECT_MANAGER) {
+      return allNavigation.filter(item => 
+        item.name === 'Projects' || item.name === 'Users' || item.name === 'Departments' || item.name === 'Department Checklists'
+      );
+    }
+    
+    // PMO department users see Projects and Users
     if (user.departmentMaster?.code === 'PMO') {
-      return allNavigation.filter(item => item.name === 'Projects');
+      return allNavigation.filter(item => 
+        item.name === 'Projects' || item.name === 'Users'
+      );
     }
     
     // Other departments see Projects by default
-    // Can be extended for department-specific menus
     return allNavigation.filter(item => item.name === 'Projects');
   };
 

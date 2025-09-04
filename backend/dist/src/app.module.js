@@ -18,6 +18,7 @@ const tasks_module_1 = require("./tasks/tasks.module");
 const comments_module_1 = require("./comments/comments.module");
 const departments_module_1 = require("./departments/departments.module");
 const roles_module_1 = require("./roles/roles.module");
+const checklist_templates_module_1 = require("./checklist-templates/checklist-templates.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -53,6 +54,7 @@ exports.AppModule = AppModule = __decorate([
             comments_module_1.CommentsModule,
             departments_module_1.DepartmentsModule,
             roles_module_1.RolesModule,
+            checklist_templates_module_1.ChecklistTemplatesModule,
         ],
         controllers: [],
         providers: [],

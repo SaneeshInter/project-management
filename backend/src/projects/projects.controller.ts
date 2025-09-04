@@ -12,6 +12,7 @@ import { CreateApprovalDto } from './dto/create-approval.dto';
 import { UpdateApprovalDto } from './dto/update-approval.dto';
 import { CreateQATestingRoundDto } from './dto/create-qa-round.dto';
 import { CreateQABugDto } from './dto/create-qa-bug.dto';
+import { UpdateChecklistItemDto, CreateChecklistItemLinkDto, CreateChecklistItemUpdateDto } from './dto/update-checklist-item.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from '../common/decorators/user.decorator';
 import { User as UserEntity } from '@prisma/client';
@@ -286,5 +287,66 @@ export class ProjectsController {
   @ApiResponse({ status: 200, description: 'Assignment history retrieved successfully' })
   getAssignmentHistory(@Param('id') projectId: string, @User() user: UserEntity) {
     return this.projectsService.getAssignmentHistory(projectId, user);
+  }
+
+  // Department Checklist Endpoints
+  @Get(':id/checklist')
+  @ApiOperation({ summary: 'Get checklist progress for a project department' })
+  @ApiQuery({ name: 'department', required: false })
+  @ApiResponse({ status: 200, description: 'Checklist progress retrieved successfully' })
+  getChecklistProgress(
+    @Param('id') projectId: string, 
+    @Query('department') department: string,
+    @User() user: UserEntity
+  ) {
+    return this.projectsService.getChecklistProgress(projectId, department, user);
+  }
+
+  @Patch(':id/checklist/:itemId')
+  @ApiOperation({ summary: 'Update checklist item' })
+  @ApiResponse({ status: 200, description: 'Checklist item updated successfully' })
+  updateChecklistItem(
+    @Param('id') projectId: string,
+    @Param('itemId') itemId: string,
+    @Body() updateDto: UpdateChecklistItemDto,
+    @User() user: UserEntity,
+  ) {
+    return this.projectsService.updateChecklistItem(projectId, itemId, updateDto, user);
+  }
+
+  @Post(':id/checklist/:itemId/links')
+  @ApiOperation({ summary: 'Add link to checklist item' })
+  @ApiResponse({ status: 201, description: 'Link added successfully' })
+  addChecklistItemLink(
+    @Param('id') projectId: string,
+    @Param('itemId') itemId: string,
+    @Body() linkDto: CreateChecklistItemLinkDto,
+    @User() user: UserEntity,
+  ) {
+    return this.projectsService.addChecklistItemLink(projectId, itemId, linkDto, user);
+  }
+
+  @Delete(':id/checklist/:itemId/links/:linkId')
+  @ApiOperation({ summary: 'Remove link from checklist item' })
+  @ApiResponse({ status: 200, description: 'Link removed successfully' })
+  removeChecklistItemLink(
+    @Param('id') projectId: string,
+    @Param('itemId') itemId: string,
+    @Param('linkId') linkId: string,
+    @User() user: UserEntity,
+  ) {
+    return this.projectsService.removeChecklistItemLink(projectId, itemId, linkId, user);
+  }
+
+  @Post(':id/checklist/:itemId/updates')
+  @ApiOperation({ summary: 'Add update history to checklist item' })
+  @ApiResponse({ status: 201, description: 'Update history added successfully' })
+  addChecklistItemUpdate(
+    @Param('id') projectId: string,
+    @Param('itemId') itemId: string,
+    @Body() updateDto: CreateChecklistItemUpdateDto,
+    @User() user: UserEntity,
+  ) {
+    return this.projectsService.addChecklistItemUpdate(projectId, itemId, updateDto, user);
   }
 }

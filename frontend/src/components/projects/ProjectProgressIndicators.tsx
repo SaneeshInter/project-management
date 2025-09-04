@@ -4,10 +4,11 @@ import {
   Users, MessageSquare
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Project, Department } from '@/types';
+import { Project, Department, DepartmentMaster } from '@/types';
 
 interface ProgressIndicatorsProps {
   project: Project;
+  departments?: DepartmentMaster[];
 }
 
 interface ProjectHealthMetrics {
@@ -19,20 +20,19 @@ interface ProjectHealthMetrics {
   }[];
 }
 
-const departmentOrder: Department[] = [
-  Department.PMO,
-  Department.DESIGN,
-  Department.HTML,
-  Department.PHP,
-  Department.REACT,
-  Department.WORDPRESS,
-  Department.QA,
-  Department.DELIVERY
-];
-
-const getDepartmentProgress = (currentDept: Department): number => {
-  const currentIndex = departmentOrder.indexOf(currentDept);
-  return ((currentIndex + 1) / departmentOrder.length) * 100;
+const getDepartmentProgress = (currentDept: Department, departments: DepartmentMaster[] = []): number => {
+  // Filter root level departments (no parent) and sort by common order
+  const rootDepartments = departments.filter(d => !d.parentId);
+  const departmentOrder = ['PMO', 'DESIGN', 'HTML', 'DEV', 'QA', 'DELIVERY', 'MANAGER'];
+  
+  const sortedDepts = rootDepartments.sort((a, b) => {
+    const aIndex = departmentOrder.indexOf(a.code);
+    const bIndex = departmentOrder.indexOf(b.code);
+    return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+  });
+  
+  const currentIndex = sortedDepts.findIndex(d => d.code === currentDept);
+  return currentIndex !== -1 ? ((currentIndex + 1) / sortedDepts.length) * 100 : 0;
 };
 
 const calculateProjectHealth = (project: Project): ProjectHealthMetrics => {
@@ -155,9 +155,13 @@ export function ProjectHealthScore({ project }: ProgressIndicatorsProps) {
   const healthColor = getHealthColor(health.score);
   
   return (
-    <div className={`px-3 py-2 rounded-lg border ${healthColor} text-center`}>
-      <div className="text-lg font-bold">{health.score}%</div>
-      <div className="text-xs opacity-75">Health Score</div>
+    <div className={`px-6 py-4 rounded-xl border-2 ${healthColor} text-center shadow-sm hover:shadow-md transition-all`}>
+      <div className="text-3xl font-bold mb-1">{health.score}%</div>
+      <div className="text-sm font-medium opacity-80">Health Score</div>
+      {health.score >= 85 && <div className="text-xs mt-1 opacity-60">Excellent</div>}
+      {health.score >= 70 && health.score < 85 && <div className="text-xs mt-1 opacity-60">Good</div>}
+      {health.score >= 50 && health.score < 70 && <div className="text-xs mt-1 opacity-60">At Risk</div>}
+      {health.score < 50 && <div className="text-xs mt-1 opacity-60">Critical</div>}
     </div>
   );
 }
@@ -181,32 +185,45 @@ export function ProjectHealthIndicators({ project }: ProgressIndicatorsProps) {
   );
 }
 
-export function DepartmentProgressBar({ project }: ProgressIndicatorsProps) {
-  const progress = getDepartmentProgress(project.currentDepartment);
-  const currentIndex = departmentOrder.indexOf(project.currentDepartment);
+export function DepartmentProgressBar({ project, departments = [] }: ProgressIndicatorsProps) {
+  const progress = getDepartmentProgress(project.currentDepartment, departments);
+  const rootDepartments = departments.filter(d => !d.parentId);
+  const departmentOrder = ['PMO', 'DESIGN', 'HTML', 'DEV', 'QA', 'DELIVERY', 'MANAGER'];
+  const sortedDepts = rootDepartments.sort((a, b) => {
+    const aIndex = departmentOrder.indexOf(a.code);
+    const bIndex = departmentOrder.indexOf(b.code);
+    return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+  });
+  const currentIndex = sortedDepts.findIndex(d => d.code === project.currentDepartment);
   
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between text-sm">
-        <span className="font-medium">Department Progress</span>
-        <span className="text-muted-foreground">{Math.round(progress)}%</span>
+    <div className="space-y-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Target className="h-5 w-5 text-blue-600" />
+          <span className="font-semibold text-gray-900">Department Progress</span>
+        </div>
+        <div className="text-right">
+          <div className="text-2xl font-bold text-blue-600">{Math.round(progress)}%</div>
+          <div className="text-xs text-gray-600">Complete</div>
+        </div>
       </div>
       
-      <div className="w-full bg-gray-200 rounded-full h-2 relative">
+      <div className="w-full bg-white rounded-full h-4 shadow-inner relative overflow-hidden">
         <div 
-          className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500"
+          className="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 h-4 rounded-full transition-all duration-700 ease-out shadow-sm"
           style={{ width: `${progress}%` }}
         ></div>
         
         {/* Department markers */}
-        <div className="absolute inset-0 flex justify-between items-center px-1">
+        <div className="absolute inset-0 flex justify-between items-center px-2">
           {departmentOrder.map((dept, index) => {
             const isActive = index <= currentIndex;
             return (
               <div
                 key={dept}
-                className={`w-1 h-1 rounded-full ${
-                  isActive ? 'bg-white' : 'bg-gray-400'
+                className={`w-2 h-2 rounded-full border transition-all duration-300 ${
+                  isActive ? 'bg-white border-blue-300 shadow-sm' : 'bg-gray-300 border-gray-400'
                 }`}
                 title={dept.replace('_', ' ')}
               />
@@ -215,31 +232,42 @@ export function DepartmentProgressBar({ project }: ProgressIndicatorsProps) {
         </div>
       </div>
       
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>{departmentOrder[0].replace('_', ' ')}</span>
-        <span className="font-medium text-blue-600">
-          {project.currentDepartment.replace('_', ' ')}
-        </span>
-        <span>{departmentOrder[departmentOrder.length - 1].replace('_', ' ')}</span>
+      <div className="flex items-center justify-between text-sm">
+        <div className="text-gray-600">
+          <span className="font-medium">Start:</span> {sortedDepts[0]?.name || 'PMO'}
+        </div>
+        <div className="px-3 py-1 bg-blue-600 text-white rounded-full text-xs font-bold">
+          {departments.find(d => d.code === project.currentDepartment)?.name || project.currentDepartment.replace('_', ' ')}
+        </div>
+        <div className="text-gray-600">
+          <span className="font-medium">End:</span> {sortedDepts[sortedDepts.length - 1]?.name || 'Delivery'}
+        </div>
       </div>
     </div>
   );
 }
 
-export function MiniTimeline({ project }: ProgressIndicatorsProps) {
-  const currentIndex = departmentOrder.indexOf(project.currentDepartment);
+export function MiniTimeline({ project, departments = [] }: ProgressIndicatorsProps) {
+  const rootDepartments = departments.filter(d => !d.parentId);
+  const departmentOrder = ['PMO', 'DESIGN', 'HTML', 'DEV', 'QA', 'DELIVERY', 'MANAGER'];
+  const sortedDepts = rootDepartments.sort((a, b) => {
+    const aIndex = departmentOrder.indexOf(a.code);
+    const bIndex = departmentOrder.indexOf(b.code);
+    return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+  });
+  const currentIndex = sortedDepts.findIndex(d => d.code === project.currentDepartment);
   
   return (
     <div className="space-y-2">
       <div className="text-sm font-medium">Workflow Timeline</div>
       <div className="flex items-center gap-1 overflow-hidden">
-        {departmentOrder.map((dept, index) => {
+        {sortedDepts.map((dept, index) => {
           const isPast = index < currentIndex;
           const isCurrent = index === currentIndex;
-          const isNext = dept === project.nextDepartment;
+          const isNext = dept.code === project.nextDepartment;
           
           return (
-            <div key={dept} className="flex items-center flex-shrink-0">
+            <div key={dept.id} className="flex items-center flex-shrink-0">
               <div className={`
                 w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium border-2 transition-all
                 ${isPast ? 'bg-green-500 border-green-500 text-white' :
@@ -256,7 +284,7 @@ export function MiniTimeline({ project }: ProgressIndicatorsProps) {
                 )}
               </div>
               
-              {index < departmentOrder.length - 1 && (
+              {index < sortedDepts.length - 1 && (
                 <div className={`
                   w-3 h-0.5 transition-all
                   ${isPast ? 'bg-green-400' : 'bg-gray-300'}
@@ -268,8 +296,8 @@ export function MiniTimeline({ project }: ProgressIndicatorsProps) {
       </div>
       
       <div className="text-xs text-muted-foreground">
-        Current: {project.currentDepartment.replace('_', ' ')}
-        {project.nextDepartment && ` → Next: ${project.nextDepartment.replace('_', ' ')}`}
+        Current: {departments.find(d => d.code === project.currentDepartment)?.name || project.currentDepartment.replace('_', ' ')}
+        {project.nextDepartment && ` → Next: ${departments.find(d => d.code === project.nextDepartment)?.name || project.nextDepartment.replace('_', ' ')}`}
       </div>
     </div>
   );
@@ -281,24 +309,37 @@ export function ProjectMetricsGrid({ project }: ProgressIndicatorsProps) {
   const targetDate = new Date(project.targetDate);
   const daysPassed = Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
   const totalDays = Math.ceil((targetDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  const daysLeft = Math.max(0, totalDays - daysPassed);
   
   return (
-    <div className="grid grid-cols-2 gap-3 text-xs">
-      <div className="text-center p-2 bg-blue-50 rounded">
-        <div className="font-bold text-blue-600">{daysPassed}</div>
-        <div className="text-blue-600">Days Passed</div>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 hover:shadow-md transition-all">
+        <div className="text-2xl font-bold text-blue-700 mb-1">{daysPassed}</div>
+        <div className="text-sm font-medium text-blue-600">Days Passed</div>
       </div>
-      <div className="text-center p-2 bg-green-50 rounded">
-        <div className="font-bold text-green-600">{Math.max(0, totalDays - daysPassed)}</div>
-        <div className="text-green-600">Days Left</div>
+      <div className={`text-center p-4 rounded-xl border hover:shadow-md transition-all ${
+        daysLeft <= 3 ? 'bg-gradient-to-br from-red-50 to-red-100 border-red-200' :
+        daysLeft <= 7 ? 'bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200' :
+        'bg-gradient-to-br from-green-50 to-green-100 border-green-200'
+      }`}>
+        <div className={`text-2xl font-bold mb-1 ${
+          daysLeft <= 3 ? 'text-red-700' :
+          daysLeft <= 7 ? 'text-orange-700' :
+          'text-green-700'
+        }`}>{daysLeft}</div>
+        <div className={`text-sm font-medium ${
+          daysLeft <= 3 ? 'text-red-600' :
+          daysLeft <= 7 ? 'text-orange-600' :
+          'text-green-600'
+        }`}>Days Left</div>
       </div>
-      <div className="text-center p-2 bg-purple-50 rounded">
-        <div className="font-bold text-purple-600">{project._count?.tasks || 0}</div>
-        <div className="text-purple-600">Tasks</div>
+      <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200 hover:shadow-md transition-all">
+        <div className="text-2xl font-bold text-purple-700 mb-1">{project._count?.tasks || 0}</div>
+        <div className="text-sm font-medium text-purple-600">Tasks</div>
       </div>
-      <div className="text-center p-2 bg-orange-50 rounded">
-        <div className="font-bold text-orange-600">{project._count?.comments || 0}</div>
-        <div className="text-orange-600">Comments</div>
+      <div className="text-center p-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl border border-amber-200 hover:shadow-md transition-all">
+        <div className="text-2xl font-bold text-amber-700 mb-1">{project._count?.comments || 0}</div>
+        <div className="text-sm font-medium text-amber-600">Comments</div>
       </div>
     </div>
   );

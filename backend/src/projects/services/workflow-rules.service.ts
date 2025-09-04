@@ -15,6 +15,7 @@ export interface WorkflowGate {
   requiredApprovals?: string[];
   requiredQAStatus?: QAStatus;
   minimumWorkStatus?: DepartmentWorkStatus;
+  requiresChecklistCompletion?: boolean;
 }
 
 @Injectable()
@@ -130,30 +131,36 @@ export class WorkflowRulesService {
       department: Department.PMO,
       requiredApprovals: ['CLIENT_APPROVAL'], // Client approval of sections
       minimumWorkStatus: DepartmentWorkStatus.PENDING_CLIENT_APPROVAL,
+      requiresChecklistCompletion: true,
     },
     {
       department: Department.DESIGN,
       requiredApprovals: ['CLIENT_APPROVAL'], // Client approval of design
       minimumWorkStatus: DepartmentWorkStatus.PENDING_CLIENT_APPROVAL,
+      requiresChecklistCompletion: true,
     },
     {
       department: Department.HTML,
       requiredQAStatus: QAStatus.PASSED, // QA testing of HTML
       minimumWorkStatus: DepartmentWorkStatus.QA_TESTING,
+      requiresChecklistCompletion: true,
     },
     {
       department: Department.PHP,
       requiredQAStatus: QAStatus.PASSED, // DEV QA testing
       minimumWorkStatus: DepartmentWorkStatus.QA_TESTING,
+      requiresChecklistCompletion: true,
     },
     {
       department: Department.REACT,
       requiredQAStatus: QAStatus.PASSED, // DEV QA testing
       minimumWorkStatus: DepartmentWorkStatus.QA_TESTING,
+      requiresChecklistCompletion: true,
     },
     {
       department: Department.QA,
       minimumWorkStatus: DepartmentWorkStatus.READY_FOR_DELIVERY, // All fixes validated
+      requiresChecklistCompletion: true,
     },
   ];
 
@@ -189,7 +196,8 @@ export class WorkflowRulesService {
     department: Department,
     currentStatus: DepartmentWorkStatus,
     approvals: Array<{ approvalType: string; status: ApprovalStatus }>,
-    qaRounds: Array<{ status: QAStatus }>
+    qaRounds: Array<{ status: QAStatus }>,
+    checklistCompleted?: boolean
   ): { satisfied: boolean; missingRequirements: string[] } {
     const gate = this.getApprovalGate(department);
     if (!gate) {
@@ -219,6 +227,11 @@ export class WorkflowRulesService {
       if (!hasPassingQA) {
         missingRequirements.push(`QA testing must pass (status: ${gate.requiredQAStatus})`);
       }
+    }
+
+    // Check checklist completion requirement
+    if (gate.requiresChecklistCompletion && checklistCompleted === false) {
+      missingRequirements.push(`Department checklist must be completed before proceeding`);
     }
 
     return {
@@ -323,7 +336,8 @@ export class WorkflowRulesService {
     currentStatus: DepartmentWorkStatus,
     approvals: Array<{ approvalType: string; status: ApprovalStatus }>,
     qaRounds: Array<{ status: QAStatus }>,
-    userRole: string
+    userRole: string,
+    checklistCompleted?: boolean
   ): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
 
@@ -347,7 +361,7 @@ export class WorkflowRulesService {
 
     // Check approval requirements
     if (requirements.requiresApproval) {
-      const gateCheck = this.areApprovalGatesSatisfied(currentDepartment, currentStatus, approvals, qaRounds);
+      const gateCheck = this.areApprovalGatesSatisfied(currentDepartment, currentStatus, approvals, qaRounds, checklistCompleted);
       if (!gateCheck.satisfied) {
         errors.push(...gateCheck.missingRequirements);
       }

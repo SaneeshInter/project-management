@@ -14,6 +14,7 @@ export declare class JwtStrategy extends JwtStrategy_base {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         };
         roleMaster: {
             name: string;

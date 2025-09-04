@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Building2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Building2, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ interface Department {
   name: string;
   code: string;
   parentId: string | null;
+  order: number;
   isActive: boolean;
   parent?: Department;
   children?: Department[];
@@ -27,6 +28,7 @@ export default function DepartmentsPage() {
     name: '',
     code: '',
     parentId: '',
+    order: 0,
     isActive: true,
   });
 
@@ -37,7 +39,14 @@ export default function DepartmentsPage() {
   const fetchDepartments = async () => {
     try {
       const response = await api.get('/departments');
-      setDepartments(response.data);
+      // Sort departments by order field
+      const sortedDepartments = response.data.sort((a: Department, b: Department) => {
+        // First sort by parent/child relationship, then by order
+        if (a.parentId === null && b.parentId !== null) return -1;
+        if (a.parentId !== null && b.parentId === null) return 1;
+        return a.order - b.order;
+      });
+      setDepartments(sortedDepartments);
     } catch (error) {
       toast.error('Failed to fetch departments');
     } finally {
@@ -55,7 +64,7 @@ export default function DepartmentsPage() {
       await api.post('/departments', payload);
       toast.success('Department created successfully');
       setShowCreateModal(false);
-      setFormData({ name: '', code: '', parentId: '', isActive: true });
+      setFormData({ name: '', code: '', parentId: '', order: 0, isActive: true });
       fetchDepartments();
     } catch (error) {
       toast.error('Failed to create department');
@@ -74,7 +83,7 @@ export default function DepartmentsPage() {
       await api.patch(`/departments/${editingDepartment.id}`, payload);
       toast.success('Department updated successfully');
       setEditingDepartment(null);
-      setFormData({ name: '', code: '', parentId: '', isActive: true });
+      setFormData({ name: '', code: '', parentId: '', order: 0, isActive: true });
       fetchDepartments();
     } catch (error) {
       toast.error('Failed to update department');
@@ -99,19 +108,30 @@ export default function DepartmentsPage() {
       name: department.name,
       code: department.code,
       parentId: department.parentId || '',
+      order: department.order,
       isActive: department.isActive,
     });
     setShowCreateModal(true);
   };
 
   const resetForm = () => {
-    setFormData({ name: '', code: '', parentId: '', isActive: true });
+    setFormData({ name: '', code: '', parentId: '', order: 0, isActive: true });
     setEditingDepartment(null);
     setShowCreateModal(false);
   };
 
+  const handleReorderDepartment = async (departmentId: string, newOrder: number) => {
+    try {
+      await api.patch(`/departments/${departmentId}`, { order: newOrder });
+      toast.success('Department order updated');
+      fetchDepartments();
+    } catch (error) {
+      toast.error('Failed to update department order');
+    }
+  };
+
   const renderDepartmentTree = (depts: Department[]) => {
-    const parentDepts = depts.filter(d => d.parentId === null);
+    const parentDepts = depts.filter(d => d.parentId === null).sort((a, b) => a.order - b.order);
     const childDepts = depts.filter(d => d.parentId !== null);
 
     return (
@@ -124,7 +144,7 @@ export default function DepartmentsPage() {
                   <Building2 className="w-5 h-5 text-primary" />
                   <div>
                     <h3 className="font-semibold">{dept.name}</h3>
-                    <p className="text-sm text-muted-foreground">Code: {dept.code}</p>
+                    <p className="text-sm text-muted-foreground">Code: {dept.code} • Order: {dept.order}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -134,6 +154,23 @@ export default function DepartmentsPage() {
                     onClick={() => startEdit(dept)}
                   >
                     <Edit className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleReorderDepartment(dept.id, dept.order - 1)}
+                    disabled={dept.order === 0}
+                    title="Move up"
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleReorderDepartment(dept.id, dept.order + 1)}
+                    title="Move down"
+                  >
+                    <ArrowDown className="w-4 h-4" />
                   </Button>
                   <Button
                     variant="outline"
@@ -148,14 +185,14 @@ export default function DepartmentsPage() {
             
             {childDepts.filter(c => c.parentId === dept.id).length > 0 && (
               <div className="ml-8 mt-2 space-y-2">
-                {childDepts.filter(c => c.parentId === dept.id).map(childDept => (
+                {childDepts.filter(c => c.parentId === dept.id).sort((a, b) => a.order - b.order).map(childDept => (
                   <Card key={childDept.id} className="p-3 bg-muted/50">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <div className="w-4 h-4 bg-primary/20 rounded" />
                         <div>
                           <h4 className="font-medium">{childDept.name}</h4>
-                          <p className="text-xs text-muted-foreground">Code: {childDept.code}</p>
+                          <p className="text-xs text-muted-foreground">Code: {childDept.code} • Order: {childDept.order}</p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -241,6 +278,16 @@ export default function DepartmentsPage() {
                     <option key={dept.id} value={dept.id}>{dept.name}</option>
                   ))}
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Display Order</label>
+                <Input
+                  type="number"
+                  value={formData.order}
+                  onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+                  placeholder="0"
+                  min="0"
+                />
               </div>
               <div className="flex items-center space-x-2">
                 <input

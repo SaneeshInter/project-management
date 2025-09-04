@@ -14,7 +14,12 @@ import {
   UpdateCorrectionDto,
   ProjectDepartmentHistory,
   DepartmentCorrection,
-  ProjectTimelineAnalytics
+  ProjectTimelineAnalytics,
+  DepartmentChecklistProgress,
+  ProjectChecklistItem,
+  UpdateChecklistItemDto,
+  CreateChecklistItemLinkDto,
+  CreateChecklistItemUpdateDto
 } from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
@@ -83,6 +88,9 @@ export const usersApi = {
 export const departmentsApi = {
   getAll: () =>
     api.get('/departments').then((res) => res.data),
+  
+  getMainDepartments: () =>
+    api.get('/departments/main').then((res) => res.data),
 };
 
 // Roles API
@@ -166,6 +174,54 @@ export const projectsApi = {
 
   getAssignmentHistory: (projectId: string) =>
     api.get(`/projects/${projectId}/assignment-history`).then((res) => res.data),
+
+  // Department Checklist Methods
+  getChecklistProgress: (projectId: string, department?: string): Promise<DepartmentChecklistProgress> =>
+    api.get(`/projects/${projectId}/checklist${department ? `?department=${department}` : ''}`).then((res) => res.data),
+
+  updateChecklistItem: (projectId: string, itemId: string, data: UpdateChecklistItemDto): Promise<ProjectChecklistItem> =>
+    api.patch(`/projects/${projectId}/checklist/${itemId}`, data).then((res) => res.data),
+
+  addChecklistItemLink: (projectId: string, itemId: string, data: CreateChecklistItemLinkDto): Promise<any> =>
+    api.post(`/projects/${projectId}/checklist/${itemId}/links`, data).then((res) => res.data),
+
+  removeChecklistItemLink: (projectId: string, itemId: string, linkId: string): Promise<void> =>
+    api.delete(`/projects/${projectId}/checklist/${itemId}/links/${linkId}`).then((res) => res.data),
+
+  addChecklistItemUpdate: (projectId: string, itemId: string, data: CreateChecklistItemUpdateDto): Promise<any> =>
+    api.post(`/projects/${projectId}/checklist/${itemId}/updates`, data).then((res) => res.data),
+
+  getChecklistTemplates: (department: string): Promise<any[]> =>
+    api.get(`/checklist/templates/${department}`).then((res) => res.data),
+};
+
+// Checklist Templates API
+export const checklistTemplatesApi = {
+  getByDepartment: (department: string) =>
+    api.get(`/checklist/templates/${department}`).then((res) => res.data),
+
+  create: (data: {
+    department: string;
+    title: string;
+    description?: string;
+    isRequired: boolean;
+    order: number;
+  }) =>
+    api.post('/checklist/templates', data).then((res) => res.data),
+
+  update: (id: string, data: {
+    title: string;
+    description?: string;
+    isRequired: boolean;
+    order: number;
+  }) =>
+    api.patch(`/checklist/templates/${id}`, data).then((res) => res.data),
+
+  delete: (id: string) =>
+    api.delete(`/checklist/templates/${id}`).then((res) => res.data),
+
+  reorder: (department: string, itemIds: string[]) =>
+    api.patch(`/checklist/templates/${department}/reorder`, { itemIds }).then((res) => res.data),
 };
 
 

@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AlertTriangle, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Project, Department } from '@/types';
+import { Project, Department, DepartmentMaster } from '@/types';
+import { departmentsApi } from '@/lib/api';
 
 interface SimpleDepartmentPipelineProps {
   projects: Project[];
@@ -11,27 +12,26 @@ interface SimpleDepartmentPipelineProps {
   className?: string;
 }
 
-const departmentOrder: Department[] = [
-  Department.PMO,
-  Department.DESIGN,
-  Department.HTML,
-  Department.PHP,
-  Department.REACT,
-  Department.WORDPRESS,
-  Department.QA,
-  Department.DELIVERY
-];
-
-const departmentConfig = {
-  [Department.PMO]: { icon: '📋', color: 'bg-blue-500', name: 'PMO' },
-  [Department.DESIGN]: { icon: '🎨', color: 'bg-purple-500', name: 'Design' },
-  [Department.HTML]: { icon: '🏗️', color: 'bg-orange-500', name: 'HTML' },
-  [Department.PHP]: { icon: '🔧', color: 'bg-red-500', name: 'PHP' },
-  [Department.REACT]: { icon: '⚛️', color: 'bg-cyan-500', name: 'React' },
-  [Department.WORDPRESS]: { icon: '📝', color: 'bg-green-500', name: 'WordPress' },
-  [Department.QA]: { icon: '🧪', color: 'bg-yellow-500', name: 'QA' },
-  [Department.DELIVERY]: { icon: '🚀', color: 'bg-emerald-500', name: 'Delivery' },
-  [Department.MANAGER]: { icon: '👔', color: 'bg-slate-500', name: 'Manager' }
+const getDepartmentConfig = (code: string, name: string) => {
+  const configs = {
+    'PMO': { icon: '📋', color: 'bg-blue-500' },
+    'DESIGN': { icon: '🎨', color: 'bg-purple-500' },
+    'HTML': { icon: '🏗️', color: 'bg-orange-500' },
+    'PHP': { icon: '🔧', color: 'bg-red-500' },
+    'REACT': { icon: '⚛️', color: 'bg-cyan-500' },
+    'WORDPRESS': { icon: '📝', color: 'bg-green-500' },
+    'QA': { icon: '🧪', color: 'bg-yellow-500' },
+    'DELIVERY': { icon: '🚀', color: 'bg-emerald-500' },
+    'MANAGER': { icon: '👔', color: 'bg-slate-500' },
+    'DEV': { icon: '💻', color: 'bg-indigo-500' },
+    'APP': { icon: '📱', color: 'bg-teal-500' }
+  };
+  
+  return {
+    icon: configs[code as keyof typeof configs]?.icon || '🏢',
+    color: configs[code as keyof typeof configs]?.color || 'bg-gray-500',
+    name: name
+  };
 };
 
 export default function SimpleDepartmentPipeline({
@@ -40,15 +40,35 @@ export default function SimpleDepartmentPipeline({
   className = ''
 }: SimpleDepartmentPipelineProps) {
   const [selectedDept, setSelectedDept] = useState<Department | null>(null);
-  
-  // Calculate department stats
-  const departmentStats = departmentOrder.map(department => {
+  const [departments, setDepartments] = useState<DepartmentMaster[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch departments from master data
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const departmentData = await departmentsApi.getAll();
+        setDepartments(departmentData);
+      } catch (error) {
+        console.error('Failed to fetch departments:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDepartments();
+  }, []);
+
+  // Calculate department stats using master data
+  const departmentStats = departments.map(departmentMaster => {
+    const department = departmentMaster.code as Department;
     const deptProjects = projects.filter(p => p.currentDepartment === department && p.status === 'ACTIVE');
     const overdueProjects = deptProjects.filter(p => new Date(p.targetDate) < new Date());
     const hasBottleneck = deptProjects.length > 5 || overdueProjects.length > 2;
     
     return {
       department,
+      departmentMaster,
       count: deptProjects.length,
       overdue: overdueProjects.length,
       hasBottleneck,
@@ -67,6 +87,18 @@ export default function SimpleDepartmentPipeline({
       onDepartmentClick?.(department);
     }
   };
+
+  if (loading) {
+    return (
+      <Card className={className}>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center">
+            <div className="text-gray-500">Loading departments...</div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className={className}>
@@ -99,12 +131,12 @@ export default function SimpleDepartmentPipeline({
         {/* Simple Pipeline Flow - Horizontal Grid Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {departmentStats.map((stat) => {
-            const config = departmentConfig[stat.department];
+            const config = getDepartmentConfig(stat.departmentMaster.code, stat.departmentMaster.name);
             const isSelected = selectedDept === stat.department;
             
             return (
               <div
-                key={stat.department}
+                key={stat.departmentMaster.id}
                 className={`
                   relative cursor-pointer transition-all duration-200 p-4 rounded-lg border
                   ${isSelected 
@@ -191,8 +223,16 @@ export default function SimpleDepartmentPipeline({
           <div className="border-t pt-4">
             <div className="flex items-center justify-between mb-3">
               <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                <span className="text-lg">{departmentConfig[selectedDept].icon}</span>
-                {departmentConfig[selectedDept].name} Department
+                {(() => {
+                  const selectedDeptMaster = departments.find(d => d.code === selectedDept);
+                  const config = selectedDeptMaster ? getDepartmentConfig(selectedDeptMaster.code, selectedDeptMaster.name) : null;
+                  return (
+                    <>
+                      <span className="text-lg">{config?.icon || '🏢'}</span>
+                      {config?.name || selectedDept} Department
+                    </>
+                  );
+                })()}
               </h4>
               <Button
                 variant="ghost"

@@ -41,6 +41,25 @@ let DepartmentsService = class DepartmentsService {
             },
             orderBy: [
                 { parentId: 'asc' },
+                { order: 'asc' },
+                { name: 'asc' },
+            ],
+        });
+    }
+    async findMainDepartments() {
+        return this.prisma.departmentMaster.findMany({
+            where: {
+                parentId: null,
+                isActive: true,
+            },
+            include: {
+                children: {
+                    where: { isActive: true },
+                    orderBy: [{ order: 'asc' }, { name: 'asc' }],
+                },
+            },
+            orderBy: [
+                { order: 'asc' },
                 { name: 'asc' },
             ],
         });
@@ -98,7 +117,10 @@ let DepartmentsService = class DepartmentsService {
             include: {
                 children: true,
             },
-            orderBy: { name: 'asc' },
+            orderBy: [
+                { order: 'asc' },
+                { name: 'asc' },
+            ],
         });
     }
 };

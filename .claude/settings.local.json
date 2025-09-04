@@ -12,7 +12,9 @@
       "Bash(npm install:*)",
       "Bash(npx ts-node:*)",
       "Bash(lsof:*)",
-      "Bash(npx prisma db seed:*)"
+      "Bash(npx prisma db seed:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)"
     ],
     "deny": []
   }

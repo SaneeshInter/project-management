@@ -12,6 +12,7 @@ export interface WorkflowGate {
     requiredApprovals?: string[];
     requiredQAStatus?: QAStatus;
     minimumWorkStatus?: DepartmentWorkStatus;
+    requiresChecklistCompletion?: boolean;
 }
 export declare class WorkflowRulesService {
     private readonly workflowSequence;
@@ -25,7 +26,7 @@ export declare class WorkflowRulesService {
         status: ApprovalStatus;
     }>, qaRounds: Array<{
         status: QAStatus;
-    }>): {
+    }>, checklistCompleted?: boolean): {
         satisfied: boolean;
         missingRequirements: string[];
     };
@@ -39,7 +40,7 @@ export declare class WorkflowRulesService {
         status: ApprovalStatus;
     }>, qaRounds: Array<{
         status: QAStatus;
-    }>, userRole: string): {
+    }>, userRole: string, checklistCompleted?: boolean): {
         valid: boolean;
         errors: string[];
     };

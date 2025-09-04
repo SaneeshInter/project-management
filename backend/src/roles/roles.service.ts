@@ -29,6 +29,7 @@ export class RolesService {
         department: true,
       },
       orderBy: [
+        { department: { order: 'asc' } },
         { department: { name: 'asc' } },
         { name: 'asc' },
       ],

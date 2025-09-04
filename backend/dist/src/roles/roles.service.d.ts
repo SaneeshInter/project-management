@@ -13,6 +13,7 @@ export declare class RolesService {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         };
     } & {
         name: string;
@@ -33,6 +34,7 @@ export declare class RolesService {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         };
     } & {
         name: string;
@@ -53,6 +55,7 @@ export declare class RolesService {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         };
     } & {
         name: string;
@@ -73,6 +76,7 @@ export declare class RolesService {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         };
     } & {
         name: string;
@@ -93,6 +97,7 @@ export declare class RolesService {
             createdAt: Date;
             updatedAt: Date;
             parentId: string | null;
+            order: number;
         };
     } & {
         name: string;

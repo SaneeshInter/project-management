@@ -27,6 +27,7 @@ const create_approval_dto_1 = require("./dto/create-approval.dto");
 const update_approval_dto_1 = require("./dto/update-approval.dto");
 const create_qa_round_dto_1 = require("./dto/create-qa-round.dto");
 const create_qa_bug_dto_1 = require("./dto/create-qa-bug.dto");
+const update_checklist_item_dto_1 = require("./dto/update-checklist-item.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const user_decorator_1 = require("../common/decorators/user.decorator");
 let ProjectsController = class ProjectsController {
@@ -107,6 +108,21 @@ let ProjectsController = class ProjectsController {
     }
     getAssignmentHistory(projectId, user) {
         return this.projectsService.getAssignmentHistory(projectId, user);
+    }
+    getChecklistProgress(projectId, department, user) {
+        return this.projectsService.getChecklistProgress(projectId, department, user);
+    }
+    updateChecklistItem(projectId, itemId, updateDto, user) {
+        return this.projectsService.updateChecklistItem(projectId, itemId, updateDto, user);
+    }
+    addChecklistItemLink(projectId, itemId, linkDto, user) {
+        return this.projectsService.addChecklistItemLink(projectId, itemId, linkDto, user);
+    }
+    removeChecklistItemLink(projectId, itemId, linkId, user) {
+        return this.projectsService.removeChecklistItemLink(projectId, itemId, linkId, user);
+    }
+    addChecklistItemUpdate(projectId, itemId, updateDto, user) {
+        return this.projectsService.addChecklistItemUpdate(projectId, itemId, updateDto, user);
     }
 };
 exports.ProjectsController = ProjectsController;
@@ -387,6 +403,66 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], ProjectsController.prototype, "getAssignmentHistory", null);
+__decorate([
+    (0, common_1.Get)(':id/checklist'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get checklist progress for a project department' }),
+    (0, swagger_1.ApiQuery)({ name: 'department', required: false }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Checklist progress retrieved successfully' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Query)('department')),
+    __param(2, (0, user_decorator_1.User)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "getChecklistProgress", null);
+__decorate([
+    (0, common_1.Patch)(':id/checklist/:itemId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update checklist item' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Checklist item updated successfully' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('itemId')),
+    __param(2, (0, common_1.Body)()),
+    __param(3, (0, user_decorator_1.User)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, update_checklist_item_dto_1.UpdateChecklistItemDto, Object]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "updateChecklistItem", null);
+__decorate([
+    (0, common_1.Post)(':id/checklist/:itemId/links'),
+    (0, swagger_1.ApiOperation)({ summary: 'Add link to checklist item' }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'Link added successfully' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('itemId')),
+    __param(2, (0, common_1.Body)()),
+    __param(3, (0, user_decorator_1.User)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, update_checklist_item_dto_1.CreateChecklistItemLinkDto, Object]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "addChecklistItemLink", null);
+__decorate([
+    (0, common_1.Delete)(':id/checklist/:itemId/links/:linkId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Remove link from checklist item' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Link removed successfully' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('itemId')),
+    __param(2, (0, common_1.Param)('linkId')),
+    __param(3, (0, user_decorator_1.User)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, String, Object]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "removeChecklistItemLink", null);
+__decorate([
+    (0, common_1.Post)(':id/checklist/:itemId/updates'),
+    (0, swagger_1.ApiOperation)({ summary: 'Add update history to checklist item' }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'Update history added successfully' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('itemId')),
+    __param(2, (0, common_1.Body)()),
+    __param(3, (0, user_decorator_1.User)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, update_checklist_item_dto_1.CreateChecklistItemUpdateDto, Object]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "addChecklistItemUpdate", null);
 exports.ProjectsController = ProjectsController = __decorate([
     (0, swagger_1.ApiTags)('Projects'),
     (0, swagger_1.ApiBearerAuth)('JWT'),

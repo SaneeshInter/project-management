@@ -30,6 +30,13 @@ export class DepartmentsController {
     return this.departmentsService.findAll();
   }
 
+  @Get('main')
+  @ApiOperation({ summary: 'Get main departments only (no sub-departments)' })
+  @ApiResponse({ status: 200, description: 'Main departments retrieved successfully' })
+  findMainDepartments() {
+    return this.departmentsService.findMainDepartments();
+  }
+
   @Get('by-parent')
   @ApiOperation({ summary: 'Get departments by parent ID' })
   @ApiResponse({ status: 200, description: 'Departments retrieved successfully' })
