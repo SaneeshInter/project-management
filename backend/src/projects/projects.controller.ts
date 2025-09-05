@@ -7,6 +7,8 @@ import { AddCustomFieldDto } from './dto/add-custom-field.dto';
 import { CreateDepartmentTransitionDto } from './dto/create-department-transition.dto';
 import { UpdateDepartmentWorkStatusDto } from './dto/update-department-work-status.dto';
 import { UpdateChecklistItemDto, CreateChecklistItemLinkDto, CreateChecklistItemUpdateDto } from './dto/update-checklist-item.dto';
+import { DisableProjectDto } from './dto/disable-project.dto';
+import { UpdateProjectStatusDto } from './dto/update-project-status.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from '../common/decorators/user.decorator';
 import { User as UserEntity } from '@prisma/client';
@@ -164,5 +166,29 @@ export class ProjectsController {
     @User() user: UserEntity,
   ) {
     return this.projectsService.addChecklistItemUpdate(projectId, itemId, updateDto, user);
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Update project status' })
+  @ApiResponse({ status: 200, description: 'Project status updated successfully' })
+  @ApiResponse({ status: 404, description: 'Project not found' })
+  updateProjectStatus(
+    @Param('id') id: string,
+    @Body() updateStatusDto: UpdateProjectStatusDto,
+    @User() user: UserEntity,
+  ) {
+    return this.projectsService.updateProjectStatus(id, updateStatusDto, user);
+  }
+
+  @Patch(':id/disable')
+  @ApiOperation({ summary: 'Disable or enable project (soft delete)' })
+  @ApiResponse({ status: 200, description: 'Project disabled/enabled successfully' })
+  @ApiResponse({ status: 404, description: 'Project not found' })
+  disableProject(
+    @Param('id') id: string,
+    @Body() disableDto: DisableProjectDto,
+    @User() user: UserEntity,
+  ) {
+    return this.projectsService.disableProject(id, disableDto, user);
   }
 }

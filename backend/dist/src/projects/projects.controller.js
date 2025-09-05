@@ -22,6 +22,8 @@ const add_custom_field_dto_1 = require("./dto/add-custom-field.dto");
 const create_department_transition_dto_1 = require("./dto/create-department-transition.dto");
 const update_department_work_status_dto_1 = require("./dto/update-department-work-status.dto");
 const update_checklist_item_dto_1 = require("./dto/update-checklist-item.dto");
+const disable_project_dto_1 = require("./dto/disable-project.dto");
+const update_project_status_dto_1 = require("./dto/update-project-status.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const user_decorator_1 = require("../common/decorators/user.decorator");
 let ProjectsController = class ProjectsController {
@@ -69,6 +71,12 @@ let ProjectsController = class ProjectsController {
     }
     addChecklistItemUpdate(projectId, itemId, updateDto, user) {
         return this.projectsService.addChecklistItemUpdate(projectId, itemId, updateDto, user);
+    }
+    updateProjectStatus(id, updateStatusDto, user) {
+        return this.projectsService.updateProjectStatus(id, updateStatusDto, user);
+    }
+    disableProject(id, disableDto, user) {
+        return this.projectsService.disableProject(id, disableDto, user);
     }
 };
 exports.ProjectsController = ProjectsController;
@@ -231,6 +239,30 @@ __decorate([
     __metadata("design:paramtypes", [String, String, update_checklist_item_dto_1.CreateChecklistItemUpdateDto, Object]),
     __metadata("design:returntype", void 0)
 ], ProjectsController.prototype, "addChecklistItemUpdate", null);
+__decorate([
+    (0, common_1.Patch)(':id/status'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update project status' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Project status updated successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Project not found' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, user_decorator_1.User)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_project_status_dto_1.UpdateProjectStatusDto, Object]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "updateProjectStatus", null);
+__decorate([
+    (0, common_1.Patch)(':id/disable'),
+    (0, swagger_1.ApiOperation)({ summary: 'Disable or enable project (soft delete)' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Project disabled/enabled successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Project not found' }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, user_decorator_1.User)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, disable_project_dto_1.DisableProjectDto, Object]),
+    __metadata("design:returntype", void 0)
+], ProjectsController.prototype, "disableProject", null);
 exports.ProjectsController = ProjectsController = __decorate([
     (0, swagger_1.ApiTags)('Projects'),
     (0, swagger_1.ApiBearerAuth)('JWT'),

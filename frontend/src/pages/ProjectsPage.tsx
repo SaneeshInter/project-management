@@ -32,6 +32,7 @@ interface FilterOptions {
   showOnlyActive: boolean;
   showOverdueOnly: boolean;
   showWithDependencies: boolean;
+  showDisabled: boolean;
 }
 
 const calculateHealthScore = (project: Project): number => {
@@ -47,7 +48,10 @@ const calculateHealthScore = (project: Project): number => {
   
   if (project.dependency) score -= 10;
   if (project.status === 'HOLD') score -= 20;
+  if (project.status === 'CANCELLED') score -= 40;
+  if (project.status === 'ARCHIVED') score -= 5;
   if (project.status === 'COMPLETED') score = Math.max(score + 10, 100);
+  if (project.disabled) score -= 50;
   if (project.deviationReason) score -= 15;
   
   return Math.max(0, Math.min(100, score));
@@ -90,7 +94,8 @@ export default function ProjectsPage() {
     sortOrder: 'asc',
     showOnlyActive: false,
     showOverdueOnly: false,
-    showWithDependencies: false
+    showWithDependencies: false,
+    showDisabled: false
   });
 
   useEffect(() => {
@@ -177,6 +182,14 @@ export default function ProjectsPage() {
     }
     if (filters.showWithDependencies) {
       filtered = filtered.filter(project => project.dependency);
+    }
+    
+    // Filter disabled projects (by default hide them unless explicitly requested)
+    if (!filters.showDisabled) {
+      filtered = filtered.filter(project => !project.disabled);
+    } else if (filters.showDisabled) {
+      // If showDisabled is true, only show disabled projects
+      filtered = filtered.filter(project => project.disabled);
     }
 
     // Sorting
@@ -419,7 +432,8 @@ export default function ProjectsPage() {
                   sortOrder: 'asc',
                   showOnlyActive: false,
                   showOverdueOnly: false,
-                  showWithDependencies: false
+                  showWithDependencies: false,
+                  showDisabled: false
                 })}
               >
                 Clear All Filters

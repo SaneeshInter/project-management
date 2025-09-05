@@ -44,7 +44,8 @@ const statusConfig = {
   [ProjectStatus.ACTIVE]: { icon: '🟢', color: 'bg-green-100 text-green-800 border-green-300', name: 'Active' },
   [ProjectStatus.HOLD]: { icon: '🟡', color: 'bg-yellow-100 text-yellow-800 border-yellow-300', name: 'On Hold' },
   [ProjectStatus.COMPLETED]: { icon: '🟦', color: 'bg-blue-100 text-blue-800 border-blue-300', name: 'Completed' },
-  [ProjectStatus.CANCELLED]: { icon: '🔴', color: 'bg-red-100 text-red-800 border-red-300', name: 'Cancelled' }
+  [ProjectStatus.CANCELLED]: { icon: '🔴', color: 'bg-red-100 text-red-800 border-red-300', name: 'Cancelled' },
+  [ProjectStatus.ARCHIVED]: { icon: '📦', color: 'bg-gray-100 text-gray-800 border-gray-300', name: 'Archived' }
 };
 
 const calculateHealthScore = (project: Project): number => {
@@ -60,7 +61,10 @@ const calculateHealthScore = (project: Project): number => {
   
   if (project.dependency) score -= 10;
   if (project.status === 'HOLD') score -= 20;
+  if (project.status === 'CANCELLED') score -= 40;
+  if (project.status === 'ARCHIVED') score -= 5;
   if (project.status === 'COMPLETED') score = Math.max(score + 10, 100);
+  if (project.disabled) score -= 50;
   if (project.deviationReason) score -= 15;
   
   return Math.max(0, Math.min(100, score));

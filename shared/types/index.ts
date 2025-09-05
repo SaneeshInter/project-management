@@ -38,6 +38,7 @@ export enum ProjectStatus {
   HOLD = 'HOLD',
   COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED',
+  ARCHIVED = 'ARCHIVED',
 }
 
 export enum TaskStatus {
@@ -242,6 +243,9 @@ export interface Project {
   startDate: string;
   deviationReason?: string;
   dependency: boolean;
+  disabled: boolean;
+  disabledAt?: string;
+  disabledBy?: string;
   createdAt: string;
   updatedAt: string;
   owner: User;

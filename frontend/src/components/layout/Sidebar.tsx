@@ -5,52 +5,84 @@ import {
   Building2,
   UserCheck,
   FileText,
-  LogOut 
+  LogOut,
+  BarChart3,
+  Settings
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Role } from '@/types';
 
-const allNavigation = [
-  { name: 'Projects', href: '/projects', icon: FolderOpen },
-  { name: 'Users', href: '/users', icon: Users },
-  { name: 'Departments', href: '/departments', icon: Building2 },
-  { name: 'Roles', href: '/roles', icon: UserCheck },
-  { name: 'Department Checklists', href: '/department-checklists', icon: FileText },
+interface NavigationItem {
+  name: string;
+  href: string;
+  icon: any;
+}
+
+interface NavigationCategory {
+  name: string;
+  icon: any;
+  items: NavigationItem[];
+}
+
+const allNavigationCategories: NavigationCategory[] = [
+  {
+    name: 'Project Management',
+    icon: BarChart3,
+    items: [
+      { name: 'Projects', href: '/projects', icon: FolderOpen },
+    ],
+  },
+  {
+    name: 'User Management',
+    icon: Users,
+    items: [
+      { name: 'Users', href: '/users', icon: Users },
+      { name: 'Roles', href: '/roles', icon: UserCheck },
+    ],
+  },
+  {
+    name: 'Organization Setup',
+    icon: Settings,
+    items: [
+      { name: 'Departments', href: '/departments', icon: Building2 },
+      { name: 'Department Checklists', href: '/department-checklists', icon: FileText },
+    ],
+  },
 ];
 
 export default function Sidebar() {
   const { user, logout } = useAuthStore();
 
   // Filter navigation based on role and department
-  const getFilteredNavigation = () => {
+  const getFilteredNavigationCategories = (): NavigationCategory[] => {
     if (!user) return [];
     
-    // Admin and Super Admin see all menus (checking both enum and string values)
+    // Admin and Super Admin see all categories
     if (user.role === 'ADMIN' || user.role === 'SU_ADMIN') {
-      return allNavigation;
+      return allNavigationCategories;
     }
     
-    // Project Managers see Projects, Users, Departments, and Department Checklists
+    // Project Managers see all categories
     if (user.role === Role.PROJECT_MANAGER) {
-      return allNavigation.filter(item => 
-        item.name === 'Projects' || item.name === 'Users' || item.name === 'Departments' || item.name === 'Department Checklists'
-      );
+      return allNavigationCategories;
     }
     
-    // PMO department users see only Projects
+    // PMO department users see only Project Management
     if (user.departmentMaster?.code === 'PMO') {
-      return allNavigation.filter(item => 
-        item.name === 'Projects'
+      return allNavigationCategories.filter(category => 
+        category.name === 'Project Management'
       );
     }
     
-    // Other departments see Projects by default
-    return allNavigation.filter(item => item.name === 'Projects');
+    // Other departments see only Project Management by default
+    return allNavigationCategories.filter(category => 
+      category.name === 'Project Management'
+    );
   };
 
-  const navigation = getFilteredNavigation();
+  const navigationCategories = getFilteredNavigationCategories();
 
   return (
     <div className="flex flex-col w-64 bg-card border-r">
@@ -65,23 +97,38 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-2">
-        {navigation.map((item) => (
-          <NavLink
-            key={item.name}
-            to={item.href}
-            className={({ isActive }) =>
-              cn(
-                'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors',
-                isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-              )
-            }
-          >
-            <item.icon className="w-5 h-5 mr-3" />
-            {item.name}
-          </NavLink>
+      <nav className="flex-1 px-4 py-6 space-y-6">
+        {navigationCategories.map((category, categoryIndex) => (
+          <div key={category.name}>
+            {/* Category Header */}
+            <div className="flex items-center px-2 py-2 mb-3">
+              <category.icon className="w-4 h-4 mr-2 text-muted-foreground" />
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                {category.name}
+              </span>
+            </div>
+            
+            {/* Category Items */}
+            <div className="space-y-1">
+              {category.items.map((item) => (
+                <NavLink
+                  key={item.name}
+                  to={item.href}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ml-2',
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                    )
+                  }
+                >
+                  <item.icon className="w-4 h-4 mr-3" />
+                  {item.name}
+                </NavLink>
+              ))}
+            </div>
+          </div>
         ))}
       </nav>
 

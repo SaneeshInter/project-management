@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useProjectsStore } from '@/stores/projects';
+import { useAuthStore } from '@/stores/auth';
 import { getStatusColor } from '@/lib/utils';
 import ProjectOverviewHero from '@/components/projects/ProjectOverviewHero';
 import ProjectMetricsDashboard from '@/components/projects/ProjectMetricsDashboard';
+import ProjectStatusManager from '@/components/projects/ProjectStatusManager';
 import DepartmentChecklist from '@/components/projects/DepartmentChecklist';
 import DepartmentHandover from '@/components/projects/DepartmentHandover';
 import ProjectTimelineTab from '@/components/projects/ProjectTimelineTab';
@@ -17,6 +19,7 @@ import ProjectFilesTab from '@/components/projects/ProjectFilesTab';
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { currentProject, fetchProject, isLoading } = useProjectsStore();
+  const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
@@ -80,9 +83,21 @@ export default function ProjectDetailPage() {
             </div>
           </div>
         </div>
-        <Badge className={getStatusColor(currentProject.status)}>
-          {currentProject.status}
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Badge className={getStatusColor(currentProject.status)}>
+            {currentProject.status}
+          </Badge>
+          <ProjectStatusManager
+            project={currentProject}
+            userRole={user?.role}
+            onProjectUpdated={(updatedProject) => {
+              // Update the current project in store
+              if (id) {
+                fetchProject(id);
+              }
+            }}
+          />
+        </div>
       </div>
 
       {/* Tabbed Interface */}

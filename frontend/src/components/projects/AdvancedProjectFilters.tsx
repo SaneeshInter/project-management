@@ -24,6 +24,7 @@ interface FilterOptions {
   showOnlyActive: boolean;
   showOverdueOnly: boolean;
   showWithDependencies: boolean;
+  showDisabled: boolean;
 }
 
 interface AdvancedProjectFiltersProps {
@@ -99,7 +100,8 @@ export default function AdvancedProjectFilters({
       sortOrder: 'asc',
       showOnlyActive: false,
       showOverdueOnly: false,
-      showWithDependencies: false
+      showWithDependencies: false,
+      showDisabled: false
     });
   };
 
@@ -322,6 +324,18 @@ export default function AdvancedProjectFilters({
                   Show only projects with dependencies
                 </label>
               </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="showDisabled"
+                  checked={filters.showDisabled}
+                  onChange={(e) => handleFilterChange('showDisabled', e.target.checked)}
+                  className="rounded border-input"
+                />
+                <label htmlFor="showDisabled" className="text-sm font-medium">
+                  Show disabled projects only
+                </label>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -385,7 +399,7 @@ export default function AdvancedProjectFilters({
               />
             </Badge>
           )}
-          {(filters.showOnlyActive || filters.showOverdueOnly || filters.showWithDependencies) && (
+          {(filters.showOnlyActive || filters.showOverdueOnly || filters.showWithDependencies || filters.showDisabled) && (
             <Badge variant="secondary" className="flex items-center gap-1">
               Special filters active
               <X 
@@ -394,6 +408,7 @@ export default function AdvancedProjectFilters({
                   handleFilterChange('showOnlyActive', false);
                   handleFilterChange('showOverdueOnly', false);
                   handleFilterChange('showWithDependencies', false);
+                  handleFilterChange('showDisabled', false);
                 }}
               />
             </Badge>

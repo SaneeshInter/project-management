@@ -137,7 +137,9 @@ let ProjectsService = class ProjectsService {
         return project;
     }
     async findAll(userId, role, user) {
-        let where = {};
+        let where = {
+            disabled: false,
+        };
         const userWithDept = userId ? await this.prisma.user.findUnique({
             where: { id: userId },
             include: {
@@ -147,13 +149,14 @@ let ProjectsService = class ProjectsService {
         }) : null;
         const roleCode = userWithDept?.roleMaster?.code || role?.toString();
         if (roleCode === 'CLIENT') {
-            where = { ownerId: userId };
+            where = { ...where, ownerId: userId };
         }
         else if (roleCode === 'ADMIN' || roleCode === 'SU_ADMIN' || roleCode === 'PROJECT_MANAGER') {
-            where = {};
+            where = { disabled: false };
         }
         else if (userWithDept?.departmentMaster?.code === 'PMO') {
             where = {
+                ...where,
                 OR: [
                     { projectCoordinatorId: userId },
                     { pcTeamLeadId: userId },
@@ -162,6 +165,7 @@ let ProjectsService = class ProjectsService {
         }
         else if (userWithDept?.departmentMaster?.code) {
             where = {
+                ...where,
                 OR: [
                     { currentDepartment: userWithDept.departmentMaster.code },
                     {
@@ -784,6 +788,102 @@ let ProjectsService = class ProjectsService {
             include: {
                 updatedBy: { select: { id: true, name: true, email: true } }
             }
+        });
+    }
+    async updateProjectStatus(id, updateStatusDto, user) {
+        const project = await this.prisma.project.findUnique({ where: { id } });
+        if (!project) {
+            throw new common_1.NotFoundException(`Project with ID ${id} not found`);
+        }
+        if (user.role !== client_1.Role.ADMIN && user.role !== client_1.Role.SU_ADMIN) {
+            throw new common_1.ForbiddenException('Only administrators can update project status');
+        }
+        return this.prisma.project.update({
+            where: { id },
+            data: {
+                status: updateStatusDto.status,
+                observations: updateStatusDto.reason ?
+                    `${project.observations || ''}\n[Status Change ${new Date().toISOString()}]: ${updateStatusDto.reason}`.trim() :
+                    project.observations,
+            },
+            include: {
+                owner: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        role: true,
+                    },
+                },
+                projectCoordinator: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        role: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        tasks: true,
+                        comments: true,
+                    },
+                },
+            },
+        });
+    }
+    async disableProject(id, disableDto, user) {
+        const project = await this.prisma.project.findUnique({ where: { id } });
+        if (!project) {
+            throw new common_1.NotFoundException(`Project with ID ${id} not found`);
+        }
+        if (user.role !== client_1.Role.ADMIN && user.role !== client_1.Role.SU_ADMIN) {
+            throw new common_1.ForbiddenException('Only administrators can disable/enable projects');
+        }
+        const updateData = {
+            disabled: disableDto.disabled,
+        };
+        if (disableDto.disabled) {
+            updateData.disabledAt = new Date();
+            updateData.disabledBy = user.id;
+            if (disableDto.reason) {
+                updateData.observations = `${project.observations || ''}\n[Disabled ${new Date().toISOString()}]: ${disableDto.reason}`.trim();
+            }
+        }
+        else {
+            updateData.disabledAt = null;
+            updateData.disabledBy = null;
+            if (disableDto.reason) {
+                updateData.observations = `${project.observations || ''}\n[Enabled ${new Date().toISOString()}]: ${disableDto.reason}`.trim();
+            }
+        }
+        return this.prisma.project.update({
+            where: { id },
+            data: updateData,
+            include: {
+                owner: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        role: true,
+                    },
+                },
+                disabledByUser: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        role: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        tasks: true,
+                        comments: true,
+                    },
+                },
+            },
         });
     }
 };

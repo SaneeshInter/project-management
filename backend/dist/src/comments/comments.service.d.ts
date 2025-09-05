@@ -23,6 +23,9 @@ export declare class CommentsService {
             startDate: Date;
             deviationReason: string | null;
             dependency: boolean;
+            disabled: boolean;
+            disabledAt: Date | null;
+            disabledBy: string | null;
             currentDepartment: import(".prisma/client").$Enums.Department;
             nextDepartment: import(".prisma/client").$Enums.Department | null;
             projectCode: string;

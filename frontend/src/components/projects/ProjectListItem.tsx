@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { 
   User, AlertTriangle, CheckCircle, 
-  Play, Pause, ArrowRight
+  Play, Pause, ArrowRight, X, Archive, EyeOff
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Project, Department, DepartmentMaster } from '@/types';
@@ -62,8 +62,11 @@ const getProjectHealthScore = (project: Project): { score: number; color: string
   
   if (project.dependency) score -= 10;
   if (project.status === 'HOLD') score -= 20;
+  if (project.status === 'CANCELLED') score -= 40;
+  if (project.status === 'ARCHIVED') score -= 5;
   if (project.status === 'COMPLETED') score = Math.max(score + 10, 100);
   if (project.deviationReason) score -= 15;
+  if (project.disabled) score -= 50;
   
   score = Math.max(0, Math.min(100, score));
   
@@ -136,7 +139,9 @@ export default function ProjectListItem({
 
   return (
     <div 
-      className="project-list-item flex items-center gap-4 p-4 bg-white border rounded-lg hover:shadow-md hover:border-gray-300 transition-all duration-200 group"
+      className={`project-list-item flex items-center gap-4 p-4 bg-white border rounded-lg hover:shadow-md hover:border-gray-300 transition-all duration-200 group ${
+        project.disabled ? 'opacity-60 bg-gray-50' : ''
+      }`}
     >
       {/* Health Indicator */}
       <div className="flex flex-col items-center flex-shrink-0">
@@ -223,15 +228,25 @@ export default function ProjectListItem({
 
       {/* Status Badge */}
       <div className="flex-shrink-0">
-        <Badge 
-          variant={project.status === 'ACTIVE' ? 'default' : 'secondary'}
-          className="text-xs"
-        >
-          {project.status === 'ACTIVE' && <Play className="h-3 w-3 mr-1" />}
-          {project.status === 'HOLD' && <Pause className="h-3 w-3 mr-1" />}
-          {project.status === 'COMPLETED' && <CheckCircle className="h-3 w-3 mr-1" />}
-          {project.status}
-        </Badge>
+        <div className="flex flex-col gap-1">
+          <Badge 
+            variant={project.status === 'ACTIVE' ? 'default' : 'secondary'}
+            className="text-xs"
+          >
+            {project.status === 'ACTIVE' && <Play className="h-3 w-3 mr-1" />}
+            {project.status === 'HOLD' && <Pause className="h-3 w-3 mr-1" />}
+            {project.status === 'COMPLETED' && <CheckCircle className="h-3 w-3 mr-1" />}
+            {project.status === 'CANCELLED' && <X className="h-3 w-3 mr-1" />}
+            {project.status === 'ARCHIVED' && <Archive className="h-3 w-3 mr-1" />}
+            {project.status}
+          </Badge>
+          {project.disabled && (
+            <Badge variant="destructive" className="text-xs">
+              <EyeOff className="h-3 w-3 mr-1" />
+              DISABLED
+            </Badge>
+          )}
+        </div>
       </div>
 
       {/* Owner */}

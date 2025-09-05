@@ -5,6 +5,8 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { CreateDepartmentTransitionDto } from './dto/create-department-transition.dto';
 import { UpdateDepartmentWorkStatusDto } from './dto/update-department-work-status.dto';
 import { UpdateChecklistItemDto, CreateChecklistItemLinkDto, CreateChecklistItemUpdateDto } from './dto/update-checklist-item.dto';
+import { DisableProjectDto } from './dto/disable-project.dto';
+import { UpdateProjectStatusDto } from './dto/update-project-status.dto';
 import { User, Role, DepartmentWorkStatus, Department, ProjectStatus, ProjectAssignmentType } from '@prisma/client';
 import { generateProjectCode } from '../utils/project-code.util';
 
@@ -146,7 +148,9 @@ export class ProjectsService {
   }
 
   async findAll(userId?: string, role?: Role, user?: User) {
-    let where: any = {};
+    let where: any = {
+      disabled: false, // Only show active projects by default
+    };
 
     // Get user with department info for filtering
     const userWithDept = userId ? await this.prisma.user.findUnique({
@@ -162,13 +166,14 @@ export class ProjectsService {
     
     if (roleCode === 'CLIENT') {
       // Clients only see their own projects
-      where = { ownerId: userId };
+      where = { ...where, ownerId: userId };
     } else if (roleCode === 'ADMIN' || roleCode === 'SU_ADMIN' || roleCode === 'PROJECT_MANAGER') {
-      // Super users see all projects
-      where = {};
+      // Super users see all projects (but still filter disabled by default)
+      where = { disabled: false };
     } else if (userWithDept?.departmentMaster?.code === 'PMO') {
       // PMO users only see assigned projects
       where = {
+        ...where,
         OR: [
           { projectCoordinatorId: userId },
           { pcTeamLeadId: userId },
@@ -177,6 +182,7 @@ export class ProjectsService {
     } else if (userWithDept?.departmentMaster?.code) {
       // Other department users see projects in their department or that they've worked on
       where = {
+        ...where,
         OR: [
           { currentDepartment: userWithDept.departmentMaster.code },
           {
@@ -898,6 +904,120 @@ export class ProjectsService {
       include: {
         updatedBy: { select: { id: true, name: true, email: true } }
       }
+    });
+  }
+
+  async updateProjectStatus(id: string, updateStatusDto: UpdateProjectStatusDto, user: User) {
+    const project = await this.prisma.project.findUnique({ where: { id } });
+    
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${id} not found`);
+    }
+
+    // Check permissions - only admins can update status
+    if (user.role !== Role.ADMIN && user.role !== Role.SU_ADMIN) {
+      throw new ForbiddenException('Only administrators can update project status');
+    }
+
+    return this.prisma.project.update({
+      where: { id },
+      data: {
+        status: updateStatusDto.status,
+        // Add reason to observations if provided
+        observations: updateStatusDto.reason ? 
+          `${project.observations || ''}\n[Status Change ${new Date().toISOString()}]: ${updateStatusDto.reason}`.trim() :
+          project.observations,
+      },
+      include: {
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+        projectCoordinator: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+        _count: {
+          select: {
+            tasks: true,
+            comments: true,
+          },
+        },
+      },
+    });
+  }
+
+  async disableProject(id: string, disableDto: DisableProjectDto, user: User) {
+    const project = await this.prisma.project.findUnique({ where: { id } });
+    
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${id} not found`);
+    }
+
+    // Check permissions - only admins can disable/enable projects
+    if (user.role !== Role.ADMIN && user.role !== Role.SU_ADMIN) {
+      throw new ForbiddenException('Only administrators can disable/enable projects');
+    }
+
+    const updateData: any = {
+      disabled: disableDto.disabled,
+    };
+
+    if (disableDto.disabled) {
+      // Disabling the project
+      updateData.disabledAt = new Date();
+      updateData.disabledBy = user.id;
+      
+      // Add reason to observations if provided
+      if (disableDto.reason) {
+        updateData.observations = `${project.observations || ''}\n[Disabled ${new Date().toISOString()}]: ${disableDto.reason}`.trim();
+      }
+    } else {
+      // Enabling the project
+      updateData.disabledAt = null;
+      updateData.disabledBy = null;
+      
+      // Add reason to observations if provided
+      if (disableDto.reason) {
+        updateData.observations = `${project.observations || ''}\n[Enabled ${new Date().toISOString()}]: ${disableDto.reason}`.trim();
+      }
+    }
+
+    return this.prisma.project.update({
+      where: { id },
+      data: updateData,
+      include: {
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+        disabledByUser: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+        _count: {
+          select: {
+            tasks: true,
+            comments: true,
+          },
+        },
+      },
     });
   }
 }
