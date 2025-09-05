@@ -9,12 +9,6 @@ import {
   CreateProjectDto,
   CreateCommentDto,
   CreateDepartmentTransitionDto,
-  UpdateDepartmentWorkStatusDto,
-  CreateCorrectionDto,
-  UpdateCorrectionDto,
-  ProjectDepartmentHistory,
-  DepartmentCorrection,
-  ProjectTimelineAnalytics,
   DepartmentChecklistProgress,
   ProjectChecklistItem,
   UpdateChecklistItemDto,
@@ -124,56 +118,7 @@ export const projectsApi = {
   
   moveToDepartment: (id: string, data: CreateDepartmentTransitionDto): Promise<Project> =>
     api.post(`/projects/${id}/move-to-department`, data).then((res) => res.data),
-  
-  getDepartmentHistory: (id: string): Promise<ProjectDepartmentHistory[]> =>
-    api.get(`/projects/${id}/department-history`).then((res) => res.data),
-  
-  updateDepartmentWorkStatus: (id: string, data: UpdateDepartmentWorkStatusDto): Promise<ProjectDepartmentHistory> =>
-    api.patch(`/projects/${id}/department-status`, data).then((res) => res.data),
-  
-  createCorrection: (projectId: string, historyId: string, data: CreateCorrectionDto): Promise<DepartmentCorrection> =>
-    api.post(`/projects/${projectId}/departments/${historyId}/corrections`, data).then((res) => res.data),
-  
-  getProjectCorrections: (id: string): Promise<DepartmentCorrection[]> =>
-    api.get(`/projects/${id}/corrections`).then((res) => res.data),
-  
-  updateCorrection: (projectId: string, correctionId: string, data: UpdateCorrectionDto): Promise<DepartmentCorrection> =>
-    api.patch(`/projects/${projectId}/corrections/${correctionId}`, data).then((res) => res.data),
-  
-  getTimelineAnalytics: (id: string): Promise<ProjectTimelineAnalytics> =>
-    api.get(`/projects/${id}/timeline-analytics`).then((res) => res.data),
 
-  // Enhanced Workflow Methods
-  requestApproval: (projectId: string, historyId: string, approvalType: string) =>
-    api.post(`/projects/${projectId}/departments/${historyId}/request-approval`, { approvalType }).then((res) => res.data),
-
-  submitApproval: (projectId: string, approvalId: string, status: string, comments?: string, rejectionReason?: string) =>
-    api.patch(`/projects/${projectId}/approvals/${approvalId}`, { status, comments, rejectionReason }).then((res) => res.data),
-
-  startQATesting: (projectId: string, historyId: string, qaType: string, testedById: string) =>
-    api.post(`/projects/${projectId}/departments/${historyId}/start-qa`, { qaType, testedById }).then((res) => res.data),
-
-  completeQATesting: (projectId: string, qaRoundId: string, status: string, bugsFound: number, criticalBugs: number, testResults?: string, rejectionReason?: string) =>
-    api.patch(`/projects/${projectId}/qa-rounds/${qaRoundId}/complete`, { status, bugsFound, criticalBugs, testResults, rejectionReason }).then((res) => res.data),
-
-  createQABug: (projectId: string, qaRoundId: string, bugData: any) =>
-    api.post(`/projects/${projectId}/qa-rounds/${qaRoundId}/bugs`, bugData).then((res) => res.data),
-
-  getWorkflowStatus: (id: string) =>
-    api.get(`/projects/${id}/workflow-status`).then((res) => res.data),
-
-  getAllowedNextDepartments: (id: string) =>
-    api.get(`/projects/${id}/allowed-departments`).then((res) => res.data),
-
-  getWorkflowValidationStatus: (id: string) =>
-    api.get(`/projects/${id}/workflow-validation`).then((res) => res.data),
-
-  // PC Assignment Methods
-  reassignPCOrTL: (projectId: string, data: { assignmentType: 'PROJECT_COORDINATOR' | 'PC_TEAM_LEAD'; newUserId: string; reason?: string; notes?: string }) =>
-    api.patch(`/projects/${projectId}/reassign`, data).then((res) => res.data),
-
-  getAssignmentHistory: (projectId: string) =>
-    api.get(`/projects/${projectId}/assignment-history`).then((res) => res.data),
 
   // Department Checklist Methods
   getChecklistProgress: (projectId: string, department?: string): Promise<DepartmentChecklistProgress> =>

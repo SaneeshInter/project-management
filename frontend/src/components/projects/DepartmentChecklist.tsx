@@ -120,9 +120,22 @@ export default function DepartmentChecklist({
       try {
         const progress = await projectsApi.getChecklistProgress(projectId, department);
         setChecklistProgress(progress);
+        console.log('Loaded checklist progress from API:', progress);
         return;
-      } catch (apiError) {
-        console.warn('Project checklist progress API not yet implemented, creating from templates');
+      } catch (apiError: any) {
+        console.error('Failed to load checklist progress from API:', {
+          error: apiError.message,
+          status: apiError.response?.status,
+          data: apiError.response?.data,
+        });
+        
+        // Only create from templates if API is not implemented
+        if (apiError.response?.status === 404 || apiError.message.includes('not implemented')) {
+          console.warn('Project checklist progress API not yet implemented, creating from templates');
+        } else {
+          // For other errors (auth, network, etc.), show error but still create from templates
+          console.warn('API error occurred, falling back to templates:', apiError.message);
+        }
       }
       
       // Load templates from API or fall back to defaults
@@ -191,9 +204,23 @@ export default function DepartmentChecklist({
     try {
       // Try to update via API first, fall back to local state
       try {
-        await projectsApi.updateChecklistItem(projectId, itemId, data);
-      } catch (apiError) {
-        console.warn('API not yet implemented, updating local state only');
+        const updatedItem = await projectsApi.updateChecklistItem(projectId, itemId, data);
+        console.log('Checklist item updated successfully via API:', updatedItem);
+      } catch (apiError: any) {
+        console.error('Failed to update checklist item via API:', {
+          error: apiError.message,
+          status: apiError.response?.status,
+          data: apiError.response?.data,
+        });
+        
+        // Only fall back to local state for specific errors (not network/auth errors)
+        if (apiError.response?.status === 404 || apiError.message.includes('not implemented')) {
+          console.warn('API endpoint not found, updating local state only');
+        } else {
+          // For other errors (auth, network, etc.), show error and don't proceed
+          toast.error(`Failed to save checklist update: ${apiError.response?.data?.message || apiError.message}`);
+          return;
+        }
       }
       
       // Update local state

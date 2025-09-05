@@ -369,6 +369,12 @@ export interface CreateDepartmentTransitionDto {
   estimatedDays?: number;
   permissionGrantedById?: string;
   notes?: string;
+  assignedToId?: string;
+  expectedStartDate?: string;
+  expectedEndDate?: string;
+  estimatedHours?: number;
+  ktDocuments?: string[];
+  ktNotes?: string;
 }
 
 export interface UpdateDepartmentWorkStatusDto {

@@ -39,4 +39,41 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateDepartmentTransitionDto.prototype, "notes", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'user456' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateDepartmentTransitionDto.prototype, "assignedToId", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: '2024-01-15' }),
+    (0, class_validator_1.IsDateString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateDepartmentTransitionDto.prototype, "expectedStartDate", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: '2024-01-25' }),
+    (0, class_validator_1.IsDateString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateDepartmentTransitionDto.prototype, "expectedEndDate", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 40 }),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], CreateDepartmentTransitionDto.prototype, "estimatedHours", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: ['https://docs.google.com/document/d/kt-doc', 'path/to/kt-file.pdf'] }),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsString)({ each: true }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateDepartmentTransitionDto.prototype, "ktDocuments", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'KT session completed with development team' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateDepartmentTransitionDto.prototype, "ktNotes", void 0);
 //# sourceMappingURL=create-department-transition.dto.js.map
