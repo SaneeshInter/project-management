@@ -1304,49 +1304,242 @@ Node.js v22.7.0
 
 [[90m9:31:01 PM[0m] Found 2 errors. Watching for file changes.
 
- [39m[32mNest application successfully started[39m[38;5;3m +15ms[39m
-[31m[Nest] 38403  - [39m09/05/2025, 9:14:40 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use :::3001[39m[38;5;3m +3ms[39m
-node:net:1902
-    const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
-               ^
+[2J[3J[H[[90m10:21:40 PM[0m] File change detected. Starting incremental compilation...
 
-Error: listen EADDRINUSE: address already in use :::3001
-    at Server.setupListenHandle [as _listen2] (node:net:1902:16)
-    at listenInCluster (node:net:1959:12)
-    at Server.listen (node:net:2061:7)
-    at ExpressAdapter.listen (/Users/intersmart/Documents/project_management/project-management/node_modules/@nestjs/platform-express/adapters/express-adapter.js:95:32)
-    at /Users/intersmart/Documents/project_management/project-management/node_modules/@nestjs/core/nest-application.js:183:30
-    at new Promise (<anonymous>)
-    at NestApplication.listen (/Users/intersmart/Documents/project_management/project-management/node_modules/@nestjs/core/nest-application.js:173:16)
-    at async bootstrap (/Users/intersmart/Documents/project_management/project-management/backend/src/main.ts:47:3) {
-  code: 'EADDRINUSE',
-  errno: -48,
-  syscall: 'listen',
-  address: '::',
-  port: 3001
-}
+[96msrc/projects/projects.service.ts[0m:[93m918[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
 
-Node.js v22.7.0
-[2J[3J[H[[90m9:30:54 PM[0m] File change detected. Starting incremental compilation...
+[7m918[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
 
-[96msrc/projects/projects.service.ts[0m:[93m918[0m:[93m56[0m - [91merror[0m[90m TS2339: [0mProperty 'SU_ADMIN' does not exist on type '{ ADMIN: "ADMIN"; PROJECT_MANAGER: "PROJECT_MANAGER"; PROJECT_COORDINATOR: "PROJECT_COORDINATOR"; DEVELOPER: "DEVELOPER"; DESIGNER: "DESIGNER"; HTML_DEVELOPER: "HTML_DEVELOPER"; QA_TESTER: "QA_TESTER"; ... 9 more ...; DESIGN_TL: "DESIGN_TL"; }'.
+[96msrc/projects/projects.service.ts[0m:[93m967[0m:[93m56[0m - [91merror[0m[90m TS2339: [0mProperty 'SU_ADMIN' does not exist on type '{ ADMIN: "ADMIN"; PROJECT_MANAGER: "PROJECT_MANAGER"; PROJECT_COORDINATOR: "PROJECT_COORDINATOR"; DEVELOPER: "DEVELOPER"; DESIGNER: "DESIGNER"; HTML_DEVELOPER: "HTML_DEVELOPER"; QA_TESTER: "QA_TESTER"; ... 9 more ...; DESIGN_TL: "DESIGN_TL"; }'.
 
-[7m918[0m     if (user.role !== Role.ADMIN && user.role !== Role.SU_ADMIN) {
+[7m967[0m     if (user.role !== Role.ADMIN && user.role !== Role.SU_ADMIN) {
 [7m   [0m [91m                                                       ~~~~~~~~[0m
 
-[[90m9:30:57 PM[0m] Found 1 error. Watching for file changes.
+[[90m10:21:41 PM[0m] Found 2 errors. Watching for file changes.
 
-[2J[3J[H[[90m9:31:00 PM[0m] File change detected. Starting incremental compilation...
+[2J[3J[H[[90m10:21:46 PM[0m] File change detected. Starting incremental compilation...
 
-[96msrc/projects/projects.service.ts[0m:[93m918[0m:[93m56[0m - [91merror[0m[90m TS2339: [0mProperty 'SU_ADMIN' does not exist on type '{ ADMIN: "ADMIN"; PROJECT_MANAGER: "PROJECT_MANAGER"; PROJECT_COORDINATOR: "PROJECT_COORDINATOR"; DEVELOPER: "DEVELOPER"; DESIGNER: "DESIGNER"; HTML_DEVELOPER: "HTML_DEVELOPER"; QA_TESTER: "QA_TESTER"; ... 9 more ...; DESIGN_TL: "DESIGN_TL"; }'.
+[96msrc/projects/projects.service.ts[0m:[93m918[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
 
-[7m918[0m     if (user.role !== Role.ADMIN && user.role !== Role.SU_ADMIN) {
-[7m   [0m [91m                                                       ~~~~~~~~[0m
+[7m918[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
 
-[96msrc/projects/projects.service.ts[0m:[93m966[0m:[93m56[0m - [91merror[0m[90m TS2339: [0mProperty 'SU_ADMIN' does not exist on type '{ ADMIN: "ADMIN"; PROJECT_MANAGER: "PROJECT_MANAGER"; PROJECT_COORDINATOR: "PROJECT_COORDINATOR"; DEVELOPER: "DEVELOPER"; DESIGNER: "DESIGNER"; HTML_DEVELOPER: "HTML_DEVELOPER"; QA_TESTER: "QA_TESTER"; ... 9 more ...; DESIGN_TL: "DESIGN_TL"; }'.
+[96msrc/projects/projects.service.ts[0m:[93m967[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
 
-[7m966[0m     if (user.role !== Role.ADMIN && user.role !== Role.SU_ADMIN) {
-[7m   [0m [91m                                                       ~~~~~~~~[0m
+[7m967[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
 
-[[90m9:31:01 PM[0m] Found 2 errors. Watching for file changes.
+[[90m10:21:47 PM[0m] Found 2 errors. Watching for file changes.
+
+[2J[3J[H[[90m10:21:53 PM[0m] File change detected. Starting incremental compilation...
+
+[96msrc/projects/projects.service.ts[0m:[93m386[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m386[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m919[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m919[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m968[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m968[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[[90m10:21:54 PM[0m] Found 3 errors. Watching for file changes.
+
+[2J[3J[H[[90m10:22:38 PM[0m] File change detected. Starting incremental compilation...
+
+[96msrc/projects/projects.service.ts[0m:[93m337[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m337[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m387[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m387[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m920[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m920[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m969[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m969[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[[90m10:22:39 PM[0m] Found 4 errors. Watching for file changes.
+
+[2J[3J[H[[90m10:22:50 PM[0m] File change detected. Starting incremental compilation...
+
+[96msrc/projects/projects.service.ts[0m:[93m337[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m337[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m353[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m353[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m388[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m388[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m921[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m921[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m970[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m970[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[[90m10:22:52 PM[0m] Found 5 errors. Watching for file changes.
+
+[2J[3J[H[[90m10:23:03 PM[0m] File change detected. Starting incremental compilation...
+
+[96msrc/projects/projects.service.ts[0m:[93m337[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m337[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m353[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m353[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m388[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m388[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m404[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m404[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m922[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m922[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m971[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m971[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[[90m10:23:04 PM[0m] Found 6 errors. Watching for file changes.
+
+[2J[3J[H[[90m10:23:26 PM[0m] File change detected. Starting incremental compilation...
+
+[96msrc/projects/projects.service.ts[0m:[93m337[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m337[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m353[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m353[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m388[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m388[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m404[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m404[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m536[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m536[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m923[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m923[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m972[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m972[0m     const userRole = user.roleMaster?.code || [96msrc/projects/projects.service.ts[0m:[93m337[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ [2J[3J[H[[90m10:23:47 PM[0m] File change detected. Starting incremental compilation...
+
+[96msrc/projects/projects.service.ts[0m:[93m337[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m337[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m353[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m353[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m388[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m388[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m404[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m404[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m536[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m536[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m923[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m923[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m972[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m972[0m     const userRole = user.roleMaster?.code || [96msrc/projects/projects.service.ts[0m:[93m337[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m337[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m353[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m353[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m388[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m388[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m404[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m404[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m536[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m536[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m923[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m923[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[96msrc/projects/projects.service.ts[0m:[93m972[0m:[93m27[0m - [91merror[0m[90m TS2339: [0mProperty 'roleMaster' does not exist on type '{ id: string; name: string; createdAt: Date; updatedAt: Date; email: string; password: string; role: Role; avatar: string; department: Department; roleId: string; departmentId: string; }'.
+
+[7m972[0m     const userRole = user.roleMaster?.code || user.role?.toString();
+[7m   [0m [91m                          ~~~~~~~~~~[0m
+
+[[90m10:23:47 PM[0m] Found 7 errors. Watching for file changes.
 

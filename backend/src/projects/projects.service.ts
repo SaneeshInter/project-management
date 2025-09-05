@@ -55,8 +55,8 @@ export class ProjectsService {
         deviationReason: createProjectDto.deviationReason,
         dependency: createProjectDto.dependency,
         startDate: createProjectDto.startDate,
-        projectCoordinatorId: createProjectDto.projectCoordinatorId,
-        pcTeamLeadId: createProjectDto.pcTeamLeadId,
+        projectCoordinatorId: createProjectDto.projectCoordinatorId || null,
+        pcTeamLeadId: createProjectDto.pcTeamLeadId || null,
         ownerId: user.id,
       },
       include: {
@@ -334,7 +334,8 @@ export class ProjectsService {
     }
 
     // Check access permissions
-    if (user.role === Role.CLIENT && project.ownerId !== user.id) {
+    const userRole = user.roleMaster?.code || user.role?.toString();
+    if (userRole === 'CLIENT' && project.ownerId !== user.id) {
       throw new ForbiddenException('Access denied to this project');
     }
 
@@ -349,7 +350,8 @@ export class ProjectsService {
     }
 
     // Check permissions
-    if (user.role === Role.CLIENT && project.ownerId !== user.id) {
+    const userRole = user.roleMaster?.code || user.role?.toString();
+    if (userRole === 'CLIENT' && project.ownerId !== user.id) {
       throw new ForbiddenException('You can only update your own projects');
     }
 
@@ -383,7 +385,8 @@ export class ProjectsService {
     }
 
     // Only admins and project owners can delete projects
-    if (user.role !== Role.ADMIN && project.ownerId !== user.id) {
+    const userRole = user.roleMaster?.code || user.role?.toString();
+    if (userRole !== 'ADMIN' && project.ownerId !== user.id) {
       throw new ForbiddenException('You can only delete your own projects');
     }
 
@@ -398,7 +401,8 @@ export class ProjectsService {
       throw new NotFoundException(`Project with ID ${projectId} not found`);
     }
 
-    if (user.role === Role.CLIENT && project.ownerId !== user.id) {
+    const userRole = user.roleMaster?.code || user.role?.toString();
+    if (userRole === 'CLIENT' && project.ownerId !== user.id) {
       throw new ForbiddenException('Access denied to this project');
     }
 
@@ -529,7 +533,8 @@ export class ProjectsService {
     }
 
     // Check access permissions
-    if (user.role === Role.CLIENT && project.ownerId !== user.id) {
+    const userRole = user.roleMaster?.code || user.role?.toString();
+    if (userRole === 'CLIENT' && project.ownerId !== user.id) {
       throw new ForbiddenException('Access denied to this project');
     }
 
@@ -915,7 +920,8 @@ export class ProjectsService {
     }
 
     // Check permissions - only admins can update status
-    if (user.role !== Role.ADMIN && user.role !== Role.SU_ADMIN) {
+    const userRole = user.roleMaster?.code || user.role?.toString();
+    if (userRole !== 'ADMIN' && userRole !== 'SU_ADMIN') {
       throw new ForbiddenException('Only administrators can update project status');
     }
 
@@ -963,7 +969,8 @@ export class ProjectsService {
     }
 
     // Check permissions - only admins can disable/enable projects
-    if (user.role !== Role.ADMIN && user.role !== Role.SU_ADMIN) {
+    const userRole = user.roleMaster?.code || user.role?.toString();
+    if (userRole !== 'ADMIN' && userRole !== 'SU_ADMIN') {
       throw new ForbiddenException('Only administrators can disable/enable projects');
     }
 

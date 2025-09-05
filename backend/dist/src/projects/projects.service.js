@@ -52,8 +52,8 @@ let ProjectsService = class ProjectsService {
                 deviationReason: createProjectDto.deviationReason,
                 dependency: createProjectDto.dependency,
                 startDate: createProjectDto.startDate,
-                projectCoordinatorId: createProjectDto.projectCoordinatorId,
-                pcTeamLeadId: createProjectDto.pcTeamLeadId,
+                projectCoordinatorId: createProjectDto.projectCoordinatorId || null,
+                pcTeamLeadId: createProjectDto.pcTeamLeadId || null,
                 ownerId: user.id,
             },
             include: {
@@ -312,7 +312,8 @@ let ProjectsService = class ProjectsService {
         if (!project) {
             throw new common_1.NotFoundException(`Project with ID ${id} not found`);
         }
-        if (user.role === client_1.Role.CLIENT && project.ownerId !== user.id) {
+        const userRole = user.roleMaster?.code || user.role?.toString();
+        if (userRole === 'CLIENT' && project.ownerId !== user.id) {
             throw new common_1.ForbiddenException('Access denied to this project');
         }
         return project;
@@ -322,7 +323,8 @@ let ProjectsService = class ProjectsService {
         if (!project) {
             throw new common_1.NotFoundException(`Project with ID ${id} not found`);
         }
-        if (user.role === client_1.Role.CLIENT && project.ownerId !== user.id) {
+        const userRole = user.roleMaster?.code || user.role?.toString();
+        if (userRole === 'CLIENT' && project.ownerId !== user.id) {
             throw new common_1.ForbiddenException('You can only update your own projects');
         }
         return this.prisma.project.update({
@@ -351,7 +353,8 @@ let ProjectsService = class ProjectsService {
         if (!project) {
             throw new common_1.NotFoundException(`Project with ID ${id} not found`);
         }
-        if (user.role !== client_1.Role.ADMIN && project.ownerId !== user.id) {
+        const userRole = user.roleMaster?.code || user.role?.toString();
+        if (userRole !== 'ADMIN' && project.ownerId !== user.id) {
             throw new common_1.ForbiddenException('You can only delete your own projects');
         }
         await this.prisma.project.delete({ where: { id } });
@@ -362,7 +365,8 @@ let ProjectsService = class ProjectsService {
         if (!project) {
             throw new common_1.NotFoundException(`Project with ID ${projectId} not found`);
         }
-        if (user.role === client_1.Role.CLIENT && project.ownerId !== user.id) {
+        const userRole = user.roleMaster?.code || user.role?.toString();
+        if (userRole === 'CLIENT' && project.ownerId !== user.id) {
             throw new common_1.ForbiddenException('Access denied to this project');
         }
         return this.prisma.customField.create({
@@ -472,7 +476,8 @@ let ProjectsService = class ProjectsService {
         if (!project) {
             throw new common_1.NotFoundException(`Project with ID ${projectId} not found`);
         }
-        if (user.role === client_1.Role.CLIENT && project.ownerId !== user.id) {
+        const userRole = user.roleMaster?.code || user.role?.toString();
+        if (userRole === 'CLIENT' && project.ownerId !== user.id) {
             throw new common_1.ForbiddenException('Access denied to this project');
         }
         return this.prisma.projectDepartmentHistory.findMany({
@@ -795,7 +800,8 @@ let ProjectsService = class ProjectsService {
         if (!project) {
             throw new common_1.NotFoundException(`Project with ID ${id} not found`);
         }
-        if (user.role !== client_1.Role.ADMIN && user.role !== client_1.Role.SU_ADMIN) {
+        const userRole = user.roleMaster?.code || user.role?.toString();
+        if (userRole !== 'ADMIN' && userRole !== 'SU_ADMIN') {
             throw new common_1.ForbiddenException('Only administrators can update project status');
         }
         return this.prisma.project.update({
@@ -837,7 +843,8 @@ let ProjectsService = class ProjectsService {
         if (!project) {
             throw new common_1.NotFoundException(`Project with ID ${id} not found`);
         }
-        if (user.role !== client_1.Role.ADMIN && user.role !== client_1.Role.SU_ADMIN) {
+        const userRole = user.roleMaster?.code || user.role?.toString();
+        if (userRole !== 'ADMIN' && userRole !== 'SU_ADMIN') {
             throw new common_1.ForbiddenException('Only administrators can disable/enable projects');
         }
         const updateData = {
