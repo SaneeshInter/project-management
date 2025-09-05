@@ -39,10 +39,10 @@ export default function Sidebar() {
       );
     }
     
-    // PMO department users see Projects and Users
+    // PMO department users see only Projects
     if (user.departmentMaster?.code === 'PMO') {
       return allNavigation.filter(item => 
-        item.name === 'Projects' || item.name === 'Users'
+        item.name === 'Projects'
       );
     }
     

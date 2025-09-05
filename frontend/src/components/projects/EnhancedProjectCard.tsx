@@ -1,20 +1,15 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Clock, User, AlertTriangle, CheckCircle, 
-  Play, Pause, ArrowRight, TrendingDown, Eye, Edit
+  Clock, User, AlertTriangle, 
+  Pause, ArrowRight, TrendingDown
 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Project, Department } from '@/types';
 import { formatDate, getStatusColor } from '@/lib/utils';
 
 interface EnhancedProjectCardProps {
   project: Project;
-  onQuickEdit?: (project: Project) => void;
-  onMoveProject?: (project: Project) => void;
-  onViewDetails?: (project: Project) => void;
 }
 
 const departmentOrder: Department[] = [
@@ -111,12 +106,8 @@ const getTimeStatus = (targetDate: string): {
 };
 
 export default function EnhancedProjectCard({ 
-  project, 
-  onQuickEdit, 
-  onMoveProject, 
-  onViewDetails 
+  project
 }: EnhancedProjectCardProps) {
-  const [showQuickActions, setShowQuickActions] = useState(false);
   const health = getProjectHealthScore(project);
   const timeStatus = getTimeStatus(project.targetDate);
   const progress = getDepartmentProgress(project.currentDepartment);
@@ -124,42 +115,7 @@ export default function EnhancedProjectCard({
   return (
     <Card 
       className="hover:shadow-lg transition-all duration-200 relative group"
-      onMouseEnter={() => setShowQuickActions(true)}
-      onMouseLeave={() => setShowQuickActions(false)}
     >
-      {/* Quick Actions Overlay */}
-      {showQuickActions && (
-        <div className="absolute top-2 right-2 flex gap-1 z-10">
-          <Button 
-            size="sm" 
-            variant="outline" 
-            className="h-8 w-8 p-0"
-            onClick={() => onViewDetails?.(project)}
-          >
-            <Eye className="h-3 w-3" />
-          </Button>
-          {onQuickEdit && (
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="h-8 w-8 p-0"
-              onClick={() => onQuickEdit(project)}
-            >
-              <Edit className="h-3 w-3" />
-            </Button>
-          )}
-          {onMoveProject && project.status === 'ACTIVE' && (
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="h-8 w-8 p-0"
-              onClick={() => onMoveProject(project)}
-            >
-              <ArrowRight className="h-3 w-3" />
-            </Button>
-          )}
-        </div>
-      )}
 
       <CardHeader className="pb-3">
         {/* Header Row 1: Project Name & Status */}
@@ -253,40 +209,6 @@ export default function EnhancedProjectCard({
           </div>
         </div>
 
-        {/* Mini Timeline */}
-        <div className="space-y-2">
-          <div className="text-sm font-medium">Workflow Status</div>
-          <div className="flex items-center gap-1">
-            {departmentOrder.map((dept, deptIndex) => {
-              const isCurrent = dept === project.currentDepartment;
-              const isPast = departmentOrder.indexOf(project.currentDepartment) > deptIndex;
-              const isNext = dept === project.nextDepartment;
-              
-              return (
-                <div key={dept} className="flex items-center">
-                  <div className={`
-                    w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium border-2
-                    ${isPast ? 'bg-green-600 border-green-600 text-white' :
-                      isCurrent ? 'bg-blue-600 border-blue-600 text-white' :
-                      isNext ? 'bg-yellow-400 border-yellow-400 text-gray-800' :
-                      'bg-gray-200 border-gray-300 text-gray-500'}
-                  `}>
-                    {isPast ? <CheckCircle className="h-3 w-3" /> :
-                     isCurrent ? <Play className="h-3 w-3" /> :
-                     deptIndex + 1}
-                  </div>
-                  {deptIndex < departmentOrder.length - 1 && (
-                    <div className={`w-4 h-0.5 ${isPast ? 'bg-green-400' : 'bg-gray-300'}`}></div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          
-          <div className="text-xs text-muted-foreground">
-            {project.currentDepartment.replace('_', ' ')} → {project.nextDepartment ? project.nextDepartment.replace('_', ' ') : 'Final'}
-          </div>
-        </div>
 
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-4 pt-3 border-t">

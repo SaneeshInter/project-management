@@ -9,18 +9,15 @@ import {
   ProjectCategory, 
   Department,
   Office,
-  DepartmentMaster,
-  CreateDepartmentTransitionDto 
+  DepartmentMaster
 } from '@/types';
 import { departmentsApi } from '@/lib/api';
 import CreateProjectModal from '@/components/projects/CreateProjectModal';
 import AdvancedProjectFilters from '@/components/projects/AdvancedProjectFilters';
-import ProjectQuickActions from '@/components/projects/ProjectQuickActions';
 import GroupedProjectView from '@/components/projects/GroupedProjectView';
 import ProjectViewControls from '@/components/projects/ProjectViewControls';
 import SimpleDepartmentPipeline from '@/components/projects/SimpleDepartmentPipeline';
 import AlertDialog from '@/components/ui/alert-dialog';
-import { standardizeErrorMessage, getErrorSuggestion } from '@/lib/errorMessages';
 
 interface FilterOptions {
   searchTerm: string;
@@ -72,10 +69,9 @@ const getDepartmentProgress = (currentDept: Department, departments: DepartmentM
 };
 
 export default function ProjectsPage() {
-  const { projects, fetchProjects, isLoading, moveProject, updateProject } = useProjectsStore();
+  const { projects, fetchProjects, isLoading } = useProjectsStore();
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [quickActionsProject, setQuickActionsProject] = useState<Project | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [groupBy, setGroupBy] = useState<'department' | 'status' | 'health' | 'dueDate' | 'none'>('department');
   const [showStats, setShowStats] = useState(true);
@@ -262,33 +258,6 @@ export default function ProjectsPage() {
     }
   };
 
-  const handleQuickEdit = (project: Project) => {
-    // This would open a quick edit modal
-    console.log('Quick edit:', project.name);
-  };
-
-  const handleMoveProject = async (projectId: string, data: CreateDepartmentTransitionDto) => {
-    try {
-      await moveProject(projectId, data);
-      fetchProjects(); // Refresh the projects list
-    } catch (error: any) {
-      const technicalMessage = error.message || 'Failed to move project to the selected department. Please try again.';
-      setErrorAlert({
-        title: 'Cannot Change Project Stage',
-        message: standardizeErrorMessage(technicalMessage),
-        suggestion: getErrorSuggestion(technicalMessage)
-      });
-    }
-  };
-
-  const handleUpdateStatus = async (projectId: string, status: ProjectStatus) => {
-    try {
-      await updateProject(projectId, { status });
-      fetchProjects(); // Refresh the projects list
-    } catch (error) {
-      console.error('Failed to update project status:', error);
-    }
-  };
 
   const getProjectStats = () => {
     const total = filteredProjects.length;
@@ -424,9 +393,6 @@ export default function ProjectsPage() {
           groupBy={groupBy}
           viewMode={viewMode}
           departments={departments}
-          onQuickEdit={handleQuickEdit}
-          onMoveProject={(project) => setQuickActionsProject(project)}
-          onViewDetails={(project) => setQuickActionsProject(project)}
         />
       )}
 
@@ -474,16 +440,6 @@ export default function ProjectsPage() {
         onClose={() => setIsCreateModalOpen(false)}
       />
       
-      {quickActionsProject && (
-        <ProjectQuickActions
-          project={quickActionsProject}
-          isOpen={!!quickActionsProject}
-          onClose={() => setQuickActionsProject(null)}
-          onMoveProject={handleMoveProject}
-          onUpdateStatus={handleUpdateStatus}
-          onQuickEdit={handleQuickEdit}
-        />
-      )}
       
       {errorAlert && (
         <AlertDialog

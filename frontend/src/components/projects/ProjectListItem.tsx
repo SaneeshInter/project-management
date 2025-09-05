@@ -1,19 +1,14 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   User, AlertTriangle, CheckCircle, 
-  Play, Pause, ArrowRight, Eye, Edit
+  Play, Pause, ArrowRight
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Project, Department, DepartmentMaster } from '@/types';
 import { formatDate } from '@/lib/utils';
 
 interface ProjectListItemProps {
   project: Project;
-  onQuickEdit?: (project: Project) => void;
-  onMoveProject?: (project: Project) => void;
-  onViewDetails?: (project: Project) => void;
   departments?: DepartmentMaster[];
 }
 
@@ -128,12 +123,8 @@ const getTimeStatus = (targetDate: string): {
 
 export default function ProjectListItem({
   project,
-  onQuickEdit,
-  onMoveProject,
-  onViewDetails,
   departments = []
 }: ProjectListItemProps) {
-  const [showActions, setShowActions] = useState(false);
   
   const health = getProjectHealthScore(project);
   const progress = getDepartmentProgress(project.currentDepartment, departments);
@@ -146,8 +137,6 @@ export default function ProjectListItem({
   return (
     <div 
       className="project-list-item flex items-center gap-4 p-4 bg-white border rounded-lg hover:shadow-md hover:border-gray-300 transition-all duration-200 group"
-      onMouseEnter={() => setShowActions(true)}
-      onMouseLeave={() => setShowActions(false)}
     >
       {/* Health Indicator */}
       <div className="flex flex-col items-center flex-shrink-0">
@@ -255,52 +244,16 @@ export default function ProjectListItem({
         </div>
       </div>
 
-      {/* Quick Actions */}
+      {/* Indicators */}
       <div className="flex-shrink-0 w-24 flex justify-end">
-        {showActions ? (
-          <div className="flex gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 w-7 p-0"
-              onClick={() => onViewDetails?.(project)}
-              title="View Details"
-            >
-              <Eye className="h-3 w-3" />
-            </Button>
-            {onQuickEdit && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0"
-                onClick={() => onQuickEdit(project)}
-                title="Quick Edit"
-              >
-                <Edit className="h-3 w-3" />
-              </Button>
-            )}
-            {onMoveProject && project.status === 'ACTIVE' && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0"
-                onClick={() => onMoveProject(project)}
-                title="Move to Next Department"
-              >
-                <ArrowRight className="h-3 w-3" />
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            {timeStatus.urgent && (
-              <AlertTriangle className="h-4 w-4 text-orange-500" />
-            )}
-            {project.dependency && (
-              <div className="w-2 h-2 bg-yellow-400 rounded-full" title="Has dependencies"></div>
-            )}
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {timeStatus.urgent && (
+            <AlertTriangle className="h-4 w-4 text-orange-500" />
+          )}
+          {project.dependency && (
+            <div className="w-2 h-2 bg-yellow-400 rounded-full" title="Has dependencies"></div>
+          )}
+        </div>
       </div>
 
     </div>

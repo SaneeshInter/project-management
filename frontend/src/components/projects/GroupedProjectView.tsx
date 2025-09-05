@@ -12,9 +12,6 @@ interface GroupedProjectViewProps {
   groupBy: 'department' | 'status' | 'health' | 'dueDate' | 'none';
   viewMode: 'grid' | 'list';
   departments?: DepartmentMaster[];
-  onQuickEdit?: (project: Project) => void;
-  onMoveProject?: (project: Project) => void;
-  onViewDetails?: (project: Project) => void;
 }
 
 interface ProjectGroup {
@@ -191,10 +188,7 @@ export default function GroupedProjectView({
   projects,
   groupBy,
   viewMode,
-  departments = [],
-  onQuickEdit,
-  onMoveProject,
-  onViewDetails
+  departments = []
 }: GroupedProjectViewProps) {
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   
@@ -218,9 +212,6 @@ export default function GroupedProjectView({
               key={project.id}
               project={project}
               departments={departments}
-              onQuickEdit={onQuickEdit}
-              onMoveProject={() => onMoveProject?.(project)}
-              onViewDetails={() => onViewDetails?.(project)}
             />
           ))}
         </div>
@@ -232,9 +223,6 @@ export default function GroupedProjectView({
             <EnhancedProjectCard
               key={project.id}
               project={project}
-              onQuickEdit={onQuickEdit}
-              onMoveProject={() => onMoveProject?.(project)}
-              onViewDetails={() => onViewDetails?.(project)}
             />
           ))}
         </div>
@@ -320,9 +308,6 @@ export default function GroupedProjectView({
                         key={project.id}
                         project={project}
                         departments={departments}
-                        onQuickEdit={onQuickEdit}
-                        onMoveProject={() => onMoveProject?.(project)}
-                        onViewDetails={() => onViewDetails?.(project)}
                       />
                     ))}
                   </div>
@@ -332,9 +317,6 @@ export default function GroupedProjectView({
                       <EnhancedProjectCard
                         key={project.id}
                         project={project}
-                        onQuickEdit={onQuickEdit}
-                        onMoveProject={() => onMoveProject?.(project)}
-                        onViewDetails={() => onViewDetails?.(project)}
                       />
                     ))}
                   </div>
