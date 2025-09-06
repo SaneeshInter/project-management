@@ -7,8 +7,8 @@ export declare class JwtStrategy extends JwtStrategy_base {
     constructor(configService: ConfigService, usersService: UsersService);
     validate(payload: any): Promise<{
         departmentMaster: {
-            name: string;
             id: string;
+            name: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -17,27 +17,27 @@ export declare class JwtStrategy extends JwtStrategy_base {
             order: number;
         };
         roleMaster: {
+            id: string;
             name: string;
+            code: string;
             description: string | null;
             departmentId: string;
-            id: string;
-            code: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
         };
     } & {
-        name: string;
-        email: string;
-        password: string;
-        roleId: string | null;
-        departmentId: string | null;
-        avatar: string | null;
         id: string;
+        name: string;
+        departmentId: string | null;
         createdAt: Date;
         updatedAt: Date;
         department: import(".prisma/client").$Enums.Department | null;
+        email: string;
+        password: string;
         role: import(".prisma/client").$Enums.Role;
+        avatar: string | null;
+        roleId: string | null;
     }>;
 }
 export {};

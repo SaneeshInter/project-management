@@ -7,8 +7,8 @@ export declare class CommentsService {
     constructor(prisma: PrismaService);
     create(createCommentDto: CreateCommentDto, user: User): Promise<{
         project: {
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             office: string;
@@ -33,21 +33,21 @@ export declare class CommentsService {
             pcTeamLeadId: string | null;
         };
         task: {
-            description: string | null;
-            title: string;
             id: string;
+            description: string | null;
             createdAt: Date;
             updatedAt: Date;
             status: import(".prisma/client").$Enums.TaskStatus;
             projectId: string;
+            title: string;
             priority: import(".prisma/client").$Enums.Priority;
             dueDate: Date | null;
             assigneeId: string | null;
         };
         author: {
+            id: string;
             name: string;
             email: string;
-            id: string;
         };
     } & {
         id: string;
@@ -59,17 +59,17 @@ export declare class CommentsService {
     }>;
     findAll(projectId?: string, taskId?: string, user?: User): Promise<({
         project: {
-            name: string;
             id: string;
+            name: string;
         };
         task: {
-            title: string;
             id: string;
+            title: string;
         };
         author: {
+            id: string;
             name: string;
             email: string;
-            id: string;
         };
     } & {
         id: string;
@@ -81,21 +81,21 @@ export declare class CommentsService {
     })[]>;
     findOne(id: string, user: User): Promise<{
         project: {
-            name: string;
             id: string;
+            name: string;
             ownerId: string;
         };
         task: {
             project: {
                 ownerId: string;
             };
-            title: string;
             id: string;
+            title: string;
         };
         author: {
+            id: string;
             name: string;
             email: string;
-            id: string;
         };
     } & {
         id: string;
@@ -107,9 +107,9 @@ export declare class CommentsService {
     }>;
     update(id: string, updateCommentDto: UpdateCommentDto, user: User): Promise<{
         author: {
+            id: string;
             name: string;
             email: string;
-            id: string;
         };
     } & {
         id: string;

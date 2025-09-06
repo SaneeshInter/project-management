@@ -6,8 +6,8 @@ export declare class RolesController {
     constructor(rolesService: RolesService);
     create(createRoleDto: CreateRoleDto): Promise<{
         department: {
-            name: string;
             id: string;
+            name: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -16,19 +16,19 @@ export declare class RolesController {
             order: number;
         };
     } & {
+        id: string;
         name: string;
+        code: string;
         description: string | null;
         departmentId: string;
-        id: string;
-        code: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
     }>;
     findAll(): Promise<({
         department: {
-            name: string;
             id: string;
+            name: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -37,19 +37,19 @@ export declare class RolesController {
             order: number;
         };
     } & {
+        id: string;
         name: string;
+        code: string;
         description: string | null;
         departmentId: string;
-        id: string;
-        code: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
     })[]>;
     findByDepartment(departmentId: string): Promise<({
         department: {
-            name: string;
             id: string;
+            name: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -58,19 +58,19 @@ export declare class RolesController {
             order: number;
         };
     } & {
+        id: string;
         name: string;
+        code: string;
         description: string | null;
         departmentId: string;
-        id: string;
-        code: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
     })[]>;
     findOne(id: string): Promise<{
         department: {
-            name: string;
             id: string;
+            name: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -79,19 +79,19 @@ export declare class RolesController {
             order: number;
         };
     } & {
+        id: string;
         name: string;
+        code: string;
         description: string | null;
         departmentId: string;
-        id: string;
-        code: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
     }>;
     update(id: string, updateRoleDto: UpdateRoleDto): Promise<{
         department: {
-            name: string;
             id: string;
+            name: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -100,21 +100,21 @@ export declare class RolesController {
             order: number;
         };
     } & {
+        id: string;
         name: string;
+        code: string;
         description: string | null;
         departmentId: string;
-        id: string;
-        code: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
     }>;
     remove(id: string): Promise<{
+        id: string;
         name: string;
+        code: string;
         description: string | null;
         departmentId: string;
-        id: string;
-        code: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;

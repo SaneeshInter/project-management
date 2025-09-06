@@ -6,58 +6,58 @@ export declare class ChecklistTemplatesController {
     private readonly checklistTemplatesService;
     constructor(checklistTemplatesService: ChecklistTemplatesService);
     create(createChecklistTemplateDto: CreateChecklistTemplateDto): Promise<{
-        description: string | null;
-        title: string;
         id: string;
+        description: string | null;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         department: string;
         order: number;
+        title: string;
         isRequired: boolean;
     }>;
     findByDepartment(department: string): Promise<{
-        description: string | null;
-        title: string;
         id: string;
+        description: string | null;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         department: string;
         order: number;
+        title: string;
         isRequired: boolean;
     }[]>;
     update(id: string, updateChecklistTemplateDto: UpdateChecklistTemplateDto): Promise<{
-        description: string | null;
-        title: string;
         id: string;
+        description: string | null;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         department: string;
         order: number;
+        title: string;
         isRequired: boolean;
     }>;
     remove(id: string): Promise<{
-        description: string | null;
-        title: string;
         id: string;
+        description: string | null;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         department: string;
         order: number;
+        title: string;
         isRequired: boolean;
     }>;
     reorder(department: string, reorderDto: ReorderChecklistTemplatesDto): Promise<{
-        description: string | null;
-        title: string;
         id: string;
+        description: string | null;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         department: string;
         order: number;
+        title: string;
         isRequired: boolean;
     }[]>;
 }

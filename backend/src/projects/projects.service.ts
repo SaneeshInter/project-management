@@ -333,8 +333,14 @@ export class ProjectsService {
       throw new NotFoundException(`Project with ID ${id} not found`);
     }
 
+    // Get user with role master relation for permission checking
+    const userWithRole = await this.prisma.user.findUnique({
+      where: { id: user.id },
+      include: { roleMaster: true }
+    });
+
     // Check access permissions
-    const userRole = user.roleMaster?.code || user.role?.toString();
+    const userRole = userWithRole?.roleMaster?.code || user.role?.toString();
     if (userRole === 'CLIENT' && project.ownerId !== user.id) {
       throw new ForbiddenException('Access denied to this project');
     }
@@ -349,8 +355,14 @@ export class ProjectsService {
       throw new NotFoundException(`Project with ID ${id} not found`);
     }
 
+    // Get user with role master relation for permission checking
+    const userWithRole = await this.prisma.user.findUnique({
+      where: { id: user.id },
+      include: { roleMaster: true }
+    });
+
     // Check permissions
-    const userRole = user.roleMaster?.code || user.role?.toString();
+    const userRole = userWithRole?.roleMaster?.code || user.role?.toString();
     if (userRole === 'CLIENT' && project.ownerId !== user.id) {
       throw new ForbiddenException('You can only update your own projects');
     }
@@ -384,8 +396,14 @@ export class ProjectsService {
       throw new NotFoundException(`Project with ID ${id} not found`);
     }
 
+    // Get user with role master relation for permission checking
+    const userWithRole = await this.prisma.user.findUnique({
+      where: { id: user.id },
+      include: { roleMaster: true }
+    });
+
     // Only admins and project owners can delete projects
-    const userRole = user.roleMaster?.code || user.role?.toString();
+    const userRole = userWithRole?.roleMaster?.code || user.role?.toString();
     if (userRole !== 'ADMIN' && project.ownerId !== user.id) {
       throw new ForbiddenException('You can only delete your own projects');
     }
@@ -401,7 +419,13 @@ export class ProjectsService {
       throw new NotFoundException(`Project with ID ${projectId} not found`);
     }
 
-    const userRole = user.roleMaster?.code || user.role?.toString();
+    // Get user with role master relation for permission checking
+    const userWithRole = await this.prisma.user.findUnique({
+      where: { id: user.id },
+      include: { roleMaster: true }
+    });
+
+    const userRole = userWithRole?.roleMaster?.code || user.role?.toString();
     if (userRole === 'CLIENT' && project.ownerId !== user.id) {
       throw new ForbiddenException('Access denied to this project');
     }
@@ -532,8 +556,14 @@ export class ProjectsService {
       throw new NotFoundException(`Project with ID ${projectId} not found`);
     }
 
+    // Get user with role master relation for permission checking
+    const userWithRole = await this.prisma.user.findUnique({
+      where: { id: user.id },
+      include: { roleMaster: true }
+    });
+
     // Check access permissions
-    const userRole = user.roleMaster?.code || user.role?.toString();
+    const userRole = userWithRole?.roleMaster?.code || user.role?.toString();
     if (userRole === 'CLIENT' && project.ownerId !== user.id) {
       throw new ForbiddenException('Access denied to this project');
     }
@@ -919,8 +949,14 @@ export class ProjectsService {
       throw new NotFoundException(`Project with ID ${id} not found`);
     }
 
+    // Get user with role master relation for permission checking
+    const userWithRole = await this.prisma.user.findUnique({
+      where: { id: user.id },
+      include: { roleMaster: true }
+    });
+
     // Check permissions - only admins can update status
-    const userRole = user.roleMaster?.code || user.role?.toString();
+    const userRole = userWithRole?.roleMaster?.code || user.role?.toString();
     if (userRole !== 'ADMIN' && userRole !== 'SU_ADMIN') {
       throw new ForbiddenException('Only administrators can update project status');
     }
@@ -968,8 +1004,14 @@ export class ProjectsService {
       throw new NotFoundException(`Project with ID ${id} not found`);
     }
 
+    // Get user with role master relation for permission checking
+    const userWithRole = await this.prisma.user.findUnique({
+      where: { id: user.id },
+      include: { roleMaster: true }
+    });
+
     // Check permissions - only admins can disable/enable projects
-    const userRole = user.roleMaster?.code || user.role?.toString();
+    const userRole = userWithRole?.roleMaster?.code || user.role?.toString();
     if (userRole !== 'ADMIN' && userRole !== 'SU_ADMIN') {
       throw new ForbiddenException('Only administrators can disable/enable projects');
     }

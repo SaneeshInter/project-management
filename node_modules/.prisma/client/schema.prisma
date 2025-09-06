@@ -330,6 +330,7 @@ enum CorrectionStatus {
 
 enum Role {
   ADMIN
+  SU_ADMIN
   PROJECT_MANAGER
   PROJECT_COORDINATOR
   DEVELOPER

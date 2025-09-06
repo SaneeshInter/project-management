@@ -19,8 +19,8 @@ export declare class AuthService {
             avatar: any;
             department: any;
             departmentMaster: {
-                name: string;
                 id: string;
+                name: string;
                 code: string;
                 isActive: boolean;
                 createdAt: Date;
@@ -29,11 +29,11 @@ export declare class AuthService {
                 order: number;
             };
             roleMaster: {
+                id: string;
                 name: string;
+                code: string;
                 description: string | null;
                 departmentId: string;
-                id: string;
-                code: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
@@ -50,8 +50,8 @@ export declare class AuthService {
             avatar: string;
             department: import(".prisma/client").$Enums.Department;
             departmentMaster: {
-                name: string;
                 id: string;
+                name: string;
                 code: string;
                 isActive: boolean;
                 createdAt: Date;
@@ -60,11 +60,11 @@ export declare class AuthService {
                 order: number;
             };
             roleMaster: {
+                id: string;
                 name: string;
+                code: string;
                 description: string | null;
                 departmentId: string;
-                id: string;
-                code: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;

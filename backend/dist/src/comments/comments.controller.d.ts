@@ -7,8 +7,8 @@ export declare class CommentsController {
     constructor(commentsService: CommentsService);
     create(createCommentDto: CreateCommentDto, user: UserEntity): Promise<{
         project: {
-            name: string;
             id: string;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             office: string;
@@ -33,21 +33,21 @@ export declare class CommentsController {
             pcTeamLeadId: string | null;
         };
         task: {
-            description: string | null;
-            title: string;
             id: string;
+            description: string | null;
             createdAt: Date;
             updatedAt: Date;
             status: import(".prisma/client").$Enums.TaskStatus;
             projectId: string;
+            title: string;
             priority: import(".prisma/client").$Enums.Priority;
             dueDate: Date | null;
             assigneeId: string | null;
         };
         author: {
+            id: string;
             name: string;
             email: string;
-            id: string;
         };
     } & {
         id: string;
@@ -59,17 +59,17 @@ export declare class CommentsController {
     }>;
     findAll(projectId: string, taskId: string, user: UserEntity): Promise<({
         project: {
-            name: string;
             id: string;
+            name: string;
         };
         task: {
-            title: string;
             id: string;
+            title: string;
         };
         author: {
+            id: string;
             name: string;
             email: string;
-            id: string;
         };
     } & {
         id: string;
@@ -81,21 +81,21 @@ export declare class CommentsController {
     })[]>;
     findOne(id: string, user: UserEntity): Promise<{
         project: {
-            name: string;
             id: string;
+            name: string;
             ownerId: string;
         };
         task: {
             project: {
                 ownerId: string;
             };
-            title: string;
             id: string;
+            title: string;
         };
         author: {
+            id: string;
             name: string;
             email: string;
-            id: string;
         };
     } & {
         id: string;
@@ -107,9 +107,9 @@ export declare class CommentsController {
     }>;
     update(id: string, updateCommentDto: UpdateCommentDto, user: UserEntity): Promise<{
         author: {
+            id: string;
             name: string;
             email: string;
-            id: string;
         };
     } & {
         id: string;

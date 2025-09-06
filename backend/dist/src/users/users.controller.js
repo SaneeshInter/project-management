@@ -21,7 +21,6 @@ const update_user_dto_1 = require("./dto/update-user.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../common/decorators/roles.decorator");
-const client_1 = require("@prisma/client");
 let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
@@ -48,7 +47,7 @@ let UsersController = class UsersController {
 exports.UsersController = UsersController;
 __decorate([
     (0, common_1.Post)(),
-    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    (0, roles_decorator_1.Roles)('ADMIN', 'SU_ADMIN'),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new user' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'User created successfully' }),
     __param(0, (0, common_1.Body)()),
@@ -76,7 +75,7 @@ __decorate([
 ], UsersController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
-    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    (0, roles_decorator_1.Roles)('ADMIN', 'SU_ADMIN'),
     (0, swagger_1.ApiOperation)({ summary: 'Update user' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'User updated successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
@@ -88,7 +87,7 @@ __decorate([
 ], UsersController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
-    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    (0, roles_decorator_1.Roles)('ADMIN', 'SU_ADMIN'),
     (0, swagger_1.ApiOperation)({ summary: 'Delete user' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'User deleted successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
