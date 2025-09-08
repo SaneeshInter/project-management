@@ -6,8 +6,8 @@ export declare class DepartmentsService {
     constructor(prisma: PrismaService);
     create(createDepartmentDto: CreateDepartmentDto): Promise<{
         parent: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -16,8 +16,8 @@ export declare class DepartmentsService {
             order: number;
         };
         children: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -26,8 +26,8 @@ export declare class DepartmentsService {
             order: number;
         }[];
     } & {
-        id: string;
         name: string;
+        id: string;
         code: string;
         isActive: boolean;
         createdAt: Date;
@@ -37,8 +37,8 @@ export declare class DepartmentsService {
     }>;
     findAll(): Promise<({
         parent: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -47,8 +47,8 @@ export declare class DepartmentsService {
             order: number;
         };
         children: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -57,8 +57,8 @@ export declare class DepartmentsService {
             order: number;
         }[];
     } & {
-        id: string;
         name: string;
+        id: string;
         code: string;
         isActive: boolean;
         createdAt: Date;
@@ -68,8 +68,8 @@ export declare class DepartmentsService {
     })[]>;
     findMainDepartments(): Promise<({
         children: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -78,8 +78,8 @@ export declare class DepartmentsService {
             order: number;
         }[];
     } & {
-        id: string;
         name: string;
+        id: string;
         code: string;
         isActive: boolean;
         createdAt: Date;
@@ -89,8 +89,8 @@ export declare class DepartmentsService {
     })[]>;
     findOne(id: string): Promise<{
         parent: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -99,8 +99,8 @@ export declare class DepartmentsService {
             order: number;
         };
         children: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -109,8 +109,8 @@ export declare class DepartmentsService {
             order: number;
         }[];
     } & {
-        id: string;
         name: string;
+        id: string;
         code: string;
         isActive: boolean;
         createdAt: Date;
@@ -120,8 +120,8 @@ export declare class DepartmentsService {
     }>;
     update(id: string, updateDepartmentDto: UpdateDepartmentDto): Promise<{
         parent: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -130,8 +130,8 @@ export declare class DepartmentsService {
             order: number;
         };
         children: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -140,8 +140,8 @@ export declare class DepartmentsService {
             order: number;
         }[];
     } & {
-        id: string;
         name: string;
+        id: string;
         code: string;
         isActive: boolean;
         createdAt: Date;
@@ -150,8 +150,8 @@ export declare class DepartmentsService {
         order: number;
     }>;
     remove(id: string): Promise<{
-        id: string;
         name: string;
+        id: string;
         code: string;
         isActive: boolean;
         createdAt: Date;
@@ -161,8 +161,8 @@ export declare class DepartmentsService {
     }>;
     findByParent(parentId: string | null): Promise<({
         children: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -171,8 +171,8 @@ export declare class DepartmentsService {
             order: number;
         }[];
     } & {
-        id: string;
         name: string;
+        id: string;
         code: string;
         isActive: boolean;
         createdAt: Date;

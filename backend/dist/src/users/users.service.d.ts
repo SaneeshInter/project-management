@@ -6,8 +6,8 @@ export declare class UsersService {
     constructor(prisma: PrismaService);
     create(createUserDto: CreateUserDto): Promise<{
         departmentMaster: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -16,32 +16,32 @@ export declare class UsersService {
             order: number;
         };
         roleMaster: {
-            id: string;
             name: string;
-            code: string;
             description: string | null;
             departmentId: string;
+            id: string;
+            code: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
         };
     } & {
-        id: string;
         name: string;
+        email: string;
+        password: string;
+        roleId: string | null;
         departmentId: string | null;
+        avatar: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         department: import(".prisma/client").$Enums.Department | null;
-        email: string;
-        password: string;
         role: import(".prisma/client").$Enums.Role;
-        avatar: string | null;
-        roleId: string | null;
     }>;
     findAll(): Promise<({
         departmentMaster: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -50,32 +50,32 @@ export declare class UsersService {
             order: number;
         };
         roleMaster: {
-            id: string;
             name: string;
-            code: string;
             description: string | null;
             departmentId: string;
+            id: string;
+            code: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
         };
     } & {
-        id: string;
         name: string;
+        email: string;
+        password: string;
+        roleId: string | null;
         departmentId: string | null;
+        avatar: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         department: import(".prisma/client").$Enums.Department | null;
-        email: string;
-        password: string;
         role: import(".prisma/client").$Enums.Role;
-        avatar: string | null;
-        roleId: string | null;
     })[]>;
     findById(id: string): Promise<{
         departmentMaster: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -84,45 +84,45 @@ export declare class UsersService {
             order: number;
         };
         roleMaster: {
-            id: string;
             name: string;
-            code: string;
             description: string | null;
             departmentId: string;
+            id: string;
+            code: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
         };
     } & {
-        id: string;
         name: string;
+        email: string;
+        password: string;
+        roleId: string | null;
         departmentId: string | null;
+        avatar: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         department: import(".prisma/client").$Enums.Department | null;
-        email: string;
-        password: string;
         role: import(".prisma/client").$Enums.Role;
-        avatar: string | null;
-        roleId: string | null;
     }>;
     findByEmail(email: string): Promise<{
-        id: string;
         name: string;
+        email: string;
+        password: string;
+        roleId: string | null;
         departmentId: string | null;
+        avatar: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         department: import(".prisma/client").$Enums.Department | null;
-        email: string;
-        password: string;
         role: import(".prisma/client").$Enums.Role;
-        avatar: string | null;
-        roleId: string | null;
     }>;
     update(id: string, updateUserDto: UpdateUserDto): Promise<{
         departmentMaster: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -131,35 +131,35 @@ export declare class UsersService {
             order: number;
         };
         roleMaster: {
-            id: string;
             name: string;
-            code: string;
             description: string | null;
             departmentId: string;
+            id: string;
+            code: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
         };
     } & {
-        id: string;
         name: string;
+        email: string;
+        password: string;
+        roleId: string | null;
         departmentId: string | null;
+        avatar: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         department: import(".prisma/client").$Enums.Department | null;
-        email: string;
-        password: string;
         role: import(".prisma/client").$Enums.Role;
-        avatar: string | null;
-        roleId: string | null;
     }>;
     remove(id: string, force?: boolean): Promise<{
         message: string;
     }>;
     getPMOCoordinators(): Promise<({
         departmentMaster: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -168,26 +168,26 @@ export declare class UsersService {
             order: number;
         };
         roleMaster: {
-            id: string;
             name: string;
-            code: string;
             description: string | null;
             departmentId: string;
+            id: string;
+            code: string;
             isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
         };
     } & {
-        id: string;
         name: string;
+        email: string;
+        password: string;
+        roleId: string | null;
         departmentId: string | null;
+        avatar: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         department: import(".prisma/client").$Enums.Department | null;
-        email: string;
-        password: string;
         role: import(".prisma/client").$Enums.Role;
-        avatar: string | null;
-        roleId: string | null;
     })[]>;
 }

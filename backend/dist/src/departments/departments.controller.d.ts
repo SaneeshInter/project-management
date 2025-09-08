@@ -6,8 +6,8 @@ export declare class DepartmentsController {
     constructor(departmentsService: DepartmentsService);
     create(createDepartmentDto: CreateDepartmentDto): Promise<{
         parent: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -16,8 +16,8 @@ export declare class DepartmentsController {
             order: number;
         };
         children: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -26,8 +26,8 @@ export declare class DepartmentsController {
             order: number;
         }[];
     } & {
-        id: string;
         name: string;
+        id: string;
         code: string;
         isActive: boolean;
         createdAt: Date;
@@ -37,8 +37,8 @@ export declare class DepartmentsController {
     }>;
     findAll(): Promise<({
         parent: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -47,8 +47,8 @@ export declare class DepartmentsController {
             order: number;
         };
         children: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -57,8 +57,8 @@ export declare class DepartmentsController {
             order: number;
         }[];
     } & {
-        id: string;
         name: string;
+        id: string;
         code: string;
         isActive: boolean;
         createdAt: Date;
@@ -68,8 +68,8 @@ export declare class DepartmentsController {
     })[]>;
     findMainDepartments(): Promise<({
         children: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -78,8 +78,8 @@ export declare class DepartmentsController {
             order: number;
         }[];
     } & {
-        id: string;
         name: string;
+        id: string;
         code: string;
         isActive: boolean;
         createdAt: Date;
@@ -89,8 +89,8 @@ export declare class DepartmentsController {
     })[]>;
     findByParent(parentId?: string): Promise<({
         children: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -99,8 +99,8 @@ export declare class DepartmentsController {
             order: number;
         }[];
     } & {
-        id: string;
         name: string;
+        id: string;
         code: string;
         isActive: boolean;
         createdAt: Date;
@@ -110,8 +110,8 @@ export declare class DepartmentsController {
     })[]>;
     findOne(id: string): Promise<{
         parent: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -120,8 +120,8 @@ export declare class DepartmentsController {
             order: number;
         };
         children: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -130,8 +130,8 @@ export declare class DepartmentsController {
             order: number;
         }[];
     } & {
-        id: string;
         name: string;
+        id: string;
         code: string;
         isActive: boolean;
         createdAt: Date;
@@ -141,8 +141,8 @@ export declare class DepartmentsController {
     }>;
     update(id: string, updateDepartmentDto: UpdateDepartmentDto): Promise<{
         parent: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -151,8 +151,8 @@ export declare class DepartmentsController {
             order: number;
         };
         children: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             isActive: boolean;
             createdAt: Date;
@@ -161,8 +161,8 @@ export declare class DepartmentsController {
             order: number;
         }[];
     } & {
-        id: string;
         name: string;
+        id: string;
         code: string;
         isActive: boolean;
         createdAt: Date;
@@ -171,8 +171,8 @@ export declare class DepartmentsController {
         order: number;
     }>;
     remove(id: string): Promise<{
-        id: string;
         name: string;
+        id: string;
         code: string;
         isActive: boolean;
         createdAt: Date;

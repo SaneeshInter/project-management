@@ -6,58 +6,58 @@ export declare class ChecklistTemplatesController {
     private readonly checklistTemplatesService;
     constructor(checklistTemplatesService: ChecklistTemplatesService);
     create(createChecklistTemplateDto: CreateChecklistTemplateDto): Promise<{
-        id: string;
         description: string | null;
+        title: string;
+        id: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         department: string;
         order: number;
-        title: string;
         isRequired: boolean;
     }>;
     findByDepartment(department: string): Promise<{
-        id: string;
         description: string | null;
+        title: string;
+        id: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         department: string;
         order: number;
-        title: string;
         isRequired: boolean;
     }[]>;
     update(id: string, updateChecklistTemplateDto: UpdateChecklistTemplateDto): Promise<{
-        id: string;
         description: string | null;
+        title: string;
+        id: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         department: string;
         order: number;
-        title: string;
         isRequired: boolean;
     }>;
     remove(id: string): Promise<{
-        id: string;
         description: string | null;
+        title: string;
+        id: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         department: string;
         order: number;
-        title: string;
         isRequired: boolean;
     }>;
     reorder(department: string, reorderDto: ReorderChecklistTemplatesDto): Promise<{
-        id: string;
         description: string | null;
+        title: string;
+        id: string;
         isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         department: string;
         order: number;
-        title: string;
         isRequired: boolean;
     }[]>;
 }

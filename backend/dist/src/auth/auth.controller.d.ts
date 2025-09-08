@@ -14,8 +14,8 @@ export declare class AuthController {
             avatar: any;
             department: any;
             departmentMaster: {
-                id: string;
                 name: string;
+                id: string;
                 code: string;
                 isActive: boolean;
                 createdAt: Date;
@@ -24,11 +24,11 @@ export declare class AuthController {
                 order: number;
             };
             roleMaster: {
-                id: string;
                 name: string;
-                code: string;
                 description: string | null;
                 departmentId: string;
+                id: string;
+                code: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
@@ -45,8 +45,8 @@ export declare class AuthController {
             avatar: string;
             department: import(".prisma/client").$Enums.Department;
             departmentMaster: {
-                id: string;
                 name: string;
+                id: string;
                 code: string;
                 isActive: boolean;
                 createdAt: Date;
@@ -55,11 +55,11 @@ export declare class AuthController {
                 order: number;
             };
             roleMaster: {
-                id: string;
                 name: string;
-                code: string;
                 description: string | null;
                 departmentId: string;
+                id: string;
+                code: string;
                 isActive: boolean;
                 createdAt: Date;
                 updatedAt: Date;
