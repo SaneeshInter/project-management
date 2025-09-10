@@ -28,10 +28,18 @@ __decorate([
     __metadata("design:type", String)
 ], CreateProjectDto.prototype, "office", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ enum: client_1.ProjectCategory, example: client_1.ProjectCategory.MOBILE_APP }),
+    (0, swagger_1.ApiPropertyOptional)({ enum: client_1.ProjectCategory, example: client_1.ProjectCategory.MOBILE_APP }),
     (0, class_validator_1.IsEnum)(client_1.ProjectCategory),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateProjectDto.prototype, "category", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'category-id-123' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.ValidateIf)((o) => !o.category),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateProjectDto.prototype, "categoryMasterId", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: 10 }),
     (0, class_validator_1.IsInt)(),
@@ -40,8 +48,9 @@ __decorate([
     __metadata("design:type", Number)
 ], CreateProjectDto.prototype, "pagesCount", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'dept-id-123' }),
+    (0, swagger_1.ApiPropertyOptional)({ example: 'dept-id-123' }),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateProjectDto.prototype, "currentDepartmentId", void 0);
 __decorate([
@@ -51,8 +60,9 @@ __decorate([
     __metadata("design:type", String)
 ], CreateProjectDto.prototype, "nextDepartmentId", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '2024-12-31T00:00:00Z' }),
+    (0, swagger_1.ApiPropertyOptional)({ example: '2024-12-31T00:00:00Z' }),
     (0, class_validator_1.IsDateString)(),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateProjectDto.prototype, "targetDate", void 0);
 __decorate([
@@ -103,4 +113,46 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateProjectDto.prototype, "pcTeamLeadId", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'user-id-789' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateProjectDto.prototype, "salesPersonId", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: true }),
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateProjectDto.prototype, "scheduleKTMeeting", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: '2024-12-15T10:00:00Z' }),
+    (0, class_validator_1.IsDateString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateProjectDto.prototype, "ktMeetingDate", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 60 }),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => Number),
+    __metadata("design:type", Number)
+], CreateProjectDto.prototype, "ktMeetingDuration", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Project knowledge transfer and workflow review' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateProjectDto.prototype, "ktMeetingAgenda", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'https://meet.google.com/xyz-abc-def' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateProjectDto.prototype, "ktMeetingLink", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: ['user-id-123', 'user-id-456'] }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateProjectDto.prototype, "ktMeetingParticipants", void 0);
 //# sourceMappingURL=create-project.dto.js.map

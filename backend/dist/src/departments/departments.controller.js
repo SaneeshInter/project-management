@@ -51,7 +51,7 @@ let DepartmentsController = class DepartmentsController {
 exports.DepartmentsController = DepartmentsController;
 __decorate([
     (0, common_1.Post)(),
-    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN, client_1.Role.SU_ADMIN),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new department' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Department created successfully' }),
     __param(0, (0, common_1.Body)()),
@@ -96,7 +96,7 @@ __decorate([
 ], DepartmentsController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
-    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN, client_1.Role.SU_ADMIN),
     (0, swagger_1.ApiOperation)({ summary: 'Update department' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Department updated successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Department not found' }),
@@ -108,7 +108,7 @@ __decorate([
 ], DepartmentsController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
-    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN, client_1.Role.SU_ADMIN),
     (0, swagger_1.ApiOperation)({ summary: 'Delete department' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Department deleted successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Department not found' }),

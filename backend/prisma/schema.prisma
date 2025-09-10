@@ -29,6 +29,7 @@ model User {
   ownedProjects         Project[]                  @relation("ProjectOwner")
   coordinatedProjects   Project[]                  @relation("ProjectCoordinator")
   pcTeamLeadProjects    Project[]                  @relation("PCTeamLead")
+  salesProjects         Project[]                  @relation("ProjectSalesPerson")
   disabledProjects      Project[]                  @relation("ProjectDisabledBy")
   bugAssignments        QABug[]                    @relation("BugAssignments")
   qaTestingRounds       QATestingRound[]           @relation("QATesters")
@@ -41,6 +42,8 @@ model User {
   checklistItemsUpdated ProjectChecklistItem[]     @relation("ChecklistLastUpdatedBy")
   checklistLinksAdded   ChecklistItemLink[]        @relation("ChecklistLinkAddedBy")
   checklistUpdateHistory ChecklistItemUpdate[]    @relation("ChecklistUpdateHistory")
+  createdKTMeetings     KTMeeting[]               @relation("KTMeetingCreator")
+  ktMeetingParticipants KTMeetingParticipant[]    @relation("KTMeetingParticipants")
 
   @@map("users")
 }
@@ -49,7 +52,8 @@ model Project {
   id                   String                     @id @default(cuid())
   name                 String
   office               String
-  category             ProjectCategory
+  category             ProjectCategory?
+  categoryMasterId     String?
   pagesCount           Int?
   targetDate           DateTime
   status               ProjectStatus              @default(ACTIVE)
@@ -70,16 +74,20 @@ model Project {
   projectCode          String                     @default("")
   projectCoordinatorId String?
   pcTeamLeadId         String?
+  salesPersonId        String?
   comments             Comment[]
   customFields         CustomField[]
   departmentHistory    ProjectDepartmentHistory[]
   owner                User                       @relation("ProjectOwner", fields: [ownerId], references: [id])
   projectCoordinator   User?                      @relation("ProjectCoordinator", fields: [projectCoordinatorId], references: [id])
   pcTeamLead           User?                      @relation("PCTeamLead", fields: [pcTeamLeadId], references: [id])
+  salesPerson          User?                      @relation("ProjectSalesPerson", fields: [salesPersonId], references: [id])
   disabledByUser       User?                      @relation("ProjectDisabledBy", fields: [disabledBy], references: [id])
+  categoryMaster       CategoryMaster?            @relation("ProjectCategoryMapping", fields: [categoryMasterId], references: [id])
   tasks                Task[]
   assignmentHistory    ProjectAssignmentHistory[]
   checklistItems       ProjectChecklistItem[]
+  ktMeetings           KTMeeting[]
 
   @@map("projects")
 }
@@ -394,6 +402,7 @@ enum Department {
   QA
   DELIVERY
   MANAGER
+  SALES_EXE
 }
 
 enum DepartmentWorkStatus {
@@ -414,6 +423,22 @@ enum DepartmentWorkStatus {
 enum ProjectAssignmentType {
   PROJECT_COORDINATOR
   PC_TEAM_LEAD
+}
+
+enum KTMeetingStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+}
+
+enum ParticipantRole {
+  ORGANIZER
+  FACILITATOR
+  PARTICIPANT
+  TEAM_LEAD
+  OBSERVER
 }
 
 model ChecklistTemplate {
@@ -484,4 +509,73 @@ model ChecklistItemUpdate {
   updatedBy   User                 @relation("ChecklistUpdateHistory", fields: [updatedById], references: [id])
 
   @@map("checklist_item_updates")
+}
+
+model CategoryMaster {
+  id                    String                     @id @default(cuid())
+  name                  String                     @unique
+  code                  String                     @unique
+  description           String?
+  isActive              Boolean                    @default(true)
+  defaultStartDept      Department                 @default(PMO)
+  estimatedTotalHours   Int?
+  createdAt             DateTime                   @default(now())
+  updatedAt             DateTime                   @updatedAt
+  departmentMappings    CategoryDepartmentMapping[]
+  projects              Project[]                  @relation("ProjectCategoryMapping")
+
+  @@map("category_master")
+}
+
+model CategoryDepartmentMapping {
+  id                String         @id @default(cuid())
+  categoryId        String
+  department        Department
+  sequence          Int
+  isRequired        Boolean        @default(true)
+  estimatedHours    Int?
+  estimatedDays     Int?
+  isActive          Boolean        @default(true)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  category          CategoryMaster @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, department])
+  @@unique([categoryId, sequence])
+  @@map("category_department_mapping")
+}
+
+model KTMeeting {
+  id            String              @id @default(cuid())
+  projectId     String
+  scheduledDate DateTime
+  duration      Int?                // Duration in minutes
+  agenda        String?
+  status        KTMeetingStatus     @default(SCHEDULED)
+  meetingLink   String?
+  notes         String?
+  completedAt   DateTime?
+  createdById   String
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  project       Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy     User                @relation("KTMeetingCreator", fields: [createdById], references: [id])
+  participants  KTMeetingParticipant[]
+
+  @@map("kt_meetings")
+}
+
+model KTMeetingParticipant {
+  id          String    @id @default(cuid())
+  meetingId   String
+  userId      String
+  role        ParticipantRole @default(PARTICIPANT)
+  isRequired  Boolean   @default(true)
+  attended    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  meeting     KTMeeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user        User      @relation("KTMeetingParticipants", fields: [userId], references: [id])
+
+  @@unique([meetingId, userId])
+  @@map("kt_meeting_participants")
 }

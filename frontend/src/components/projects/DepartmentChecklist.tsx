@@ -92,7 +92,13 @@ const defaultChecklists: Record<Department, Array<{title: string; description?: 
     { title: "Client handover completed", description: "Project handed over to client with documentation", isRequired: true },
     { title: "Documentation provided", description: "User manuals and technical documentation provided", isRequired: false },
   ],
-  [Department.MANAGER]: []
+  [Department.MANAGER]: [],
+  [Department.SALES_EXE]: [
+    { title: "Client requirements gathered", description: "Initial client requirements and needs documented", isRequired: true },
+    { title: "Project proposal prepared", description: "Detailed project proposal with scope and pricing", isRequired: true },
+    { title: "Contract negotiations completed", description: "Terms and conditions agreed upon with client", isRequired: true },
+    { title: "Project handover to PMO", description: "All client information and requirements handed over to PMO team", isRequired: true },
+  ]
 };
 
 export default function DepartmentChecklist({ 

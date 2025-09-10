@@ -48,7 +48,7 @@ let RolesController = class RolesController {
 exports.RolesController = RolesController;
 __decorate([
     (0, common_1.Post)(),
-    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN, client_1.Role.SU_ADMIN),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new role' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Role created successfully' }),
     __param(0, (0, common_1.Body)()),
@@ -85,7 +85,7 @@ __decorate([
 ], RolesController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
-    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN, client_1.Role.SU_ADMIN),
     (0, swagger_1.ApiOperation)({ summary: 'Update role' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Role updated successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Role not found' }),
@@ -97,7 +97,7 @@ __decorate([
 ], RolesController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
-    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN, client_1.Role.SU_ADMIN),
     (0, swagger_1.ApiOperation)({ summary: 'Delete role' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Role deleted successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Role not found' }),

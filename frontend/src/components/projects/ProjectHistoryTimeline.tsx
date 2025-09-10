@@ -53,6 +53,7 @@ const departmentColors: Record<Department, string> = {
   [Department.QA]: 'bg-yellow-100 text-yellow-800 border-yellow-200',
   [Department.DELIVERY]: 'bg-emerald-100 text-emerald-800 border-emerald-200',
   [Department.MANAGER]: 'bg-red-100 text-red-800 border-red-200',
+  [Department.SALES_EXE]: 'bg-pink-100 text-pink-800 border-pink-200',
 };
 
 const workStatusColors: Record<DepartmentWorkStatus, string> = {

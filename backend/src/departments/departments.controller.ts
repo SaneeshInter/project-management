@@ -16,7 +16,7 @@ export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}
 
   @Post()
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.SU_ADMIN)
   @ApiOperation({ summary: 'Create a new department' })
   @ApiResponse({ status: 201, description: 'Department created successfully' })
   create(@Body() createDepartmentDto: CreateDepartmentDto) {
@@ -53,7 +53,7 @@ export class DepartmentsController {
   }
 
   @Patch(':id')
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.SU_ADMIN)
   @ApiOperation({ summary: 'Update department' })
   @ApiResponse({ status: 200, description: 'Department updated successfully' })
   @ApiResponse({ status: 404, description: 'Department not found' })
@@ -62,7 +62,7 @@ export class DepartmentsController {
   }
 
   @Delete(':id')
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.SU_ADMIN)
   @ApiOperation({ summary: 'Delete department' })
   @ApiResponse({ status: 200, description: 'Department deleted successfully' })
   @ApiResponse({ status: 404, description: 'Department not found' })

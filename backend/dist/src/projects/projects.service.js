@@ -12,41 +12,67 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../database/prisma.service");
+const categories_service_1 = require("../categories/categories.service");
 const client_1 = require("@prisma/client");
 const project_code_util_1 = require("../utils/project-code.util");
 let ProjectsService = class ProjectsService {
-    constructor(prisma) {
+    constructor(prisma, categoriesService) {
         this.prisma = prisma;
+        this.categoriesService = categoriesService;
     }
     async create(createProjectDto, user) {
         console.log('🔍 Creating project with data:', createProjectDto);
         console.log('🔍 User creating project:', user.id, user.name);
-        const currentDepartment = await this.prisma.departmentMaster.findUnique({
-            where: { id: createProjectDto.currentDepartmentId }
-        });
-        if (!currentDepartment) {
-            throw new common_1.NotFoundException(`Current department with ID ${createProjectDto.currentDepartmentId} not found`);
+        let currentDepartment = null;
+        let nextDepartment = null;
+        let categoryMaster = null;
+        if (createProjectDto.categoryMasterId) {
+            categoryMaster = await this.categoriesService.findCategoryById(createProjectDto.categoryMasterId);
+            const workflow = await this.categoriesService.getCategoryWorkflow(createProjectDto.categoryMasterId);
+            if (workflow.departments.length > 0) {
+                const firstDept = workflow.departments[0];
+                currentDepartment = { code: firstDept.department };
+                if (workflow.departments.length > 1) {
+                    const secondDept = workflow.departments[1];
+                    nextDepartment = { code: secondDept.department };
+                }
+            }
+            else {
+                currentDepartment = { code: categoryMaster.defaultStartDept };
+            }
+        }
+        else if (createProjectDto.currentDepartmentId) {
+            currentDepartment = await this.prisma.departmentMaster.findUnique({
+                where: { id: createProjectDto.currentDepartmentId }
+            });
+            if (!currentDepartment) {
+                throw new common_1.NotFoundException(`Current department with ID ${createProjectDto.currentDepartmentId} not found`);
+            }
+        }
+        else {
+            currentDepartment = { code: 'PMO' };
         }
         if (createProjectDto.nextDepartmentId) {
-            const nextDepartment = await this.prisma.departmentMaster.findUnique({
+            nextDepartment = await this.prisma.departmentMaster.findUnique({
                 where: { id: createProjectDto.nextDepartmentId }
             });
             if (!nextDepartment) {
                 throw new common_1.NotFoundException(`Next department with ID ${createProjectDto.nextDepartmentId} not found`);
             }
         }
+        const targetDate = createProjectDto.targetDate ||
+            new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
         const project = await this.prisma.project.create({
             data: {
                 name: createProjectDto.name,
                 office: createProjectDto.office,
-                category: createProjectDto.category,
+                category: createProjectDto.category || null,
+                categoryMasterId: createProjectDto.categoryMasterId,
                 pagesCount: createProjectDto.pagesCount,
                 currentDepartment: currentDepartment.code,
-                nextDepartment: createProjectDto.nextDepartmentId ?
-                    (await this.prisma.departmentMaster.findUnique({ where: { id: createProjectDto.nextDepartmentId } }))?.code :
-                    undefined,
-                targetDate: createProjectDto.targetDate,
-                status: createProjectDto.status,
+                nextDepartment: nextDepartment?.code || undefined,
+                targetDate: targetDate,
+                status: createProjectDto.status || client_1.ProjectStatus.ACTIVE,
                 clientName: createProjectDto.clientName,
                 observations: createProjectDto.observations,
                 deviationReason: createProjectDto.deviationReason,
@@ -54,6 +80,7 @@ let ProjectsService = class ProjectsService {
                 startDate: createProjectDto.startDate,
                 projectCoordinatorId: createProjectDto.projectCoordinatorId || null,
                 pcTeamLeadId: createProjectDto.pcTeamLeadId || null,
+                salesPersonId: createProjectDto.salesPersonId || null,
                 ownerId: user.id,
             },
             include: {
@@ -79,6 +106,14 @@ let ProjectsService = class ProjectsService {
                         name: true,
                         email: true,
                         role: true,
+                    },
+                },
+                categoryMaster: {
+                    include: {
+                        departmentMappings: {
+                            where: { isActive: true },
+                            orderBy: { sequence: 'asc' },
+                        },
                     },
                 },
                 _count: {
@@ -133,6 +168,58 @@ let ProjectsService = class ProjectsService {
         }
         catch (assignmentError) {
             console.error('❌ Failed to create assignment history:', assignmentError);
+        }
+        try {
+            if (createProjectDto.scheduleKTMeeting && createProjectDto.ktMeetingDate) {
+                const ktMeeting = await this.prisma.kTMeeting.create({
+                    data: {
+                        projectId: project.id,
+                        scheduledDate: new Date(createProjectDto.ktMeetingDate),
+                        duration: createProjectDto.ktMeetingDuration || 60,
+                        agenda: createProjectDto.ktMeetingAgenda || 'Project Knowledge Transfer Meeting',
+                        meetingLink: createProjectDto.ktMeetingLink,
+                        createdById: user.id,
+                    },
+                });
+                if (createProjectDto.ktMeetingParticipants && createProjectDto.ktMeetingParticipants.length > 0) {
+                    const participantData = createProjectDto.ktMeetingParticipants.map(userId => ({
+                        meetingId: ktMeeting.id,
+                        userId,
+                        role: 'PARTICIPANT',
+                        isRequired: true,
+                    }));
+                    await this.prisma.kTMeetingParticipant.createMany({
+                        data: participantData,
+                    });
+                }
+                const autoParticipants = [];
+                if (createProjectDto.projectCoordinatorId) {
+                    autoParticipants.push({
+                        meetingId: ktMeeting.id,
+                        userId: createProjectDto.projectCoordinatorId,
+                        role: 'FACILITATOR',
+                        isRequired: true,
+                    });
+                }
+                if (createProjectDto.pcTeamLeadId && createProjectDto.pcTeamLeadId !== createProjectDto.projectCoordinatorId) {
+                    autoParticipants.push({
+                        meetingId: ktMeeting.id,
+                        userId: createProjectDto.pcTeamLeadId,
+                        role: 'TEAM_LEAD',
+                        isRequired: true,
+                    });
+                }
+                if (autoParticipants.length > 0) {
+                    await this.prisma.kTMeetingParticipant.createMany({
+                        data: autoParticipants,
+                        skipDuplicates: true,
+                    });
+                }
+                console.log('✅ KT Meeting created:', ktMeeting.id);
+            }
+        }
+        catch (ktMeetingError) {
+            console.error('❌ Failed to create KT meeting:', ktMeetingError);
         }
         return project;
     }
@@ -925,6 +1012,7 @@ let ProjectsService = class ProjectsService {
 exports.ProjectsService = ProjectsService;
 exports.ProjectsService = ProjectsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        categories_service_1.CategoriesService])
 ], ProjectsService);
 //# sourceMappingURL=projects.service.js.map

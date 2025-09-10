@@ -7,7 +7,8 @@ import {
   FileText,
   LogOut,
   BarChart3,
-  Settings
+  Settings,
+  Tags
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { Button } from '@/components/ui/button';
@@ -46,6 +47,7 @@ const allNavigationCategories: NavigationCategory[] = [
     name: 'Organization Setup',
     icon: Settings,
     items: [
+      { name: 'Categories', href: '/categories', icon: Tags },
       { name: 'Departments', href: '/departments', icon: Building2 },
       { name: 'Department Checklists', href: '/department-checklists', icon: FileText },
     ],

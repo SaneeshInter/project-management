@@ -12,11 +12,13 @@ const projects_service_1 = require("./projects.service");
 const projects_controller_1 = require("./projects.controller");
 const workflow_rules_service_1 = require("./services/workflow-rules.service");
 const workflow_validator_service_1 = require("./services/workflow-validator.service");
+const categories_module_1 = require("../categories/categories.module");
 let ProjectsModule = class ProjectsModule {
 };
 exports.ProjectsModule = ProjectsModule;
 exports.ProjectsModule = ProjectsModule = __decorate([
     (0, common_1.Module)({
+        imports: [categories_module_1.CategoriesModule],
         controllers: [projects_controller_1.ProjectsController],
         providers: [projects_service_1.ProjectsService, workflow_rules_service_1.WorkflowRulesService, workflow_validator_service_1.WorkflowValidatorService],
         exports: [projects_service_1.ProjectsService],

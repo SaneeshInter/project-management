@@ -14,6 +14,7 @@ const DEPARTMENT_CODES = {
     [client_1.Department.QA]: 'Q',
     [client_1.Department.DELIVERY]: 'L',
     [client_1.Department.MANAGER]: 'M',
+    [client_1.Department.SALES_EXE]: 'S',
 };
 function generateProjectCode(departmentHistory) {
     if (!departmentHistory || departmentHistory.length === 0) {

@@ -25,6 +25,7 @@ const departmentColors: Record<Department, string> = {
   [Department.QA]: 'bg-yellow-100 text-yellow-800',
   [Department.DELIVERY]: 'bg-emerald-100 text-emerald-800',
   [Department.MANAGER]: 'bg-red-100 text-red-800',
+  [Department.SALES_EXE]: 'bg-pink-100 text-pink-800',
 };
 
 const departmentOrder: Department[] = [

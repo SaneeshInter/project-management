@@ -14,7 +14,9 @@
       "Bash(lsof:*)",
       "Bash(npx prisma db seed:*)",
       "Bash(curl:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(grep:*)",
+      "Bash(npx prisma:*)"
     ],
     "deny": []
   }

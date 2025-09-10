@@ -10,6 +10,8 @@ import { CommentsModule } from './comments/comments.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { RolesModule } from './roles/roles.module';
 import { ChecklistTemplatesModule } from './checklist-templates/checklist-templates.module';
+import { CategoriesModule } from './categories/categories.module';
+import { KTMeetingsModule } from './kt-meetings/kt-meetings.module';
 
 @Module({
   imports: [
@@ -43,6 +45,8 @@ import { ChecklistTemplatesModule } from './checklist-templates/checklist-templa
     DepartmentsModule,
     RolesModule,
     ChecklistTemplatesModule,
+    CategoriesModule,
+    KTMeetingsModule,
   ],
   controllers: [],
   providers: [],

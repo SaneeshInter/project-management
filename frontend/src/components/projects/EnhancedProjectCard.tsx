@@ -138,7 +138,7 @@ export default function EnhancedProjectCard({
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>{project.office.toLowerCase().replace(/^\w/, c => c.toUpperCase())}</span>
               <span>•</span>
-              <span>{project.category.replace('_', ' ')}</span>
+              <span>{project.category?.replace('_', ' ') || 'No Category'}</span>
               {project.clientName && (
                 <>
                   <span>•</span>
@@ -188,13 +188,13 @@ export default function EnhancedProjectCard({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Badge variant="default" className="bg-blue-600 text-white">
-                {project.currentDepartment.replace('_', ' ')}
+                {project.currentDepartment?.replace('_', ' ') || 'No Department'}
               </Badge>
               {project.nextDepartment && (
                 <>
                   <ArrowRight className="h-3 w-3 text-muted-foreground" />
                   <Badge variant="outline">
-                    {project.nextDepartment.replace('_', ' ')}
+                    {project.nextDepartment?.replace('_', ' ')}
                   </Badge>
                 </>
               )}

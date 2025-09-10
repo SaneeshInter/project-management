@@ -19,6 +19,8 @@ const comments_module_1 = require("./comments/comments.module");
 const departments_module_1 = require("./departments/departments.module");
 const roles_module_1 = require("./roles/roles.module");
 const checklist_templates_module_1 = require("./checklist-templates/checklist-templates.module");
+const categories_module_1 = require("./categories/categories.module");
+const kt_meetings_module_1 = require("./kt-meetings/kt-meetings.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -55,6 +57,8 @@ exports.AppModule = AppModule = __decorate([
             departments_module_1.DepartmentsModule,
             roles_module_1.RolesModule,
             checklist_templates_module_1.ChecklistTemplatesModule,
+            categories_module_1.CategoriesModule,
+            kt_meetings_module_1.KTMeetingsModule,
         ],
         controllers: [],
         providers: [],

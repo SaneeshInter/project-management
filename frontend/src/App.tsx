@@ -9,6 +9,7 @@ import ProjectDetailPage from '@/pages/ProjectDetailPage';
 import UsersPage from '@/pages/UsersPage';
 import DepartmentsPage from '@/pages/DepartmentsPage';
 import RolesPage from '@/pages/RolesPage';
+import CategoriesPage from '@/pages/CategoriesPage';
 import DepartmentChecklistManagementPage from '@/pages/DepartmentChecklistManagementPage';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Role } from '@/types';
@@ -77,6 +78,14 @@ function App() {
             element={
               <RoleProtectedRoute allowedRoles={[Role.PROJECT_MANAGER]}>
                 <UsersPage />
+              </RoleProtectedRoute>
+            } 
+          />
+          <Route 
+            path="categories" 
+            element={
+              <RoleProtectedRoute allowedRoles={[Role.PROJECT_MANAGER]}>
+                <CategoriesPage />
               </RoleProtectedRoute>
             } 
           />

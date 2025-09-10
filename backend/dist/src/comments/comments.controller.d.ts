@@ -12,7 +12,8 @@ export declare class CommentsController {
             createdAt: Date;
             updatedAt: Date;
             office: string;
-            category: import(".prisma/client").$Enums.ProjectCategory;
+            category: import(".prisma/client").$Enums.ProjectCategory | null;
+            categoryMasterId: string | null;
             pagesCount: number | null;
             targetDate: Date;
             status: import(".prisma/client").$Enums.ProjectStatus;
@@ -31,6 +32,7 @@ export declare class CommentsController {
             projectCode: string;
             projectCoordinatorId: string | null;
             pcTeamLeadId: string | null;
+            salesPersonId: string | null;
         };
         task: {
             description: string | null;

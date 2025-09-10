@@ -85,6 +85,7 @@ const departmentColors: Record<Department, string> = {
   [Department.QA]: 'bg-yellow-500 text-white',
   [Department.DELIVERY]: 'bg-emerald-500 text-white',
   [Department.MANAGER]: 'bg-red-500 text-white',
+  [Department.SALES_EXE]: 'bg-pink-500 text-white',
 };
 
 const departmentLightColors: Record<Department, string> = {
@@ -97,6 +98,7 @@ const departmentLightColors: Record<Department, string> = {
   [Department.QA]: 'bg-yellow-50 text-yellow-700 border-yellow-200',
   [Department.DELIVERY]: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   [Department.MANAGER]: 'bg-red-50 text-red-700 border-red-200',
+  [Department.SALES_EXE]: 'bg-pink-50 text-pink-700 border-pink-200',
 };
 
 const workStatusColors: Record<DepartmentWorkStatus, string> = {
@@ -382,7 +384,8 @@ export default function ProjectTimelineTab({ project }: ProjectTimelineTabProps)
       [Department.WORDPRESS]: 'WP',
       [Department.QA]: 'QA',
       [Department.DELIVERY]: 'DEL',
-      [Department.MANAGER]: 'MGR'
+      [Department.MANAGER]: 'MGR',
+      [Department.SALES_EXE]: 'SALE'
     };
     return abbreviations[dept];
   };

@@ -74,6 +74,38 @@ async function main() {
             parentId: devDept.id,
         },
     });
+    const salesDept = await prisma.departmentMaster.upsert({
+        where: { code: 'SALES_EXE' },
+        update: {},
+        create: {
+            name: 'Sales Executive',
+            code: 'SALES_EXE',
+        },
+    });
+    const qaDept = await prisma.departmentMaster.upsert({
+        where: { code: 'QA' },
+        update: {},
+        create: {
+            name: 'QA',
+            code: 'QA',
+        },
+    });
+    const deliveryDept = await prisma.departmentMaster.upsert({
+        where: { code: 'DELIVERY' },
+        update: {},
+        create: {
+            name: 'Delivery',
+            code: 'DELIVERY',
+        },
+    });
+    const managerDept = await prisma.departmentMaster.upsert({
+        where: { code: 'MANAGER' },
+        update: {},
+        create: {
+            name: 'Manager',
+            code: 'MANAGER',
+        },
+    });
     console.log('✅ Department master data created/updated');
     await prisma.roleMaster.upsert({
         where: { code: 'PC' },
@@ -113,6 +145,16 @@ async function main() {
             code: 'TESTER',
             description: 'Tests software quality and functionality',
             departmentId: devDept.id,
+        },
+    });
+    await prisma.roleMaster.upsert({
+        where: { code: 'SALES_PERSON' },
+        update: {},
+        create: {
+            name: 'Sales Person',
+            code: 'SALES_PERSON',
+            description: 'Handles client relationships and sales activities',
+            departmentId: salesDept.id,
         },
     });
     console.log('✅ Role master data created/updated');
@@ -212,6 +254,28 @@ async function main() {
             password: hashedPassword,
             role: client_1.Role.PROJECT_MANAGER,
             department: client_1.Department.MANAGER,
+        },
+    });
+    const salesPerson = await prisma.user.upsert({
+        where: { email: 'sales@intersmart.com' },
+        update: {},
+        create: {
+            email: 'sales@intersmart.com',
+            name: 'Sales Representative',
+            password: hashedPassword,
+            role: client_1.Role.PROJECT_COORDINATOR,
+            department: client_1.Department.SALES_EXE,
+        },
+    });
+    const salesManager = await prisma.user.upsert({
+        where: { email: 'sales.manager@intersmart.com' },
+        update: {},
+        create: {
+            email: 'sales.manager@intersmart.com',
+            name: 'Sales Manager',
+            password: hashedPassword,
+            role: client_1.Role.PROJECT_MANAGER,
+            department: client_1.Department.SALES_EXE,
         },
     });
     console.log('✅ Users created');
@@ -566,6 +630,127 @@ async function main() {
         });
     }
     console.log('✅ Department corrections created');
+    console.log('🔧 Creating category master data...');
+    const mobileAppCategory = await prisma.categoryMaster.upsert({
+        where: { code: 'MOBILE_APP' },
+        update: {},
+        create: {
+            name: 'Mobile Application',
+            code: 'MOBILE_APP',
+            description: 'Native and hybrid mobile applications for iOS and Android',
+            defaultStartDept: 'PMO',
+            estimatedTotalHours: 800,
+        },
+    });
+    const reactNodejsCategory = await prisma.categoryMaster.upsert({
+        where: { code: 'REACT_NODEJS' },
+        update: {},
+        create: {
+            name: 'React + Node.js Application',
+            code: 'REACT_NODEJS',
+            description: 'Full-stack web applications using React frontend and Node.js backend',
+            defaultStartDept: 'PMO',
+            estimatedTotalHours: 600,
+        },
+    });
+    const advancedPhpCategory = await prisma.categoryMaster.upsert({
+        where: { code: 'ADVANCED_PHP' },
+        update: {},
+        create: {
+            name: 'Advanced PHP Application',
+            code: 'ADVANCED_PHP',
+            description: 'Complex PHP applications with custom frameworks and integrations',
+            defaultStartDept: 'PMO',
+            estimatedTotalHours: 500,
+        },
+    });
+    const customPhpCategory = await prisma.categoryMaster.upsert({
+        where: { code: 'CUSTOM_PHP' },
+        update: {},
+        create: {
+            name: 'Custom PHP Development',
+            code: 'CUSTOM_PHP',
+            description: 'Custom PHP applications and systems',
+            defaultStartDept: 'PMO',
+            estimatedTotalHours: 400,
+        },
+    });
+    const ecommerceCategory = await prisma.categoryMaster.upsert({
+        where: { code: 'ECOMMERCE' },
+        update: {},
+        create: {
+            name: 'E-commerce Platform',
+            code: 'ECOMMERCE',
+            description: 'Online shopping platforms and e-commerce solutions',
+            defaultStartDept: 'PMO',
+            estimatedTotalHours: 700,
+        },
+    });
+    const businessCollateralCategory = await prisma.categoryMaster.upsert({
+        where: { code: 'BUSINESS_COLLATERAL' },
+        update: {},
+        create: {
+            name: 'Business Collateral',
+            code: 'BUSINESS_COLLATERAL',
+            description: 'Marketing materials, brochures, and business presentations',
+            defaultStartDept: 'DESIGN',
+            estimatedTotalHours: 80,
+        },
+    });
+    console.log('✅ Category master data created');
+    console.log('🔧 Creating department mappings...');
+    await prisma.categoryDepartmentMapping.createMany({
+        data: [
+            { categoryId: mobileAppCategory.id, department: 'PMO', sequence: 1, isRequired: true, estimatedHours: 80, estimatedDays: 10 },
+            { categoryId: mobileAppCategory.id, department: 'DESIGN', sequence: 2, isRequired: true, estimatedHours: 120, estimatedDays: 15 },
+            { categoryId: mobileAppCategory.id, department: 'HTML', sequence: 3, isRequired: false, estimatedHours: 40, estimatedDays: 5 },
+            { categoryId: mobileAppCategory.id, department: 'REACT', sequence: 4, isRequired: true, estimatedHours: 400, estimatedDays: 60 },
+            { categoryId: mobileAppCategory.id, department: 'QA', sequence: 5, isRequired: true, estimatedHours: 120, estimatedDays: 20 },
+            { categoryId: mobileAppCategory.id, department: 'DELIVERY', sequence: 6, isRequired: true, estimatedHours: 40, estimatedDays: 10 },
+        ],
+        skipDuplicates: true,
+    });
+    await prisma.categoryDepartmentMapping.createMany({
+        data: [
+            { categoryId: reactNodejsCategory.id, department: 'PMO', sequence: 1, isRequired: true, estimatedHours: 60, estimatedDays: 8 },
+            { categoryId: reactNodejsCategory.id, department: 'DESIGN', sequence: 2, isRequired: true, estimatedHours: 80, estimatedDays: 12 },
+            { categoryId: reactNodejsCategory.id, department: 'HTML', sequence: 3, isRequired: true, estimatedHours: 80, estimatedDays: 10 },
+            { categoryId: reactNodejsCategory.id, department: 'REACT', sequence: 4, isRequired: true, estimatedHours: 280, estimatedDays: 40 },
+            { categoryId: reactNodejsCategory.id, department: 'QA', sequence: 5, isRequired: true, estimatedHours: 80, estimatedDays: 15 },
+            { categoryId: reactNodejsCategory.id, department: 'DELIVERY', sequence: 6, isRequired: true, estimatedHours: 20, estimatedDays: 5 },
+        ],
+        skipDuplicates: true,
+    });
+    await prisma.categoryDepartmentMapping.createMany({
+        data: [
+            { categoryId: advancedPhpCategory.id, department: 'PMO', sequence: 1, isRequired: true, estimatedHours: 50, estimatedDays: 7 },
+            { categoryId: advancedPhpCategory.id, department: 'DESIGN', sequence: 2, isRequired: true, estimatedHours: 70, estimatedDays: 10 },
+            { categoryId: advancedPhpCategory.id, department: 'HTML', sequence: 3, isRequired: true, estimatedHours: 60, estimatedDays: 8 },
+            { categoryId: advancedPhpCategory.id, department: 'PHP', sequence: 4, isRequired: true, estimatedHours: 240, estimatedDays: 35 },
+            { categoryId: advancedPhpCategory.id, department: 'QA', sequence: 5, isRequired: true, estimatedHours: 60, estimatedDays: 10 },
+            { categoryId: advancedPhpCategory.id, department: 'DELIVERY', sequence: 6, isRequired: true, estimatedHours: 20, estimatedDays: 5 },
+        ],
+        skipDuplicates: true,
+    });
+    await prisma.categoryDepartmentMapping.createMany({
+        data: [
+            { categoryId: ecommerceCategory.id, department: 'PMO', sequence: 1, isRequired: true, estimatedHours: 80, estimatedDays: 12 },
+            { categoryId: ecommerceCategory.id, department: 'DESIGN', sequence: 2, isRequired: true, estimatedHours: 100, estimatedDays: 15 },
+            { categoryId: ecommerceCategory.id, department: 'HTML', sequence: 3, isRequired: true, estimatedHours: 80, estimatedDays: 12 },
+            { categoryId: ecommerceCategory.id, department: 'PHP', sequence: 4, isRequired: true, estimatedHours: 320, estimatedDays: 48 },
+            { categoryId: ecommerceCategory.id, department: 'QA', sequence: 5, isRequired: true, estimatedHours: 100, estimatedDays: 15 },
+            { categoryId: ecommerceCategory.id, department: 'DELIVERY', sequence: 6, isRequired: true, estimatedHours: 20, estimatedDays: 3 },
+        ],
+        skipDuplicates: true,
+    });
+    await prisma.categoryDepartmentMapping.createMany({
+        data: [
+            { categoryId: businessCollateralCategory.id, department: 'DESIGN', sequence: 1, isRequired: true, estimatedHours: 60, estimatedDays: 10 },
+            { categoryId: businessCollateralCategory.id, department: 'DELIVERY', sequence: 2, isRequired: true, estimatedHours: 20, estimatedDays: 5 },
+        ],
+        skipDuplicates: true,
+    });
+    console.log('✅ Department mappings created');
     const allProjects = await prisma.project.findMany({
         include: {
             departmentHistory: {

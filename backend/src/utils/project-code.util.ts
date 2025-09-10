@@ -11,6 +11,7 @@ const DEPARTMENT_CODES: Record<Department, string> = {
   [Department.QA]: 'Q',
   [Department.DELIVERY]: 'L', // Using L to distinguish from DESIGN (D)
   [Department.MANAGER]: 'M',
+  [Department.SALES_EXE]: 'S',
 };
 
 export interface DepartmentHistoryForCode {

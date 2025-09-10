@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
+import { CategoriesService } from '../categories/categories.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { CreateDepartmentTransitionDto } from './dto/create-department-transition.dto';
@@ -13,23 +14,53 @@ import { generateProjectCode } from '../utils/project-code.util';
 @Injectable()
 export class ProjectsService {
   constructor(
-    private prisma: PrismaService
+    private prisma: PrismaService,
+    private categoriesService: CategoriesService
   ) {}
 
   async create(createProjectDto: CreateProjectDto, user: User) {
     console.log('🔍 Creating project with data:', createProjectDto);
     console.log('🔍 User creating project:', user.id, user.name);
     
-    // Validate department IDs exist
-    const currentDepartment = await this.prisma.departmentMaster.findUnique({
-      where: { id: createProjectDto.currentDepartmentId }
-    });
-    if (!currentDepartment) {
-      throw new NotFoundException(`Current department with ID ${createProjectDto.currentDepartmentId} not found`);
+    // Determine workflow from categoryMaster if provided
+    let currentDepartment: any = null;
+    let nextDepartment: any = null;
+    let categoryMaster: any = null;
+
+    if (createProjectDto.categoryMasterId) {
+      // Get category workflow
+      categoryMaster = await this.categoriesService.findCategoryById(createProjectDto.categoryMasterId);
+      const workflow = await this.categoriesService.getCategoryWorkflow(createProjectDto.categoryMasterId);
+      
+      if (workflow.departments.length > 0) {
+        // Use category workflow to determine departments
+        const firstDept = workflow.departments[0];
+        currentDepartment = { code: firstDept.department };
+        
+        if (workflow.departments.length > 1) {
+          const secondDept = workflow.departments[1];
+          nextDepartment = { code: secondDept.department };
+        }
+      } else {
+        // Fallback to category's default start department
+        currentDepartment = { code: categoryMaster.defaultStartDept };
+      }
+    } else if (createProjectDto.currentDepartmentId) {
+      // Legacy: use manually specified department
+      currentDepartment = await this.prisma.departmentMaster.findUnique({
+        where: { id: createProjectDto.currentDepartmentId }
+      });
+      if (!currentDepartment) {
+        throw new NotFoundException(`Current department with ID ${createProjectDto.currentDepartmentId} not found`);
+      }
+    } else {
+      // Default to PMO
+      currentDepartment = { code: 'PMO' };
     }
 
+    // Handle next department
     if (createProjectDto.nextDepartmentId) {
-      const nextDepartment = await this.prisma.departmentMaster.findUnique({
+      nextDepartment = await this.prisma.departmentMaster.findUnique({
         where: { id: createProjectDto.nextDepartmentId }
       });
       if (!nextDepartment) {
@@ -37,19 +68,22 @@ export class ProjectsService {
       }
     }
     
+    // Set default targetDate if not provided (30 days from now)
+    const targetDate = createProjectDto.targetDate || 
+      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
     // Create the project first
     const project = await this.prisma.project.create({
       data: {
         name: createProjectDto.name,
         office: createProjectDto.office,
-        category: createProjectDto.category,
+        category: createProjectDto.category || null,
+        categoryMasterId: createProjectDto.categoryMasterId,
         pagesCount: createProjectDto.pagesCount,
         currentDepartment: currentDepartment.code as Department,
-        nextDepartment: createProjectDto.nextDepartmentId ? 
-          (await this.prisma.departmentMaster.findUnique({ where: { id: createProjectDto.nextDepartmentId } }))?.code as Department :
-          undefined,
-        targetDate: createProjectDto.targetDate,
-        status: createProjectDto.status,
+        nextDepartment: nextDepartment?.code as Department || undefined,
+        targetDate: targetDate,
+        status: createProjectDto.status || ProjectStatus.ACTIVE,
         clientName: createProjectDto.clientName,
         observations: createProjectDto.observations,
         deviationReason: createProjectDto.deviationReason,
@@ -57,6 +91,7 @@ export class ProjectsService {
         startDate: createProjectDto.startDate,
         projectCoordinatorId: createProjectDto.projectCoordinatorId || null,
         pcTeamLeadId: createProjectDto.pcTeamLeadId || null,
+        salesPersonId: createProjectDto.salesPersonId || null,
         ownerId: user.id,
       },
       include: {
@@ -82,6 +117,14 @@ export class ProjectsService {
             name: true,
             email: true,
             role: true,
+          },
+        },
+        categoryMaster: {
+          include: {
+            departmentMappings: {
+              where: { isActive: true },
+              orderBy: { sequence: 'asc' },
+            },
           },
         },
         _count: {
@@ -142,6 +185,66 @@ export class ProjectsService {
       }
     } catch (assignmentError) {
       console.error('❌ Failed to create assignment history:', assignmentError);
+    }
+
+    // Create KT Meeting if requested
+    try {
+      if (createProjectDto.scheduleKTMeeting && createProjectDto.ktMeetingDate) {
+        const ktMeeting = await this.prisma.kTMeeting.create({
+          data: {
+            projectId: project.id,
+            scheduledDate: new Date(createProjectDto.ktMeetingDate),
+            duration: createProjectDto.ktMeetingDuration || 60,
+            agenda: createProjectDto.ktMeetingAgenda || 'Project Knowledge Transfer Meeting',
+            meetingLink: createProjectDto.ktMeetingLink,
+            createdById: user.id,
+          },
+        });
+
+        // Add participants if provided
+        if (createProjectDto.ktMeetingParticipants && createProjectDto.ktMeetingParticipants.length > 0) {
+          const participantData = createProjectDto.ktMeetingParticipants.map(userId => ({
+            meetingId: ktMeeting.id,
+            userId,
+            role: 'PARTICIPANT' as const,
+            isRequired: true,
+          }));
+
+          await this.prisma.kTMeetingParticipant.createMany({
+            data: participantData,
+          });
+        }
+
+        // Auto-add PC and PC Team Lead as participants if assigned
+        const autoParticipants: any[] = [];
+        if (createProjectDto.projectCoordinatorId) {
+          autoParticipants.push({
+            meetingId: ktMeeting.id,
+            userId: createProjectDto.projectCoordinatorId,
+            role: 'FACILITATOR' as const,
+            isRequired: true,
+          });
+        }
+        if (createProjectDto.pcTeamLeadId && createProjectDto.pcTeamLeadId !== createProjectDto.projectCoordinatorId) {
+          autoParticipants.push({
+            meetingId: ktMeeting.id,
+            userId: createProjectDto.pcTeamLeadId,
+            role: 'TEAM_LEAD' as const,
+            isRequired: true,
+          });
+        }
+
+        if (autoParticipants.length > 0) {
+          await this.prisma.kTMeetingParticipant.createMany({
+            data: autoParticipants,
+            skipDuplicates: true,
+          });
+        }
+
+        console.log('✅ KT Meeting created:', ktMeeting.id);
+      }
+    } catch (ktMeetingError) {
+      console.error('❌ Failed to create KT meeting:', ktMeetingError);
     }
 
     return project;

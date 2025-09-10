@@ -14,7 +14,8 @@ const departmentNames: Record<Department, string> = {
   [Department.WORDPRESS]: 'WordPress Development',
   [Department.QA]: 'Quality Assurance',
   [Department.DELIVERY]: 'Delivery',
-  [Department.MANAGER]: 'Management Review'
+  [Department.MANAGER]: 'Management Review',
+  [Department.SALES_EXE]: 'Sales Executive'
 };
 
 const errorMappings: ErrorMapping[] = [

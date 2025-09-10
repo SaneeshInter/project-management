@@ -2,11 +2,12 @@ import { ProjectCategory, ProjectStatus } from '@prisma/client';
 export declare class CreateProjectDto {
     name: string;
     office: string;
-    category: ProjectCategory;
+    category?: ProjectCategory;
+    categoryMasterId?: string;
     pagesCount?: number;
-    currentDepartmentId: string;
+    currentDepartmentId?: string;
     nextDepartmentId?: string;
-    targetDate: string;
+    targetDate?: string;
     status?: ProjectStatus;
     clientName?: string;
     observations?: string;
@@ -15,4 +16,11 @@ export declare class CreateProjectDto {
     startDate?: string;
     projectCoordinatorId?: string;
     pcTeamLeadId?: string;
+    salesPersonId?: string;
+    scheduleKTMeeting?: boolean;
+    ktMeetingDate?: string;
+    ktMeetingDuration?: number;
+    ktMeetingAgenda?: string;
+    ktMeetingLink?: string;
+    ktMeetingParticipants?: string[];
 }

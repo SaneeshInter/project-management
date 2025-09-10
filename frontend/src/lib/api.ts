@@ -13,7 +13,14 @@ import {
   ProjectChecklistItem,
   UpdateChecklistItemDto,
   CreateChecklistItemLinkDto,
-  CreateChecklistItemUpdateDto
+  CreateChecklistItemUpdateDto,
+  CategoryMaster,
+  CreateCategoryMasterDto,
+  UpdateCategoryMasterDto,
+  CategoryDepartmentMapping,
+  CreateCategoryDepartmentMappingDto,
+  UpdateCategoryDepartmentMappingDto,
+  CategoryWorkflowDto
 } from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
@@ -190,4 +197,112 @@ export const commentsApi = {
   
   delete: (id: string): Promise<void> =>
     api.delete(`/comments/${id}`).then((res) => res.data),
+};
+
+// Categories API
+export const categoriesApi = {
+  // Category Master operations
+  getAll: (includeInactive = false): Promise<CategoryMaster[]> => {
+    const params = includeInactive ? '?includeInactive=true' : '';
+    return api.get(`/categories${params}`).then((res) => res.data);
+  },
+  
+  getById: (id: string): Promise<CategoryMaster> =>
+    api.get(`/categories/${id}`).then((res) => res.data),
+  
+  create: (data: CreateCategoryMasterDto): Promise<CategoryMaster> =>
+    api.post('/categories', data).then((res) => res.data),
+  
+  update: (id: string, data: UpdateCategoryMasterDto): Promise<CategoryMaster> =>
+    api.patch(`/categories/${id}`, data).then((res) => res.data),
+  
+  delete: (id: string): Promise<{ message: string }> =>
+    api.delete(`/categories/${id}`).then((res) => res.data),
+  
+  // Department mapping operations
+  getDepartmentMappings: (categoryId: string): Promise<CategoryDepartmentMapping[]> =>
+    api.get(`/categories/${categoryId}/departments`).then((res) => res.data),
+  
+  createDepartmentMapping: (categoryId: string, data: Omit<CreateCategoryDepartmentMappingDto, 'categoryId'>): Promise<CategoryDepartmentMapping> =>
+    api.post(`/categories/${categoryId}/departments`, data).then((res) => res.data),
+  
+  updateDepartmentMapping: (mappingId: string, data: UpdateCategoryDepartmentMappingDto): Promise<CategoryDepartmentMapping> =>
+    api.patch(`/categories/departments/${mappingId}`, data).then((res) => res.data),
+  
+  deleteDepartmentMapping: (mappingId: string): Promise<{ message: string }> =>
+    api.delete(`/categories/departments/${mappingId}`).then((res) => res.data),
+  
+  // Workflow operations
+  getWorkflow: (categoryId: string): Promise<CategoryWorkflowDto> =>
+    api.get(`/categories/${categoryId}/workflow`).then((res) => res.data),
+  
+  getNextDepartment: (categoryId: string, currentDept: string): Promise<string | null> =>
+    api.get(`/categories/${categoryId}/next-department?currentDept=${currentDept}`).then((res) => res.data),
+  
+  bulkCreateDepartmentMappings: (categoryId: string, departments: any[]): Promise<CategoryDepartmentMapping[]> =>
+    api.post(`/categories/${categoryId}/departments/bulk`, departments).then((res) => res.data),
+};
+
+// KT Meetings API
+export const ktMeetingsApi = {
+  // Get all KT meetings (with optional project filter)
+  getAll: (projectId?: string): Promise<any[]> => {
+    const params = projectId ? `?projectId=${projectId}` : '';
+    return api.get(`/kt-meetings${params}`).then((res) => res.data);
+  },
+
+  // Get upcoming KT meetings
+  getUpcoming: (days: number = 7): Promise<any[]> =>
+    api.get(`/kt-meetings/upcoming?days=${days}`).then((res) => res.data),
+
+  // Get specific KT meeting by ID
+  getById: (id: string): Promise<any> =>
+    api.get(`/kt-meetings/${id}`).then((res) => res.data),
+
+  // Create new KT meeting
+  create: (data: {
+    projectId: string;
+    scheduledDate: string;
+    duration?: number;
+    agenda?: string;
+    meetingLink?: string;
+    participantIds?: string[];
+  }): Promise<any> =>
+    api.post('/kt-meetings', data).then((res) => res.data),
+
+  // Update KT meeting
+  update: (id: string, data: {
+    scheduledDate?: string;
+    duration?: number;
+    agenda?: string;
+    meetingLink?: string;
+    status?: string;
+    notes?: string;
+    completedAt?: string;
+  }): Promise<any> =>
+    api.patch(`/kt-meetings/${id}`, data).then((res) => res.data),
+
+  // Delete KT meeting
+  delete: (id: string): Promise<{ message: string }> =>
+    api.delete(`/kt-meetings/${id}`).then((res) => res.data),
+
+  // Add participant to KT meeting
+  addParticipant: (meetingId: string, data: {
+    userId: string;
+    role?: string;
+    isRequired?: boolean;
+  }): Promise<any> =>
+    api.post(`/kt-meetings/${meetingId}/participants`, data).then((res) => res.data),
+
+  // Remove participant from KT meeting
+  removeParticipant: (meetingId: string, userId: string): Promise<{ message: string }> =>
+    api.delete(`/kt-meetings/${meetingId}/participants/${userId}`).then((res) => res.data),
+
+  // Update participant details (attendance, role, etc.)
+  updateParticipant: (meetingId: string, userId: string, data: {
+    attended?: boolean;
+    role?: string;
+    isRequired?: boolean;
+  }): Promise<any> =>
+    api.patch(`/kt-meetings/${meetingId}/participants/${userId}`, data).then((res) => res.data),
 };

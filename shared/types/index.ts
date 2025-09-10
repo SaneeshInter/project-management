@@ -71,6 +71,7 @@ export enum Department {
   QA = 'QA',
   DELIVERY = 'DELIVERY',
   MANAGER = 'MANAGER',
+  SALES_EXE = 'SALES_EXE',
 }
 
 export enum DepartmentWorkStatus {
@@ -96,6 +97,34 @@ export enum CorrectionStatus {
 }
 
 // Master table types
+export interface CategoryMaster {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  isActive: boolean;
+  defaultStartDept: Department;
+  estimatedTotalHours?: number;
+  estimatedTotalDays?: number;
+  createdAt: Date;
+  updatedAt: Date;
+  departmentMappings?: CategoryDepartmentMapping[];
+}
+
+export interface CategoryDepartmentMapping {
+  id: string;
+  categoryId: string;
+  department: Department;
+  sequence: number;
+  isRequired: boolean;
+  estimatedHours?: number;
+  estimatedDays?: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  category?: CategoryMaster;
+}
+
 export interface DepartmentMaster {
   id: string;
   name: string;
@@ -231,6 +260,8 @@ export interface Project {
   name: string;
   office: Office;
   category: ProjectCategory;
+  categoryMasterId?: string;
+  categoryMaster?: CategoryMaster;
   pagesCount?: number;
   currentDepartment: Department;
   nextDepartment?: Department;
@@ -270,11 +301,12 @@ export interface Project {
 export interface CreateProjectDto {
   name: string;
   office: string;
-  category: ProjectCategory;
+  category?: ProjectCategory;
+  categoryMasterId?: string;
   pagesCount?: number;
-  currentDepartmentId: string;
+  currentDepartmentId?: string;
   nextDepartmentId?: string;
-  targetDate: string;
+  targetDate?: string;
   status?: ProjectStatus;
   clientName?: string;
   observations?: string;
@@ -283,6 +315,14 @@ export interface CreateProjectDto {
   startDate?: string;
   projectCoordinatorId?: string;
   pcTeamLeadId?: string;
+  salesPersonId?: string;
+  // KT Meeting fields
+  scheduleKTMeeting?: boolean;
+  ktMeetingDate?: string;
+  ktMeetingDuration?: number;
+  ktMeetingAgenda?: string;
+  ktMeetingLink?: string;
+  ktMeetingParticipants?: string[];
 }
 
 // Task types
@@ -838,4 +878,52 @@ export interface CreateChecklistItemLinkDto {
 export interface CreateChecklistItemUpdateDto {
   date: string;
   notes: string;
+}
+
+// Category Management DTOs
+export interface CreateCategoryMasterDto {
+  name: string;
+  code: string;
+  description?: string;
+  defaultStartDept?: Department;
+  estimatedTotalHours?: number;
+  estimatedTotalDays?: number;
+}
+
+export interface UpdateCategoryMasterDto {
+  name?: string;
+  code?: string;
+  description?: string;
+  defaultStartDept?: Department;
+  estimatedTotalHours?: number;
+  estimatedTotalDays?: number;
+  isActive?: boolean;
+}
+
+export interface CreateCategoryDepartmentMappingDto {
+  categoryId: string;
+  department: Department;
+  sequence: number;
+  isRequired?: boolean;
+  estimatedHours?: number;
+  estimatedDays?: number;
+}
+
+export interface UpdateCategoryDepartmentMappingDto {
+  sequence?: number;
+  isRequired?: boolean;
+  estimatedHours?: number;
+  estimatedDays?: number;
+  isActive?: boolean;
+}
+
+export interface CategoryWorkflowDto {
+  categoryId: string;
+  departments: Array<{
+    department: Department;
+    sequence: number;
+    isRequired: boolean;
+    estimatedHours?: number;
+    estimatedDays?: number;
+  }>;
 }

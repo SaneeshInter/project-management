@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsOptional, IsInt, IsBoolean, IsDateString } from 'class-validator';
+import { IsString, IsEnum, IsOptional, IsInt, IsBoolean, IsDateString, ValidateIf } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ProjectCategory, ProjectStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
@@ -12,9 +12,16 @@ export class CreateProjectDto {
   @IsString()
   office: string;
 
-  @ApiProperty({ enum: ProjectCategory, example: ProjectCategory.MOBILE_APP })
+  @ApiPropertyOptional({ enum: ProjectCategory, example: ProjectCategory.MOBILE_APP })
   @IsEnum(ProjectCategory)
-  category: ProjectCategory;
+  @IsOptional()
+  category?: ProjectCategory;
+
+  @ApiPropertyOptional({ example: 'category-id-123' })
+  @IsString()
+  @ValidateIf((o) => !o.category)
+  @IsOptional()
+  categoryMasterId?: string;
 
   @ApiPropertyOptional({ example: 10 })
   @IsInt()
@@ -22,18 +29,20 @@ export class CreateProjectDto {
   @Type(() => Number)
   pagesCount?: number;
 
-  @ApiProperty({ example: 'dept-id-123' })
+  @ApiPropertyOptional({ example: 'dept-id-123' })
   @IsString()
-  currentDepartmentId: string;
+  @IsOptional()
+  currentDepartmentId?: string;
 
   @ApiPropertyOptional({ example: 'dept-id-456' })
   @IsString()
   @IsOptional()
   nextDepartmentId?: string;
 
-  @ApiProperty({ example: '2024-12-31T00:00:00Z' })
+  @ApiPropertyOptional({ example: '2024-12-31T00:00:00Z' })
   @IsDateString()
-  targetDate: string;
+  @IsOptional()
+  targetDate?: string;
 
   @ApiPropertyOptional({ enum: ProjectStatus, example: ProjectStatus.ACTIVE })
   @IsEnum(ProjectStatus)
@@ -74,4 +83,40 @@ export class CreateProjectDto {
   @IsString()
   @IsOptional()
   pcTeamLeadId?: string;
+
+  @ApiPropertyOptional({ example: 'user-id-789' })
+  @IsString()
+  @IsOptional()
+  salesPersonId?: string;
+
+  // KT Meeting fields
+  @ApiPropertyOptional({ example: true })
+  @IsBoolean()
+  @IsOptional()
+  scheduleKTMeeting?: boolean;
+
+  @ApiPropertyOptional({ example: '2024-12-15T10:00:00Z' })
+  @IsDateString()
+  @IsOptional()
+  ktMeetingDate?: string;
+
+  @ApiPropertyOptional({ example: 60 })
+  @IsInt()
+  @IsOptional()
+  @Type(() => Number)
+  ktMeetingDuration?: number;
+
+  @ApiPropertyOptional({ example: 'Project knowledge transfer and workflow review' })
+  @IsString()
+  @IsOptional()
+  ktMeetingAgenda?: string;
+
+  @ApiPropertyOptional({ example: 'https://meet.google.com/xyz-abc-def' })
+  @IsString()
+  @IsOptional()
+  ktMeetingLink?: string;
+
+  @ApiPropertyOptional({ example: ['user-id-123', 'user-id-456'] })
+  @IsOptional()
+  ktMeetingParticipants?: string[];
 }
